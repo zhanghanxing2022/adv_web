@@ -1,6 +1,25 @@
 <mat-drawer-container class="example-container">
     <mat-drawer #drawer mode="over">
-        <div style="width: 400px;"></div>
+        <div style="width: 400px;">
+            <mat-list *ngFor="let room in roomList">
+                <mat-list-item>{{ room}}
+                    <button mat-flat-button color="accent">Join</button>
+                </mat-list-item>
+            </mat-list>
+        </div>
+        
+        <mat-divider></mat-divider>
+        <div style="display: inline-flex;align-content: center;justify-content: center;margin:10px ;">
+            <mat-form-field style="display: block;" appearance="fill">
+                <mat-label>Create Room</mat-label>
+                <input matInput placeholder="Placeholder" [(ngModel)]="newRoom">
+
+                <mat-hint>Hint</mat-hint>
+            </mat-form-field>
+            <button style="display: block;" mat-flat-button color="accent"(click)="create_room()" >Create</button>
+        </div>
+
+
     </mat-drawer>
     <mat-drawer-content>
 
@@ -8,5 +27,8 @@
     </mat-drawer-content>
 </mat-drawer-container>
 <div class="bubble">
-    <span>zhx:</span><span>sdjsfhnhb</span>
+    <div class="bubble-content">
+        <span>zhx:</span><span>sdjsfhnhb</span>
+    </div>
+
 </div>

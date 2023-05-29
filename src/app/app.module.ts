@@ -5,7 +5,7 @@ import { MatInputModule } from '@angular/material/input';
 import { MatButtonModule } from '@angular/material/button';
 import { HttpClientModule } from '@angular/common/http';
 import {MatSidenavModule} from '@angular/material/sidenav';
-
+import {MatListModule} from '@angular/material/list';
 import { AppComponent } from './app.component';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { RegisterComponent } from './register/register.component';
@@ -14,7 +14,9 @@ import { LoginComponent } from './login/login.component';
 import { HomepageComponent } from './homepage/homepage.component';
 import { PersonalInfoComponent } from './personal-info/personal-info.component';
 import { ChatComponent } from './chat/chat.component';
-
+import { SocketIoService } from './socket-io.service';
+import { FormsModule } from '@angular/forms';
+import { ChatInRoomService } from './chat-in-room.service';
 
 
 @NgModule({
@@ -34,6 +36,8 @@ import { ChatComponent } from './chat/chat.component';
     MatButtonModule,
     HttpClientModule,
     MatSidenavModule,
+    MatListModule,
+    FormsModule,
     RouterModule.forRoot([
       { path : "", component : HomepageComponent },
       { path : "user/login", component : LoginComponent },
@@ -41,7 +45,9 @@ import { ChatComponent } from './chat/chat.component';
       { path : "user/personalInfo/:id", component : PersonalInfoComponent }
     ])
   ],
-  providers: [],
+  providers: [
+    ChatInRoomService
+  ],
   bootstrap: [AppComponent]
 })
 export class AppModule { }
