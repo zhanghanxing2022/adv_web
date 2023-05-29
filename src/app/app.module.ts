@@ -4,7 +4,7 @@ import { BrowserModule } from '@angular/platform-browser';
 import { MatInputModule } from '@angular/material/input';
 import { MatButtonModule } from '@angular/material/button';
 import { HttpClientModule } from '@angular/common/http';
-
+import {MatSidenavModule} from '@angular/material/sidenav';
 
 import { AppComponent } from './app.component';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
@@ -13,6 +13,7 @@ import { RouterModule } from '@angular/router';
 import { LoginComponent } from './login/login.component';
 import { HomepageComponent } from './homepage/homepage.component';
 import { PersonalInfoComponent } from './personal-info/personal-info.component';
+import { ChatComponent } from './chat/chat.component';
 
 
 
@@ -23,6 +24,7 @@ import { PersonalInfoComponent } from './personal-info/personal-info.component';
     LoginComponent,
     HomepageComponent,
     PersonalInfoComponent,
+    ChatComponent,
   ],
   imports: [
     BrowserModule,
@@ -31,6 +33,7 @@ import { PersonalInfoComponent } from './personal-info/personal-info.component';
     ReactiveFormsModule,
     MatButtonModule,
     HttpClientModule,
+    MatSidenavModule,
     RouterModule.forRoot([
       { path : "", component : HomepageComponent },
       { path : "user/login", component : LoginComponent },
