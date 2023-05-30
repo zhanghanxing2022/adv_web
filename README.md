@@ -1,27 +1,127 @@
-# Lab3
+# adv_web
 
-This project was generated with [Angular CLI](https://github.com/angular/angular-cli) version 15.1.6.
+[toc]
 
-## Development server
+<p style="color:red;">！ 注意分分支开发</p>
 
-Run `ng serve` for a dev server. Navigate to `http://localhost:4200/`. The application will automatically reload if you change any of the source files.
+lab3交两个东西：自己的lab3为主，这个为辅。
 
-## Code scaffolding
+## 房间与Scene
 
-Run `ng generate component component-name` to generate a new component. You can also use `ng generate directive|pipe|service|class|guard|interface|enum|module`.
+1. 房间初始化、资源的释放：防止占用浏览器内存
 
-## Build
+   Room：房间资源的释放和加载
+2. **`<u>`场景设置`</u>`**
 
-Run `ng build` to build the project. The build artifacts will be stored in the `dist/` directory.
+   1. 暂时使用老师的town
+   2. 根据模板 /tag 创建房间
+   3. **场景内跳转**
+3. 场景的切换：场景内切换。
+4. 聊天：和房间关联。
 
-## Running unit tests
+## Player
 
-Run `ng test` to execute the unit tests via [Karma](https://karma-runner.github.io).
+1. player
+2. localplayer
 
-## Running end-to-end tests
+> 用户可以选择自己的虚拟形象以在进入3D场景时与其他用户区分开来;
 
-Run `ng e2e` to execute the end-to-end tests via a platform of your choice. To use this command, you need to first add a package that implements end-to-end testing capabilities.
+## game
 
-## Further help
+1. 做一个魔方
+2. 做一些算法的展示
 
-To get more help on the Angular CLI use `ng help` or go check out the [Angular CLI Overview and Command Reference](https://angular.io/cli) page.
+> 有教学意义的Web 3D场景，可以是一个丰富的大场景或者由几个案例组合起来。
+>
+> 环境中可以有一些可交互性的实体(如可以打开的⻔)。
+
+## service
+
+1. 实现和socket交互和多人同时在线的service
+
+   前端：使用angular实现socket
+
+   > 实现
+   >
+2. 实现一个后台页面，展示房间、用户、形象
+
+   > 图表化展示后台记录的
+   > 数据
+   >
+
+> 加入一些人工智能因素，增加一个由计算机控制的智能虚拟人(NPC)，比如导游、服务员。可以根据用户化身 的行为做简单的响应，比如介绍景点等。
+
+## 第一阶段 :完成“脚手架”的构建
+
+主要目标：将之前实现的功能：前台页面、用户后台页面、支持多人、维护世界一致性
+
+使用angular复现，暂时不考虑太多游戏核心设计。
+
+### 登录注册
+
+1. 前段页面后端数据库操作
+2. 登陆之后进个人中心
+3. 功能：
+   1. 动态展示个人形象
+   2. 更改当前人物形象
+   3. 只有在个人中心可以修改个人形象
+   4. 后端存储个人形象选择历史
+   5. 可以在个人中心查看形象选择历史
+
+### 选择世界和人物形象
+
+#### 世界：
+
+1. 世界相当于王者的服务器，每个世界内部的房间都是预设，不能修改。
+2. 世界不能创建
+3. 世界分很多房间
+4. 存储他的世界选择历史
+5. 前段展示世界选择历史
+6. 世界内的聊天：
+
+   1. 页面左下角：
+   2. 没有人说话不显示
+   3. 没有按enter只显示最近几条，热更新，太长了省略号结尾
+   4. 只展示最近10条
+   5. 按回车显示记录，并显示对话框
+
+      全部交给前段
+
+      > 1. 实现一个component
+      > 2. 实现一个service
+      > 3. 使用Socket.io
+      >
+
+### 任务及负责人
+
+1. 目标：根据你的场景，可选提供历史行为查看和分析功能：苏佳迪
+
+   ##### 后端
+
+
+   1. 数据库：存储用户人物形象，选择的世界，基本信息，
+   2. 拦截，token，注解
+   3. REST ful接口：专门文档
+
+   ##### 前端
+
+   1. profile页面，显示历史行为数据
+2. 目标：人物形象展示和修改、世界的加载：
+
+   ##### `<u>`人物的加载`</u>`
+
+   ##### 世界的加载
+
+   注意：three.js资源的释放
+3. 目标：聊天和房间：张涵星
+
+   ##### 服务：
+
+
+   1. service
+
+   ##### Socket.io:
+
+   1. mock
+
+   实现目标：一个component，使用房间号初始化
