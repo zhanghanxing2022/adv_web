@@ -16,8 +16,8 @@ import { PersonalInfoComponent } from './personal-info/personal-info.component';
 import { ChatComponent } from './chat/chat.component';
 import { SocketIoService } from './socket-io.service';
 import { FormsModule } from '@angular/forms';
-import { ChatInRoomService } from './chat-in-room.service';
-
+import { CommonModule } from "@angular/common";
+import {MatCardModule} from '@angular/material/card';
 
 @NgModule({
   declarations: [
@@ -38,6 +38,8 @@ import { ChatInRoomService } from './chat-in-room.service';
     MatSidenavModule,
     MatListModule,
     FormsModule,
+    MatCardModule,
+    CommonModule,
     RouterModule.forRoot([
       { path : "", component : HomepageComponent },
       { path : "user/login", component : LoginComponent },
@@ -46,7 +48,6 @@ import { ChatInRoomService } from './chat-in-room.service';
     ])
   ],
   providers: [
-    ChatInRoomService
   ],
   bootstrap: [AppComponent]
 })

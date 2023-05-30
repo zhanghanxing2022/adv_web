@@ -1,49 +1,56 @@
 import { Injectable } from '@angular/core';
-import { SocketIoService } from './socket-io.service';
-import { io } from "socket.io-client";
+import { io, Socket } from "socket.io-client";
 import { Observable } from 'rxjs';
 @Injectable({
   providedIn: 'root'
 })
-export class ChatInRoomService {
-  private url = 'http://localhost:3000';  // 后台服务端口
-  private socket: any;
-  constructor()
-  {
-    this.socket = null;
+class ChatInRoomService {
+  private url = 'ws://localhost:3000';  // 后台服务端口
+  private socket: Socket;
+  constructor() {
+    this.socket = io(this.url, {
+      transports: ["websocket"]
+    });
+    console.log(this.socket);
+    this.socket.on("connect", () => {
+      console.log(this.socket.disconnected); // false
+    });
+
+    this.socket.on("disconnect", () => {
+      console.log(this.socket.disconnected); // true
+    });
   }
   join_room(roomName: string) {
+    this.socket.connect();
     this.socket.emit("join room", roomName);
+    
   }
-  create_room(newRoom:string)
-  {
+  create_room(newRoom: string) {
+    this.socket.connect();
+    console.log("emit new room");
     this.socket.emit('new room', newRoom);
   }
-  getRooms():Observable<any>
-  {
+  getRooms(): Observable<Map<string,Set<string>>> {
     return new Observable(observer => {
-      if(this.socket)
-      {
-      }else
-      {
-        this.socket = io(this.url);
+      if (!this.socket.connected) {
+        this.socket.connect();
+        console.log("try connect");
       }
-      this.socket.on('getRooms', (data: any) => {
+      this.socket.on('rooms', (data: Map<string,Set<string>>) => {
+        console.log(data);
         observer.next(data);
+        
       });
       return () => {
         this.socket.disconnect();
       }
     })
   }
-  setId():Observable<any>
-  {
+  setId(): Observable<any> {
     return new Observable(observer => {
-      if(this.socket)
-      {
-      }else
-      {
-        this.socket = io(this.url);
+      if (!this.socket.connected) {
+        this.socket.connect();
+        console.log("try connect");
       }
       this.socket.on('setId', (data: any) => {
         observer.next(data);

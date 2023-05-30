@@ -1,15 +1,29 @@
 <mat-drawer-container class="example-container">
-    <mat-drawer #drawer mode="over">
+    <mat-drawer #drawer mode="over" >
         <div style="width: 400px;">
-            <mat-list *ngFor="let room in roomList">
-                <mat-list-item>{{ room}}
-                    <button mat-flat-button color="accent">Join</button>
+            <mat-list >
+                <mat-list-item *ngFor="let room of roomList">
+                    {{ room}}
+                    <button mat-flat-button color="accent"(click)="join_room(room)">Join</button>
                 </mat-list-item>
             </mat-list>
         </div>
+        <div class="chat-container">
+            <mat-card *ngFor="let mess of messList">
+                <mat-card-header>
+                  <mat-card-title>{{mess.name}}</mat-card-title>
+                </mat-card-header>
+                <mat-card-content>
+                    <p>
+                      {{mess.mess}}
+                    </p>
+                  </mat-card-content>
+              </mat-card>
+            </div>
         
         <mat-divider></mat-divider>
-        <div style="display: inline-flex;align-content: center;justify-content: center;margin:10px ;">
+        <div style="display: inline-flex;align-content: center;justify-content: center;margin:10px ;
+        scroll-snap-align: end;">
             <mat-form-field style="display: block;" appearance="fill">
                 <mat-label>Create Room</mat-label>
                 <input matInput placeholder="Placeholder" [(ngModel)]="newRoom">
@@ -18,17 +32,32 @@
             </mat-form-field>
             <button style="display: block;" mat-flat-button color="accent"(click)="create_room()" >Create</button>
         </div>
+        <div style="position: sticky;
+        bottom: 0;
+        padding: 10px; 
+        left: 0;
+        box-shadow: 0 5 5 5 gray;
+        background-color: aquamarine;
+        display: flex;
+        justify-content: space-around;
+        align-content: center;
+        ">
+        <input style="height: 30px;width:300px ; display: block; border-radius: 10px;" type="email" matInput [(ngModel)]="mess" placeholder="message">
+          <button style="height: 30px;width: 50px;display: block; border-radius: 10px;" mat-flat-button color="accent"(click)="send_message()">Send</button>
+
+        </div>
+        
 
 
     </mat-drawer>
     <mat-drawer-content>
 
-        <button mat-raised-button (click)="drawer.toggle()">Toggle drawer</button>
+        <button mat-raised-button (click)="drawer.toggle();closeBubble()">Toggle drawer</button>
     </mat-drawer-content>
 </mat-drawer-container>
-<div class="bubble">
+<div class="bubble" #bubble>
     <div class="bubble-content">
-        <span>zhx:</span><span>sdjsfhnhb</span>
+        <span>{{new_mess_author}}:</span><span>{{new_mess_text}}</span>
     </div>
 
 </div>

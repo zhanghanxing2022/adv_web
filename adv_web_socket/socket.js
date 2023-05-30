@@ -3,7 +3,7 @@ const app = express();
 const http = require('http').Server(app,
 	{
 		cors: {
-			origin: "http://localhost:4200"
+			origin: "*"
 		}
 	});
 const io = require('socket.io')(http);
@@ -12,19 +12,17 @@ http.listen(3000, function () {
 	console.log('listening on *:3000');
 });
 
-var roomList = [];
 var packList = [];
 var a = 0;
 io.on('connection', function (socket) {
-	console.log(a);
+	console.log(socket.id);
 	a+=1;
 	socket.username = "";
 	socket.userData = { x: 0, y: 0, z: 0, heading: 0 };//Default values;
-	socket.emit("getRooms", roomList)
 	socket.emit('setId', { id: socket.id });
 	console.log('a user connected ');
 
-	io.emit('rooms', getRooms('connected'));
+	io.emit('rooms', getRooms());
 
 
 	socket.on('disconnect', function () {
@@ -33,24 +31,21 @@ io.on('connection', function (socket) {
 
 	socket.on('new room', function (room) {
 		console.log(`A new room is created ${room}`);
-		roomList.push(room);
 		socket.room = room;
 		socket.join(room);
-		io.emit('rooms', getRooms('new room'));
-		io.emit("getRooms", roomList)
+		io.emit('rooms', getRooms());
 	});
 
 	socket.on('join room', function (room) {
 		console.log(`A new user joined room ${room}`);
 		socket.room = room;
 		socket.join(room);
-		io.emit('rooms', getRooms('joined room'));
-		io.emit("getRooms", roomList)
+		io.emit('rooms', getRooms());
 	});
 
 	socket.on('chat message', function (data) {
 		console.log(`chat message:${data.id} ${data.message}`);
-		io.to(data.id).emit('chat message', { id: socket.id, message: data.message });
+		io.in(socket.room).emit('chat message', { id: socket.id, message: data.message });
 	});
 
 	socket.on('set username', function (name) {
@@ -81,54 +76,27 @@ io.on('connection', function (socket) {
 });
 
 
-
-function arrayDiff(arr1, arr2) {
-	var set2 = new Set(arr2);
-	var subset = [];
-	arr1.forEach(function (val, index) {
-		if (!set2.has(val)) {
-			subset.push(val);
-		}
-	});
-	return subset;
-};
-
 setInterval(function () {
 	const nsp = io.of('/');
 	const rooms = nsp.adapter.rooms;
-	/*Returns data in this form
-	{
-		'roomid1': { 'socketid1', socketid2', ...},
-		...
-	}
-	
-	*/
-	// console.log('getRooms rooms>>' + util.inspect(rooms));
-	console.log('getRooms roomList>>' + util.inspect(roomList));
-	let to_delete = []
+	io.emit("rooms", getRooms());
+	console.log(util.inspect(rooms));
 
-	for (let roomId in roomList) {
-		let pack = [];
-		let data_room = "";
+	rooms.forEach((key,val)=>{
+		if(key.has(val)&&key.size==1)
+		{
+			return
+		}else
+		{
+			let pack = [];
 
-		const room = rooms[roomList[roomId]];
-
-		console.log(roomList[roomId]);
-		if (room == undefined) {
-
-			to_delete.push(roomList[roomId]);
-		} else if (room.sockets.length == 0) {
-			to_delete.push(roomList[roomId]);
-		} else {
-			for (let socketId in room.sockets) {
-
-				const socket = nsp.connected[socketId];
-				data_room = socket.room;
-				//Only push sockets that have been initialised
-				if (socket.userData !== undefined && socket.userData.model !== undefined) {
+			key.forEach((socketId)=>
+			{
+				const socket = nsp.sockets.get(socketId);
+				if (socket?.userData!==undefined&& socket.userData.model!==undefined){
 					pack.push({
 						id: socket.id,
-						name: socket.username,
+						name:socket.username,
 						model: socket.userData.model,
 						colour: socket.userData.colour,
 						x: socket.userData.x,
@@ -137,47 +105,27 @@ setInterval(function () {
 						heading: socket.userData.heading,
 						pb: socket.userData.pb,
 						action: socket.userData.action
-					});
+					});    
 				}
-			}
-			io.in(data_room).emit('remoteData', pack);
+			});
+			io.in(val).emit('remoteData', pack);
 		}
-	}
-	console.log("to_delete", to_delete);
-	roomList = arrayDiff(roomList, to_delete)
-	if (to_delete.length > 0) {
-		io.emit("getRooms", roomList)
-	}
-}, 40);
+	})
+},40);
 
-function getRooms(msg) {
+function getRooms() {
 	const nsp = io.of('/');
-	const rooms = nsp.adapter.rooms;
-	/*Returns data in this form
-	{
-		'roomid1': { 'socketid1', socketid2', ...},
-		...
-	}
-	*/
-	//console.log('getRooms rooms>>' + util.inspect(rooms));
-	const list = {};
-	for (let roomId in rooms) {
-		const room = rooms[roomId];
-		if (room === undefined) continue;
-		const sockets = [];
-		let roomName = "";
-		//console.log('getRooms room>>' + util.inspect(room));
-		for (let socketId in room.sockets) {
-			const socket = nsp.connected[socketId];
-			if (socket === undefined || socket.username === undefined || socket.room === undefined) continue;
-			//console.log(`getRooms socket(${socketId})>>${socket.username}:${socket.room}`);
-			sockets.push(socket.username);
-			if (roomName == "") roomName = socket.room;
+	const rooms= nsp.adapter.rooms;
+	res=[];
+	rooms.forEach((key,val)=>{
+		
+		if(key.has(val)&&key.size==1)
+		{
+			return
+		}else
+		{
+			res.push(val);
 		}
-		if (roomName != "") list[roomName] = sockets;
-	}
-
-	console.log(`getRooms: ${msg} >>` + util.inspect(list));
-
-	return list;
+	})
+	return res;
 }
