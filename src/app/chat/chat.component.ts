@@ -70,6 +70,7 @@ export class ChatComponent implements OnInit {
     this.socket.emit('join room', roomName);
   }
   create_room() {
+    if(this.newRoom)
     this.socket.emit('new room', this.newRoom);
   }
   send_message() {
