@@ -17,7 +17,10 @@ import { ChatComponent } from './chat/chat.component';
 import { SocketIoService } from './socket-io.service';
 import { FormsModule } from '@angular/forms';
 import { CommonModule } from "@angular/common";
-import {MatCardModule} from '@angular/material/card';
+import { MatCardModule } from '@angular/material/card';
+import * as THREE from 'three'
+import { OrbitControls } from 'three-orbitcontrols-ts';
+
 
 @NgModule({
   declarations: [
@@ -45,7 +48,7 @@ import {MatCardModule} from '@angular/material/card';
       { path : "user/login", component : LoginComponent },
       { path : "user/register", component : RegisterComponent},
       { path : "user/personalInfo/:id", component : PersonalInfoComponent }
-    ])
+    ]),
   ],
   providers: [
   ],
