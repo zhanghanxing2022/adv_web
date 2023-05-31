@@ -20,6 +20,8 @@ import { CommonModule } from "@angular/common";
 import { MatCardModule } from '@angular/material/card';
 import * as THREE from 'three'
 import { OrbitControls } from 'three-orbitcontrols-ts';
+import { PersonalCenterComponent } from './personal-center/personal-center.component';
+import { TestComponent } from './test/test.component';
 
 
 @NgModule({
@@ -30,6 +32,8 @@ import { OrbitControls } from 'three-orbitcontrols-ts';
     HomepageComponent,
     PersonalInfoComponent,
     ChatComponent,
+    PersonalCenterComponent,
+    TestComponent,
   ],
   imports: [
     BrowserModule,
@@ -47,7 +51,9 @@ import { OrbitControls } from 'three-orbitcontrols-ts';
       { path : "", component : HomepageComponent },
       { path : "user/login", component : LoginComponent },
       { path : "user/register", component : RegisterComponent},
-      { path : "user/personalInfo/:id", component : PersonalInfoComponent }
+      { path : "user/personalInfo/:id", component : PersonalInfoComponent },
+      { path : "user/personalCenter", component : PersonalCenterComponent},
+      { path : "test", component : TestComponent }
     ]),
   ],
   providers: [
