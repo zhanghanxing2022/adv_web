@@ -26,7 +26,7 @@ import { MatRadioModule } from '@angular/material/radio';
 import { MatSelectModule } from '@angular/material/select';
 import { MatToolbarModule } from '@angular/material/toolbar'
 import { MatGridListModule } from '@angular/material/grid-list';
-
+import { MatIconModule } from '@angular/material/icon';
 
 @NgModule({
   declarations: [
@@ -55,6 +55,7 @@ import { MatGridListModule } from '@angular/material/grid-list';
     MatSelectModule,
     MatToolbarModule,
     MatGridListModule,
+    MatIconModule,
     RouterModule.forRoot([
       { path : "", component : HomepageComponent },
       { path : "user/login", component : LoginComponent },
