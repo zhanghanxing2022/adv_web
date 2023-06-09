@@ -1,1 +1,62 @@
-<div class="character-display" #Three></div>
+<mat-toolbar>
+  Personal Center
+</mat-toolbar>
+
+<mat-sidenav-container>
+  <mat-sidenav>
+
+  </mat-sidenav>
+  <mat-sidenav-content>
+    
+  </mat-sidenav-content>
+</mat-sidenav-container>
+
+<mat-grid-list cols="4" rowHeight="160px">
+  <!-- 左侧 3x1 网格 -->
+  <mat-grid-tile colspan="3" rowspan="3">
+    <div class="left-grid" #Three>
+      <!-- 这里放置你的内容 -->
+      <!-- <div #Three>Left Content</div> -->
+    </div>
+    <div id="overlay">
+      <div class="text-box">
+        <h2>Welcome to the Scene</h2>
+        <p>This is a description of the scene.</p>
+      </div>
+    </div>
+  </mat-grid-tile>
+  <!-- 右侧 3x1 网格 -->
+  <mat-grid-tile [style.backgroundColor]="'#F7F6F6'">
+    <button mat-button [style.backgroundColor]="'#1092F9 '" [style.height]="'60px'" [style.width]="'60%'" (click)="Idle()">Idle</button>
+  </mat-grid-tile>
+  <mat-grid-tile [style.backgroundColor]="'#F7F6F6'">
+    <button mat-button [style.backgroundColor]="'#1092F9 '" [style.height]="'60px'" [style.width]="'60%'" (click)="Walking()">Walking</button>
+  </mat-grid-tile>
+  <mat-grid-tile [style.backgroundColor]="'#F7F6F6'">
+    <button mat-button [style.backgroundColor]="'#1092F9 '" [style.height]="'60px'" [style.width]="'60%'" (click)="Running()">Running</button>
+  </mat-grid-tile>
+</mat-grid-list>
+
+<mat-grid-list cols="2" rowHeight="80px" class="options">
+  <mat-grid-tile colspan="1" rowspan="1">
+    <mat-form-field appearance="fill" class="select">
+      <mat-label>Select an character</mat-label>
+      <mat-select [(value)]="selected_character" (valueChange)="handleCharacterChange()">
+        <mat-option *ngFor="let character of characterList" [value]="character">
+          {{ character }}
+        </mat-option>
+      </mat-select>
+    </mat-form-field>
+  </mat-grid-tile>
+
+  <mat-grid-tile colspan="1" rowspan="1">
+    <mat-form-field appearance="fill" class="select">
+      <mat-label>Select color</mat-label>
+      <mat-select [(value)]="selected_skin" (valueChange)="handleSkinChange()">
+        <mat-option *ngFor="let skin of skinList" [value]="skin">
+          {{ skin }}
+        </mat-option>
+      </mat-select>
+    </mat-form-field>
+  </mat-grid-tile>
+</mat-grid-list>

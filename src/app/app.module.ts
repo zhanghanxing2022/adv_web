@@ -22,6 +22,10 @@ import * as THREE from 'three'
 import { OrbitControls } from 'three-orbitcontrols-ts';
 import { PersonalCenterComponent } from './personal-center/personal-center.component';
 import { TestComponent } from './test/test.component';
+import { MatRadioModule } from '@angular/material/radio';
+import { MatSelectModule } from '@angular/material/select';
+import { MatToolbarModule } from '@angular/material/toolbar'
+import { MatGridListModule } from '@angular/material/grid-list';
 
 
 @NgModule({
@@ -47,6 +51,10 @@ import { TestComponent } from './test/test.component';
     FormsModule,
     MatCardModule,
     CommonModule,
+    MatRadioModule,
+    MatSelectModule,
+    MatToolbarModule,
+    MatGridListModule,
     RouterModule.forRoot([
       { path : "", component : HomepageComponent },
       { path : "user/login", component : LoginComponent },
