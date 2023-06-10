@@ -1,4 +1,3 @@
-import { render } from '@angular-three/core';
 import { Component, ElementRef, ViewChild, OnChanges, SimpleChanges, Input } from '@angular/core';
 import * as THREE from 'three'
 import { OrbitControls } from 'three-orbitcontrols-ts';
