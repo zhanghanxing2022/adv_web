@@ -10,7 +10,7 @@ import { Router } from '@angular/router';
 })
 export class RegisterComponent{
   constructor(public http : HttpClient, public router : Router){}
-  private ip = "34.201.157.50"
+  private ip = "localhost"
   private url = `http://${this.ip}:8080/user/`
   emailFormControl = new FormControl('', [Validators.required, Validators.email]);
   nameFormControl = new FormControl('', [Validators.pattern('^[A-Za-z0-9]+$'), Validators.minLength(6)]);
@@ -48,6 +48,8 @@ export class RegisterComponent{
       (response : any) => {
         window.alert("注册成功");
         this.router.navigateByUrl("user/login");
+      }, response => {
+        window.alert(response.error);
       }
     )
   }

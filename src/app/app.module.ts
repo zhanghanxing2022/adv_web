@@ -59,7 +59,7 @@ import { MatGridListModule } from '@angular/material/grid-list';
       { path : "", component : HomepageComponent },
       { path : "user/login", component : LoginComponent },
       { path : "user/register", component : RegisterComponent},
-      { path : "user/personalInfo/:id", component : PersonalInfoComponent },
+      { path : "user/personalInfo", component : PersonalInfoComponent },
       { path : "user/personalCenter", component : PersonalCenterComponent},
       { path : "test", component : TestComponent }
     ]),

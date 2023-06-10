@@ -16,15 +16,12 @@ export class PersonalInfoComponent implements OnInit{
   }
 
   getUser(): void {
-    const id = Number(this.route.snapshot.paramMap.get('id'));
-    this.userService.getUserById(id)
+    this.userService.getUser()
       .subscribe(response => {
-        console.log(response.message);
-        if (response.message === "token"){
-          alert("请登录!");
-          this.router.navigateByUrl("user/login");
-        }
-        this.user = response.data;
+        this.user = JSON.parse(JSON.stringify(response));
+      }, response => {
+        window.alert("请登录！");
+        this.router.navigateByUrl("user/login");
       })
   }
 

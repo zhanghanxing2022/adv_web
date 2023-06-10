@@ -11,8 +11,8 @@ import { Router } from '@angular/router';
 })
 export class LoginComponent {
   constructor(public http : HttpClient, public router : Router){}
-  private ip = "34.201.157.50";
-  //private ip = "localhost"
+  // private ip = "34.201.157.50";
+  private ip = "localhost"
   private url = `http://${this.ip}:8080/user/`;
   emailFormControl = new FormControl('', [Validators.required, Validators.email]);
   passwordFormControl = new FormControl('', [Validators.pattern('^[A-Za-z0-9]+$'), Validators.minLength(6)]);
@@ -37,7 +37,10 @@ export class LoginComponent {
         }
         alert("登录成功");
         sessionStorage.setItem("token", response.token);
-        this.router.navigateByUrl("user/personalInfo/" + response.data.id)
+        this.router.navigateByUrl("user/personalInfo")
+      }, response => {
+        console.log(response);
+        window.alert(response.error);
       }
     )
   }
