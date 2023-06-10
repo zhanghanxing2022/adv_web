@@ -12,7 +12,7 @@ import { Location } from '@angular/common';
 export class PersonalInfoComponent implements OnInit{
   user? : User;
   ngOnInit(): void {
-      this.getUser();
+      // this.getUser();
   }
 
   getUser(): void {
