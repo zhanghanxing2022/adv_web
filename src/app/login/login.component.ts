@@ -22,6 +22,10 @@ export class LoginComponent {
       alert("输入有误")
       return;
     }
+    sessionStorage.setItem("email",String(this.emailFormControl.value));
+    this.router.navigateByUrl("user/game");
+    return;
+
     let body = {
       id : 0,
       email : this.emailFormControl.value,
