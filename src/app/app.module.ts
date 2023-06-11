@@ -21,7 +21,13 @@ import { MatCardModule } from '@angular/material/card';
 import * as THREE from 'three'
 import { OrbitControls } from 'three-orbitcontrols-ts';
 import { GameComponent } from './game/game.component';
-
+import { PersonalCenterComponent } from './personal-center/personal-center.component';
+import { TestComponent } from './test/test.component';
+import { MatRadioModule } from '@angular/material/radio';
+import { MatSelectModule } from '@angular/material/select';
+import { MatToolbarModule } from '@angular/material/toolbar'
+import { MatGridListModule } from '@angular/material/grid-list';
+import { MatIconModule } from '@angular/material/icon';
 
 @NgModule({
   declarations: [
@@ -32,6 +38,8 @@ import { GameComponent } from './game/game.component';
     PersonalInfoComponent,
     ChatComponent,
     GameComponent,
+    PersonalCenterComponent,
+    TestComponent,
   ],
   imports: [
     BrowserModule,
@@ -45,12 +53,19 @@ import { GameComponent } from './game/game.component';
     FormsModule,
     MatCardModule,
     CommonModule,
+    MatRadioModule,
+    MatSelectModule,
+    MatToolbarModule,
+    MatGridListModule,
+    MatIconModule,
     RouterModule.forRoot([
       { path : "", component : HomepageComponent },
       { path : "user/login", component : LoginComponent },
       { path : "user/register", component : RegisterComponent},
-      { path : "user/personalInfo/:id", component : PersonalInfoComponent },
-      { path : "user/game",component:GameComponent}
+      { path : "user/game",component:GameComponent},
+      { path : "user/personalInfo", component : PersonalInfoComponent },
+      { path : "user/personalCenter", component : PersonalCenterComponent},
+      { path : "test", component : TestComponent }
     ]),
   ],
   providers: [

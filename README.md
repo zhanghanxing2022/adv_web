@@ -125,3 +125,10 @@ lab3交两个东西：自己的lab3为主，这个为辅。
    1. mock
 
    实现目标：一个component，使用房间号初始化
+
+### 模型的material：
+1. rabbit
+   0 : skirt
+   2 : skin
+   3 : inner-ear
+2. 
