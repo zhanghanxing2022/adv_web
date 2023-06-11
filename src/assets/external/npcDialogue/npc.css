@@ -4,20 +4,22 @@
     left: 0;
     width: 100%;
     height: auto;
-    background-color: rgba(248, 248, 248, 0.5);
-    padding: 20px;
+    background-color: rgba(32, 23, 113, 0.5);
     box-sizing: border-box;
     display: none;
     z-index: 9999;
     padding: 20px;
+    margin-bottom: 10px;
 }
 
 #npc-message {
+
     white-space: nowrap;
     overflow: hidden;
-    min-height: 40%;
     padding: 20px;
+    height: auto;
     min-width: 30px;
+    margin-bottom: 10px;
     animation: showChars 1s steps(100);
 }
 
@@ -44,7 +46,10 @@
     justify-content: center;
     align-items: flex-end;
 }
-
+#npc-name
+{
+    font-size: 20px;
+}
 .child-div {
     max-width: 100px;
     height: auto;
@@ -54,7 +59,7 @@
     flex: 0 0 auto;
     margin: 10px 10px;
     padding: 10px;
-    background-color: rgba(248, 248, 248, 0.5);
+    background-color: rgba(61, 28, 132, 0.694);
     border-radius: 5px;
 }
 

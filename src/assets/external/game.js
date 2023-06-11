@@ -1,17 +1,17 @@
-class Game{
-	constructor(){
-		if ( ! Detector.webgl ) Detector.addGetWebGLMessage();
+class Game {
+	constructor() {
+		if (!Detector.webgl) Detector.addGetWebGLMessage();
 
 		this.modes = Object.freeze({
-			NONE:   Symbol("none"),
+			NONE: Symbol("none"),
 			PRELOAD: Symbol("preload"),
-			INITIALISING:  Symbol("initialising"),
+			INITIALISING: Symbol("initialising"),
 			CREATING_LEVEL: Symbol("creating_level"),
 			ACTIVE: Symbol("active"),
 			GAMEOVER: Symbol("gameover")
 		});
 		this.mode = this.modes.NONE;
-		
+
 		this.container;
 		this.player;
 		this.cameras;
@@ -20,31 +20,31 @@ class Game{
 		this.renderer;
 		this.animations = {};
 		this.assetsPath = 'assets/';
-		
+
 		this.remotePlayers = [];
 		this.remoteColliders = [];
 		this.initialisingPlayers = [];
 		this.remoteData = [];
-		
-		this.messages = { 
-			text:[ 
-			"Welcome to Blockland",
-			"GOOD LUCK!"
+
+		this.messages = {
+			text: [
+				"Welcome to Blockland",
+				"GOOD LUCK!"
 			],
-			index:0
+			index: 0
 		}
-		
-		this.container = document.createElement( 'div' );
+
+		this.container = document.createElement('div');
 		this.container.style.height = '100%';
-		document.body.appendChild( this.container );
-		
+		document.body.appendChild(this.container);
+
 		const sfxExt = SFX.supportsAudioType('mp3') ? 'mp3' : 'ogg';
-        
+
 		const game = this;
 		this.anims = ['Walking', 'Walking Backwards', 'Turn', 'Running', 'Pointing', 'Talking', 'Pointing Gesture'];
-		
+
 		const options = {
-			assets:[
+			assets: [
 				`${this.assetsPath}images/nx.jpg`,
 				`${this.assetsPath}images/px.jpg`,
 				`${this.assetsPath}images/ny.jpg`,
@@ -52,151 +52,179 @@ class Game{
 				`${this.assetsPath}images/nz.jpg`,
 				`${this.assetsPath}images/pz.jpg`
 			],
-			oncomplete: function(){
+			oncomplete: function () {
 				game.init();
 			}
 		}
-		
-		this.anims.forEach( function(anim){ options.assets.push(`${game.assetsPath}fbx/anims/${anim}.fbx`)});
+
+		this.anims.forEach(function (anim) { options.assets.push(`${game.assetsPath}fbx/anims/${anim}.fbx`) });
 		options.assets.push(`${game.assetsPath}fbx/town.fbx`);
-		
+
 		this.mode = this.modes.PRELOAD;
-		
+
 		this.clock = new THREE.Clock();
 
 		const preloader = new Preloader(options);
-		
-		window.onError = function(error){
+
+		window.onError = function (error) {
 			console.error(JSON.stringify(error));
 		}
 	}
-	
-	initSfx(){
+
+	initSfx() {
 		this.sfx = {};
 		this.sfx.context = new (window.AudioContext || window.webkitAudioContext)();
 		this.sfx.gliss = new SFX({
 			context: this.sfx.context,
-			src:{mp3:`${this.assetsPath}sfx/gliss.mp3`, ogg:`${this.assetsPath}sfx/gliss.ogg`},
+			src: { mp3: `${this.assetsPath}sfx/gliss.mp3`, ogg: `${this.assetsPath}sfx/gliss.ogg` },
 			loop: false,
 			volume: 0.3
 		});
 	}
-	
-	set activeCamera(object){
+
+	set activeCamera(object) {
 		this.cameras.active = object;
 	}
-	
+
 	init() {
 		this.mode = this.modes.INITIALISING;
 
-		this.camera = new THREE.PerspectiveCamera( 45, window.innerWidth / window.innerHeight, 10, 200000 );
-		
+		this.camera = new THREE.PerspectiveCamera(45, window.innerWidth / window.innerHeight, 10, 200000);
+
 		this.scene = new THREE.Scene();
-		this.scene.background = new THREE.Color( 0x00a0f0 );
+		this.scene.background = new THREE.Color(0x00a0f0);
 
-		const ambient = new THREE.AmbientLight( 0xaaaaaa );
-        this.scene.add( ambient );
+		const ambient = new THREE.AmbientLight(0xaaaaaa);
+		this.scene.add(ambient);
 
-        const light = new THREE.DirectionalLight( 0xaaaaaa );
-        light.position.set( 30, 100, 40 );
-        light.target.position.set( 0, 0, 0 );
+		const light = new THREE.DirectionalLight(0xaaaaaa);
+		light.position.set(30, 100, 40);
+		light.target.position.set(0, 0, 0);
 
-        light.castShadow = true;
+		light.castShadow = true;
 
 		const lightSize = 500;
-        light.shadow.camera.near = 1;
-        light.shadow.camera.far = 500;
+		light.shadow.camera.near = 1;
+		light.shadow.camera.far = 500;
 		light.shadow.camera.left = light.shadow.camera.bottom = -lightSize;
 		light.shadow.camera.right = light.shadow.camera.top = lightSize;
 
-        light.shadow.bias = 0.0039;
-        light.shadow.mapSize.width = 1024;
-        light.shadow.mapSize.height = 1024;
-		
+		light.shadow.bias = 0.0039;
+		light.shadow.mapSize.width = 1024;
+		light.shadow.mapSize.height = 1024;
+
 		this.sun = light;
 		this.scene.add(light);
 
 		// model
 		const loader = new THREE.FBXLoader();
 		const game = this;
-		
+
+
 		this.player = new PlayerLocal(this);
-		
+
 		this.loadEnvironment(loader);	// 默认blockland场景
-		this.loadNPC(loader);
-		
+
 		this.speechBubble = new SpeechBubble(this, "", 150);
 		this.speechBubble.mesh.position.set(0, 350, 0);
-		
+
 		// this.joystick = new JoyStick({
 		// 	onMove: this.playerControl,
 		// 	game: this
 		// });
-		
-		this.renderer = new THREE.WebGLRenderer( { antialias: true } );
-		this.renderer.setPixelRatio( window.devicePixelRatio );
-		this.renderer.setSize( window.innerWidth, window.innerHeight );
+
+		this.renderer = new THREE.WebGLRenderer({ antialias: true });
+
+		this.renderer.setPixelRatio(window.devicePixelRatio);
+		this.renderer.setSize(window.innerWidth, window.innerHeight);
 		this.renderer.shadowMap.enabled = true;
-		this.container.appendChild( this.renderer.domElement );
-		
-		if ('ontouchstart' in window){
-			window.addEventListener( 'touchdown', (event) => game.onMouseDown(event), false );
-		}else{
-			window.addEventListener( 'mousedown', (event) => game.onMouseDown(event), false );	
+		this.loadNPC(loader);
+
+		this.container.appendChild(this.renderer.domElement);
+
+		if ('ontouchstart' in window) {
+			window.addEventListener('touchdown', (event) => game.onMouseDown(event), false);
+		} else {
+			window.addEventListener('mousedown', (event) => game.onMouseDown(event), false);
+		}
+
+		window.addEventListener('resize', () => game.onWindowResize(), false);
+
+	}
+	loadNPC(loader) {
+		//根据配置文件加载npc并设置好逻辑
+		for( let a in dialogueData)
+		{
+			loader.load(`${this.assetsPath}${dialogueData[a].fbx}`, (obj) => {
+				this.scene.add(obj);
+				console.log(obj)
+				obj.position.set(...dialogueData[a].position);
+				obj.scale.set(...dialogueData[a].scale);
+				obj.rotation.set(...dialogueData[a].rotation);
+				//定义动画
+				this.NPCmixer = new THREE.AnimationMixer(obj);
+				obj.animations.forEach((clip) => {
+					const clips = this.NPCmixer.clipAction(clip)
+					clips.play();
+				})
+				const raycaster = new THREE.Raycaster();
+				const mouse = new THREE.Vector2();
+	
+	
+				const npcMouse = (event) => {
+					console.log(a)
+					// 将鼠标点击位置归一化为屏幕坐标系
+					mouse.x = (event.clientX / window.innerWidth) * 2 - 1;
+					mouse.y = -(event.clientY / window.innerHeight) * 2 + 1;
+	
+					// 更新射线的起点和方向
+	
+					raycaster.setFromCamera(mouse, game.camera);
+					// 执行射线和物体的交互检测
+	
+					const intersects = raycaster.intersectObject(obj, true);
+					// 处理点击事件
+					console.log(intersects)
+					if (intersects.length > 0) {
+	
+						// 点击了物体
+						loadNPCDialogue(a);
+					}
+				}
+				document.addEventListener("click", npcMouse, false);
+			})
 		}
 		
-		window.addEventListener( 'resize', () => game.onWindowResize(), false );
-		
 	}
-	loadNPC(loader)
-	{
-		loader.load(`${this.assetsPath}fbx/character/mouse/Idle.fbx`,(obj)=>
-		{
-			game.scene.add(obj);
-			obj.position.set(3122, 0, -173);
-			obj.scale.set(2,2,2);
-			obj.rotation.set(0, Math.PI, 0);
-			//定义动画
-			this.NPCmixer = new THREE.AnimationMixer( obj );
-			obj.animations.forEach((clip)=>
-			{
-				const clips = this.NPCmixer.clipAction(clip)
-				clips.play();
-			})
-			
-			
-		})
-		
-	}
-	loadEnvironment(loader){
+	loadEnvironment(loader) {
 		const game = this;
-		loader.load(`${this.assetsPath}fbx/town.fbx`, function(object){
+		loader.load(`${this.assetsPath}fbx/town.fbx`, function (object) {
 			game.environment = object;
 			game.colliders = [];
 			game.scene.add(object);
-			object.traverse( function ( child ) {
-				if ( child.isMesh ) {
-					if (child.name.startsWith("proxy")){
+			object.traverse(function (child) {
+				if (child.isMesh) {
+					if (child.name.startsWith("proxy")) {
 						game.colliders.push(child);
 						child.material.visible = false;
-					}else{
+					} else {
 						child.castShadow = true;
 						child.receiveShadow = true;
 					}
 				}
-			} );
-			
-			const tloader = new THREE.CubeTextureLoader();
-			tloader.setPath( `${game.assetsPath}/images/` );
+			});
 
-			var textureCube = tloader.load( [
+			const tloader = new THREE.CubeTextureLoader();
+			tloader.setPath(`${game.assetsPath}/images/`);
+
+			var textureCube = tloader.load([
 				'px.jpg', 'nx.jpg',
 				'py.jpg', 'ny.jpg',
 				'pz.jpg', 'nz.jpg'
-			] );
+			]);
 
 			game.scene.background = textureCube;
-			
+
 			game.loadNextAnim(loader);
 		})
 	}
@@ -224,7 +252,7 @@ class Game{
 		if (game.scene1 !== undefined && game.scene1.animate !== undefined) {
 			game.scene1.animate(dt);
 		}
-		
+
 	}
 
 	goToScene1() {
@@ -239,7 +267,7 @@ class Game{
 			// 一些工具函数
 			game.scene1.utils = {};
 			game.scene1.utils.getNumCanvas = function (i, bgc, fc) {
-				var width=512, height=512; 
+				var width = 512, height = 512;
 				var canvas = document.createElement('canvas');
 				canvas.width = width;
 				canvas.height = height;
@@ -250,17 +278,17 @@ class Game{
 				let str = `${i}`;
 				ctx.fillStyle = fc;		// 字体颜色
 				if (str.length == 1) {
-					ctx.font = 512+'px " bold';
+					ctx.font = 512 + 'px " bold';
 					ctx.fillText(`${i}`, 110, 450);
 				} else if (str.length == 2) {
-					ctx.font = 448+'px " bold';
+					ctx.font = 448 + 'px " bold';
 					ctx.fillText(`${i}`, 0, 450);
 				}
 
 				return canvas;
 			}
 			game.scene1.utils.getInsCanvas = function (i, bgc, fc) {
-				var width=512, height=512; 
+				var width = 512, height = 512;
 				var canvas = document.createElement('canvas');
 				canvas.width = width;
 				canvas.height = height;
@@ -268,7 +296,7 @@ class Game{
 				ctx.fillStyle = bgc;	// 背景颜色
 				ctx.fillRect(0, 0, width, height);
 				ctx.fillStyle = fc;		// 字体颜色
-				ctx.font = 128+'px " bold';
+				ctx.font = 128 + 'px " bold';
 				ctx.fillText(`${i}`, 50, 300);
 				return canvas;
 			}
@@ -279,10 +307,10 @@ class Game{
 				for (let i = 0; i <= list.length - 2; i++) {
 					for (let j = list.length - 1; j >= i + 1; j--) {
 						if (list[j] < list[j - 1]) {
-							record.push([j, j-1, list[j], list[j-1]]);	// 交换第j和第j-1项，他们的值分别是list[j]和list[j-1]
+							record.push([j, j - 1, list[j], list[j - 1]]);	// 交换第j和第j-1项，他们的值分别是list[j]和list[j-1]
 							let temp = list[j];
-							list[j] = list[j-1];
-							list[j-1] = temp;
+							list[j] = list[j - 1];
+							list[j - 1] = temp;
 						}
 					}
 				}
@@ -292,31 +320,31 @@ class Game{
 			// 彩色花纹地板
 			const vertex = new THREE.Vector3();
 			const color = new THREE.Color();
-			let ggg = new THREE.PlaneGeometry( 10000, 10000, 100, 100 );
+			let ggg = new THREE.PlaneGeometry(10000, 10000, 100, 100);
 			let floorGeometry = new THREE.BufferGeometry().fromGeometry(ggg);
-			floorGeometry.rotateX( - Math.PI / 2 );
+			floorGeometry.rotateX(- Math.PI / 2);
 			// vertex displacement
 			// console.log(floorGeometry);
 			let position = floorGeometry.attributes.position;
-			for ( let i = 0, l = position.count; i < l; i ++ ) {
-				vertex.fromBufferAttribute( position, i );
+			for (let i = 0, l = position.count; i < l; i++) {
+				vertex.fromBufferAttribute(position, i);
 				// vertex.x += Math.random() * 20 - 10;
 				vertex.y += 10000;
 				// vertex.z += Math.random() * 20 - 10;
-				position.setXYZ( i, vertex.x, vertex.y, vertex.z );
+				position.setXYZ(i, vertex.x, vertex.y, vertex.z);
 			}
 			floorGeometry = floorGeometry.toNonIndexed(); // ensure each face has unique vertices
 			position = floorGeometry.attributes.position;
 			const colorsFloor = [];
 
-			for ( let i = 0, l = position.count; i < l; i ++ ) {
-				color.setHSL( Math.random() * 0.3 + 0.5, 0.75, Math.random() * 0.25 + 0.75, THREE.SRGBColorSpace );
-				colorsFloor.push( color.r, color.g, color.b );
+			for (let i = 0, l = position.count; i < l; i++) {
+				color.setHSL(Math.random() * 0.3 + 0.5, 0.75, Math.random() * 0.25 + 0.75, THREE.SRGBColorSpace);
+				colorsFloor.push(color.r, color.g, color.b);
 			}
 
-			floorGeometry.addAttribute( 'color', new THREE.Float32BufferAttribute( colorsFloor, 3 ) );
-			const floorMaterial = new THREE.MeshBasicMaterial( { vertexColors: true } );
-			const floor = new THREE.Mesh( floorGeometry, floorMaterial );
+			floorGeometry.addAttribute('color', new THREE.Float32BufferAttribute(colorsFloor, 3));
+			const floorMaterial = new THREE.MeshBasicMaterial({ vertexColors: true });
+			const floor = new THREE.Mesh(floorGeometry, floorMaterial);
 			game.scene.add(floor);
 			game.colliders.push(floor);
 			game.scene1.floor = floor;
@@ -325,8 +353,8 @@ class Game{
 			// 8个立方体，对应待排序的8个数字
 			let boxList = [];
 
-			let valList =[1, 2, 3, 4, 5, 6, 7, 8]; 
-			valList.sort( function() {return Math.random() > 0.5 ? -1 : 1;}); 
+			let valList = [1, 2, 3, 4, 5, 6, 7, 8];
+			valList.sort(function () { return Math.random() > 0.5 ? -1 : 1; });
 			game.scene1.bubbleSort = {};
 			game.scene1.bubbleSort.valList = valList.concat();
 
@@ -335,19 +363,19 @@ class Game{
 
 			let boxMaterialList = [];
 			for (let i = 0; i < 10; i++) {
-				boxMaterialList.push(new THREE.MeshLambertMaterial( { map: new THREE.CanvasTexture(game.scene1.utils.getNumCanvas(i, '#700BE1', '#FFD795')) } ));
+				boxMaterialList.push(new THREE.MeshLambertMaterial({ map: new THREE.CanvasTexture(game.scene1.utils.getNumCanvas(i, '#700BE1', '#FFD795')) }));
 			}
 
 			let bbb = new THREE.BoxGeometry(200, 200, 200);
 			let boxGeometry = new THREE.BufferGeometry().fromGeometry(bbb).toNonIndexed();
 
 			for (let i = 0; i < 8; i++) {
-				const box = new THREE.Mesh( boxGeometry, boxMaterialList[valList[i]] );
+				const box = new THREE.Mesh(boxGeometry, boxMaterialList[valList[i]]);
 				box.position.x = -900 - 400 * i;
 				box.position.y = 10000 + 500;
 				box.position.z = 0 + 2400;
-				game.scene.add( box );
-				game.colliders.push( box );
+				game.scene.add(box);
+				game.colliders.push(box);
 
 				boxList.push(box);
 				game.scene1.bubbleSort.boxList = boxList;
@@ -363,13 +391,13 @@ class Game{
 			for (let i = 0; i < 3; i++) {
 				const box = new THREE.Mesh(
 					boxGeometry,
-					new THREE.MeshLambertMaterial( { map: new THREE.CanvasTexture(game.scene1.utils.getInsCanvas(insList[i], '#D2D518', '#21FFB8')) })
+					new THREE.MeshLambertMaterial({ map: new THREE.CanvasTexture(game.scene1.utils.getInsCanvas(insList[i], '#D2D518', '#21FFB8')) })
 				);
 				box.position.x = -900 - 1610 - 400 * i;
 				box.position.y = 10000 + 100;
 				box.position.z = 0 + 2400 - 1650;
-				game.scene.add( box );
-				game.colliders.push( box );
+				game.scene.add(box);
+				game.colliders.push(box);
 
 				boxButtonList.push(box);
 				boxButtonXList.push(box.position.x);
@@ -389,7 +417,7 @@ class Game{
 				raycaster.setFromCamera(mouse, game.camera);
 				// 计算物体和射线的焦点
 				const intersects = raycaster.intersectObjects(game.scene1.bubbleSort.boxButtonList);
-		
+
 				if (intersects.length > 0) {
 					for (let i = 0; i < 3; i++) {
 						if (game.scene1.bubbleSort.boxButtonXList[i] == intersects[0].object.position.x) {
@@ -433,7 +461,7 @@ class Game{
 				raycaster.setFromCamera(mouse, game.camera);
 				// 计算物体和射线的焦点
 				const intersects = raycaster.intersectObjects(game.scene1.bubbleSort.boxButtonList);
-		
+
 				if (intersects.length > 0) {
 					for (let i = 0; i < 3; i++) {
 						if (game.scene1.bubbleSort.boxButtonXList[i] == intersects[0].object.position.x) {
@@ -456,7 +484,7 @@ class Game{
 				// console.log('[scene1] state:', game.scene1.bubbleSort.state);
 				// console.log('[scene1] instruction:', game.scene1.bubbleSort.instruction);
 				// console.log('[scene1] cur_ins:', game.scene1.bubbleSort.cur_ins);
-				
+
 				if (game.scene1.bubbleSort.state == 'busy') {
 					if (game.scene1.bubbleSort.instruction == 'next') {
 						// do next
@@ -536,7 +564,7 @@ class Game{
 								// 交换完成，取消高亮
 								a.material.map = new THREE.CanvasTexture(game.scene1.utils.getNumCanvas(av, '#700BE1', '#FFD795'));
 								b.material.map = new THREE.CanvasTexture(game.scene1.utils.getNumCanvas(bv, '#700BE1', '#FFD795'));
-								
+
 								let temp_box = game.scene1.bubbleSort.boxList[swap_pair[0]];
 								game.scene1.bubbleSort.boxList[swap_pair[0]] = game.scene1.bubbleSort.boxList[swap_pair[1]];
 								game.scene1.bubbleSort.boxList[swap_pair[1]] = temp_box;
@@ -544,7 +572,7 @@ class Game{
 						} else {
 							game.scene1.bubbleSort.swap_state = 'finish';
 						}
-						
+
 						// once done, become free
 						if (game.scene1.bubbleSort.swap_state == 'finish') {
 							console.log('next is done');
@@ -561,7 +589,7 @@ class Game{
 						for (let i = 0; i < list.length; i++) {
 							game.scene1.bubbleSort.boxList[i].material.map = new THREE.CanvasTexture(game.scene1.utils.getNumCanvas(list[i], '#700BE1', '#FFD795'));
 						}
-						
+
 						// once done, become free
 						console.log('restart is done');
 						game.scene1.bubbleSort.cur_ins = 0;
@@ -570,11 +598,11 @@ class Game{
 						// do shuffle
 						console.log('doing shuffle...');
 
-						let valList =[1, 2, 3, 4, 5, 6, 7, 8]; 
-						valList.sort( function() {return Math.random() > 0.5 ? -1 : 1;}); 
+						let valList = [1, 2, 3, 4, 5, 6, 7, 8];
+						valList.sort(function () { return Math.random() > 0.5 ? -1 : 1; });
 						game.scene1.bubbleSort.valList = valList.concat();
 						game.scene1.bubbleSort.record = game.scene1.utils.getBubbleSortRecord();
-						
+
 						let list = game.scene1.bubbleSort.valList;
 						for (let i = 0; i < list.length; i++) {
 							game.scene1.bubbleSort.boxList[i].material.map = new THREE.CanvasTexture(game.scene1.utils.getNumCanvas(list[i], '#700BE1', '#FFD795'));
@@ -587,7 +615,7 @@ class Game{
 					}
 				}
 
-				
+
 			}
 		}
 
@@ -597,7 +625,7 @@ class Game{
 		game.player.object.rotation.x = 0;
 		game.player.object.rotation.y = 0;
 		game.player.object.rotation.z = 0;
-	}	
+	}
 
 	goToScene2() {
 		const game = this;
@@ -612,35 +640,35 @@ class Game{
 			game.scene2.utils = {};
 			let F = game.scene2.utils;
 			F.getNumCanvas = function (i, bgc, fc) {
-				var width=512, height=512; 
+				var width = 512, height = 512;
 				var canvas = document.createElement('canvas');
 				canvas.width = width;
 				canvas.height = height;
 				var ctx = canvas.getContext('2d');
 				ctx.fillStyle = bgc;	// 背景颜色
 				ctx.fillRect(0, 0, width, height);
-				
+
 				let str = `${i}`;
 				ctx.fillStyle = fc;		// 字体颜色
 				if (str.length == 1) {
-					ctx.font = 512+'px " bold';
+					ctx.font = 512 + 'px " bold';
 					ctx.fillText(`${i}`, 110, 450);
 				} else if (str.length == 2) {
-					ctx.font = 448+'px " bold';
+					ctx.font = 448 + 'px " bold';
 					ctx.fillText(`${i}`, 0, 450);
 				}
 
 				return canvas;
 			}
 			F.getInsCanvas = function (i, bgc, fc) {
-				var width=512, height=512; 
+				var width = 512, height = 512;
 				var canvas = document.createElement('canvas');
 				canvas.width = width;
 				canvas.height = height;
 				var ctx = canvas.getContext('2d');
 				ctx.fillStyle = bgc;	// 背景颜色
 				ctx.fillRect(0, 0, width, height);
-				ctx.font = 96+'px " bold';
+				ctx.font = 96 + 'px " bold';
 				ctx.fillStyle = fc;		// 字体颜色
 
 				ctx.fillText(`${i}`, 35, 300);
@@ -649,7 +677,7 @@ class Game{
 			F.renderTree = function (root) {
 				let L = F.calTreeLevel(root);
 				let x0 = 0;
-				let y0 = (2*L - 0.5) * 200;
+				let y0 = (2 * L - 0.5) * 200;
 				F.renderNode(root, x0, y0, L);	// 递归绘制节点对应的立方体
 			}
 			F.renderNode = function (node, x0, y0, L) {
@@ -659,15 +687,15 @@ class Game{
 				node.x = x0;
 				node.y = y0;
 				F.generateNode(node);
-				let dx0 = Math.pow(2, L-2);
+				let dx0 = Math.pow(2, L - 2);
 				let dy0 = 2;
 				// 注意左边是x轴正方向
-				let left_x0 = x0 + dx0*200;
-				let right_x0 = x0 - dx0*200;
-				let left_y0 = y0 - dy0*200;
-				let right_y0 = y0 - dy0*200;
-				F.renderNode(node.left, left_x0, left_y0, L-1);
-				F.renderNode(node.right, right_x0, right_y0, L-1);
+				let left_x0 = x0 + dx0 * 200;
+				let right_x0 = x0 - dx0 * 200;
+				let left_y0 = y0 - dy0 * 200;
+				let right_y0 = y0 - dy0 * 200;
+				F.renderNode(node.left, left_x0, left_y0, L - 1);
+				F.renderNode(node.right, right_x0, right_y0, L - 1);
 				let cylinderLeft = F.generateEdge(node, node.left, 1);
 				let cylinderRight = F.generateEdge(node, node.right, -1);
 				if (node.left !== undefined) {
@@ -679,35 +707,35 @@ class Game{
 			}
 			F.generateNode = function (node) {
 				let boxGeometry = new THREE.BoxGeometry(200, 200, 200);
-				let boxMaterial = new THREE.MeshLambertMaterial( { map: new THREE.CanvasTexture(F.getNumCanvas(node.val, '#700BE1', '#FFD795')) } );
+				let boxMaterial = new THREE.MeshLambertMaterial({ map: new THREE.CanvasTexture(F.getNumCanvas(node.val, '#700BE1', '#FFD795')) });
 				let box = new THREE.Mesh(boxGeometry, boxMaterial);
 				box.position.x = node.x;
 				box.position.y = 20000 + node.y;
 				box.position.z = 0;
 				game.scene.add(box);
-				game.colliders.push( box );
+				game.colliders.push(box);
 				node.box = box;
 			}
 			F.generateEdge = function (node_p, node_c, sign) {
 				if (node_c === undefined) {
 					return;
 				}
-				let x1 = node_p.x + sign*0.5*200;
-				let y1 = node_p.y - 0.5*200;
+				let x1 = node_p.x + sign * 0.5 * 200;
+				let y1 = node_p.y - 0.5 * 200;
 				let x2 = node_c.x;
-				let y2 = node_c.y + 0.5*200;
+				let y2 = node_c.y + 0.5 * 200;
 
-				let length = Math.sqrt((x1-x2)*(x1-x2) + (y1-y2)*(y1-y2));
-				let angle = Math.atan((x1-x2)/(y1-y2));	// 顺时针角度
+				let length = Math.sqrt((x1 - x2) * (x1 - x2) + (y1 - y2) * (y1 - y2));
+				let angle = Math.atan((x1 - x2) / (y1 - y2));	// 顺时针角度
 				let cylinderGeometry = new THREE.CylinderGeometry(10, 10, length, 16);
 				let cylinderMaterial = F.cylinderMaterial;
 				let cylinder = new THREE.Mesh(cylinderGeometry, cylinderMaterial);
 				cylinder.rotation.z = -angle;	// 逆时针旋转
-				cylinder.position.x = (x1+x2)/2;
-				cylinder.position.y = 20000 + (y1+y2)/2;
+				cylinder.position.x = (x1 + x2) / 2;
+				cylinder.position.y = 20000 + (y1 + y2) / 2;
 				cylinder.position.z = 0;
 				game.scene.add(cylinder);
-				game.colliders.push( cylinder );
+				game.colliders.push(cylinder);
 				return cylinder;
 			}
 			F.calTreeLevel = function (root) {
@@ -730,7 +758,7 @@ class Game{
 				node.right = {};
 				node.right.val = val;
 			}
-			F.cylinderMaterial = new THREE.MeshBasicMaterial({color: 0x000000});
+			F.cylinderMaterial = new THREE.MeshBasicMaterial({ color: 0x000000 });
 			F.generateBST = function (valList) {
 				let root = {};
 				root.val = valList[0];
@@ -1016,7 +1044,7 @@ class Game{
 				// 当前高亮结点 取消高亮
 				orderList[cur_ins].box.material.map = new THREE.CanvasTexture(game.scene2.utils.getNumCanvas(orderList[cur_ins].val, '#700BE1', '#FFD795'));
 				// 下一个结点高亮
-				orderList[cur_ins+1].box.material.map = new THREE.CanvasTexture(game.scene2.utils.getNumCanvas(orderList[cur_ins+1].val, '#21FFB2', '#FF21E7'));
+				orderList[cur_ins + 1].box.material.map = new THREE.CanvasTexture(game.scene2.utils.getNumCanvas(orderList[cur_ins + 1].val, '#21FFB2', '#FF21E7'));
 				game.scene2.BSTtraverse.cur_ins++;
 			}
 			F.shuffle = function () {
@@ -1024,7 +1052,7 @@ class Game{
 				for (let i = 1; i <= 20; i++) {
 					valList.push(i);
 				}
-				valList.sort( function() {return Math.random() > 0.5 ? -1 : 1;}); 
+				valList.sort(function () { return Math.random() > 0.5 ? -1 : 1; });
 				console.log('valList', valList);
 				game.scene2.BSTtraverse.valList = valList;
 				game.scene2.BSTtraverse.BST = F.generateAVL(valList);
@@ -1074,7 +1102,7 @@ class Game{
 				let orderList = game.scene2.BSTtraverse.orderList;
 				let cur_ins = game.scene2.BSTtraverse.cur_ins;
 				orderList[cur_ins].box.material.map = new THREE.CanvasTexture(game.scene2.utils.getNumCanvas(orderList[cur_ins].val, '#700BE1', '#FFD795'));
-				
+
 				game.scene2.BSTtraverse.type = 'postOrder';
 				orderList = [];
 				let root = game.scene2.BSTtraverse.BST;
@@ -1119,31 +1147,31 @@ class Game{
 
 			const vertex = new THREE.Vector3();
 			const color = new THREE.Color();
-			let ggg = new THREE.PlaneGeometry( 10000, 10000, 100, 100 );
+			let ggg = new THREE.PlaneGeometry(10000, 10000, 100, 100);
 			let floorGeometry = new THREE.BufferGeometry().fromGeometry(ggg);
-			floorGeometry.rotateX( - Math.PI / 2 );
+			floorGeometry.rotateX(- Math.PI / 2);
 			// vertex displacement
 			// console.log(floorGeometry);
 			let position = floorGeometry.attributes.position;
-			for ( let i = 0, l = position.count; i < l; i ++ ) {
-				vertex.fromBufferAttribute( position, i );
+			for (let i = 0, l = position.count; i < l; i++) {
+				vertex.fromBufferAttribute(position, i);
 				// vertex.x += Math.random() * 20 - 10;
 				vertex.y += 20000;
 				// vertex.z += Math.random() * 20 - 10;
-				position.setXYZ( i, vertex.x, vertex.y, vertex.z );
+				position.setXYZ(i, vertex.x, vertex.y, vertex.z);
 			}
 			floorGeometry = floorGeometry.toNonIndexed(); // ensure each face has unique vertices
 			position = floorGeometry.attributes.position;
 			const colorsFloor = [];
 
-			for ( let i = 0, l = position.count; i < l; i ++ ) {
-				color.setHSL( Math.random() * 0.3 + 0.6, 0.25, Math.random() * 0.25 + 0.25, THREE.SRGBColorSpace );
-				colorsFloor.push( color.r, color.g, color.b );
+			for (let i = 0, l = position.count; i < l; i++) {
+				color.setHSL(Math.random() * 0.3 + 0.6, 0.25, Math.random() * 0.25 + 0.25, THREE.SRGBColorSpace);
+				colorsFloor.push(color.r, color.g, color.b);
 			}
 
-			floorGeometry.addAttribute( 'color', new THREE.Float32BufferAttribute( colorsFloor, 3 ) );
-			const floorMaterial = new THREE.MeshBasicMaterial( { vertexColors: true } );
-			const floor = new THREE.Mesh( floorGeometry, floorMaterial );
+			floorGeometry.addAttribute('color', new THREE.Float32BufferAttribute(colorsFloor, 3));
+			const floorMaterial = new THREE.MeshBasicMaterial({ vertexColors: true });
+			const floor = new THREE.Mesh(floorGeometry, floorMaterial);
 			game.scene.add(floor);
 			game.colliders.push(floor);
 			game.scene2.floor = floor;
@@ -1153,7 +1181,7 @@ class Game{
 			for (let i = 1; i <= 20; i++) {
 				valList.push(i);
 			}
-			valList.sort( function() {return Math.random() > 0.5 ? -1 : 1;}); 
+			valList.sort(function () { return Math.random() > 0.5 ? -1 : 1; });
 			console.log('valList', valList);
 			game.scene2.BSTtraverse = {};
 			game.scene2.BSTtraverse.valList = valList;
@@ -1177,7 +1205,7 @@ class Game{
 			for (let i = 0; i < 5; i++) {
 				const box = new THREE.Mesh(
 					boxGeometry,
-					new THREE.MeshLambertMaterial( { map: new THREE.CanvasTexture(game.scene2.utils.getInsCanvas(insList[i], '#D2D518', '#21FFB8')) })
+					new THREE.MeshLambertMaterial({ map: new THREE.CanvasTexture(game.scene2.utils.getInsCanvas(insList[i], '#D2D518', '#21FFB8')) })
 				);
 				if (i <= 1) {
 					box.position.x = 800 - 400 * i;
@@ -1186,8 +1214,8 @@ class Game{
 				}
 				box.position.y = 20000 + 100;
 				box.position.z = -4000;
-				game.scene.add( box );
-				game.colliders.push( box );
+				game.scene.add(box);
+				game.colliders.push(box);
 
 				boxButtonList.push(box);
 				boxButtonXList.push(box.position.x);
@@ -1207,7 +1235,7 @@ class Game{
 				raycaster.setFromCamera(mouse, game.camera);
 				// 计算物体和射线的焦点
 				const intersects = raycaster.intersectObjects(game.scene2.BSTtraverse.boxButtonList);
-		
+
 				if (intersects.length > 0) {
 					for (let i = 0; i < 5; i++) {
 						if (game.scene2.BSTtraverse.boxButtonXList[i] == intersects[0].object.position.x) {
@@ -1250,7 +1278,7 @@ class Game{
 				raycaster.setFromCamera(mouse, game.camera);
 				// 计算物体和射线的焦点
 				const intersects = raycaster.intersectObjects(game.scene2.BSTtraverse.boxButtonList);
-		
+
 				if (intersects.length > 0) {
 					for (let i = 0; i < 5; i++) {
 						if (game.scene2.BSTtraverse.boxButtonXList[i] == intersects[0].object.position.x) {
@@ -1282,62 +1310,62 @@ class Game{
 
 			const vertex = new THREE.Vector3();
 			const color = new THREE.Color();
-			let ggg = new THREE.PlaneGeometry( 10000, 10000, 100, 100 );
+			let ggg = new THREE.PlaneGeometry(10000, 10000, 100, 100);
 			let floorGeometry = new THREE.BufferGeometry().fromGeometry(ggg);
-			floorGeometry.rotateX( - Math.PI / 2 );
+			floorGeometry.rotateX(- Math.PI / 2);
 			// vertex displacement
 			// console.log(floorGeometry);
 			let position = floorGeometry.attributes.position;
-			for ( let i = 0, l = position.count; i < l; i ++ ) {
-				vertex.fromBufferAttribute( position, i );
+			for (let i = 0, l = position.count; i < l; i++) {
+				vertex.fromBufferAttribute(position, i);
 				// vertex.x += Math.random() * 20 - 10;
 				vertex.y += 30000;
 				// vertex.z += Math.random() * 20 - 10;
-				position.setXYZ( i, vertex.x, vertex.y, vertex.z );
+				position.setXYZ(i, vertex.x, vertex.y, vertex.z);
 			}
 			floorGeometry = floorGeometry.toNonIndexed(); // ensure each face has unique vertices
 			position = floorGeometry.attributes.position;
 			const colorsFloor = [];
 
-			for ( let i = 0, l = position.count; i < l; i ++ ) {
-				color.setHSL( Math.random() * 0.3 + 0.1, 0.25, Math.random() * 0.25 + 0.75, THREE.SRGBColorSpace );
-				colorsFloor.push( color.r, color.g, color.b );
+			for (let i = 0, l = position.count; i < l; i++) {
+				color.setHSL(Math.random() * 0.3 + 0.1, 0.25, Math.random() * 0.25 + 0.75, THREE.SRGBColorSpace);
+				colorsFloor.push(color.r, color.g, color.b);
 			}
 
-			floorGeometry.addAttribute( 'color', new THREE.Float32BufferAttribute( colorsFloor, 3 ) );
-			const floorMaterial = new THREE.MeshBasicMaterial( { vertexColors: true } );
-			const floor = new THREE.Mesh( floorGeometry, floorMaterial );
+			floorGeometry.addAttribute('color', new THREE.Float32BufferAttribute(colorsFloor, 3));
+			const floorMaterial = new THREE.MeshBasicMaterial({ vertexColors: true });
+			const floor = new THREE.Mesh(floorGeometry, floorMaterial);
 			game.scene.add(floor);
 			game.colliders.push(floor);
 			game.scene3 = {};
 			game.scene3.floor = floor;
 
-			let bbb = new THREE.BoxGeometry( 200, 200, 200 );
+			let bbb = new THREE.BoxGeometry(200, 200, 200);
 			let boxGeometry = new THREE.BufferGeometry().fromGeometry(bbb);
 			boxGeometry = boxGeometry.toNonIndexed();
 			position = boxGeometry.attributes.position;
 			const colorsBox = [];
-			for ( let i = 0, l = position.count; i < l; i ++ ) {
-				color.setHSL( Math.random() * 0.3 + 0.1, 0.25, Math.random() * 0.25 + 0.75, THREE.SRGBColorSpace );
-				colorsBox.push( color.r, color.g, color.b );
+			for (let i = 0, l = position.count; i < l; i++) {
+				color.setHSL(Math.random() * 0.3 + 0.1, 0.25, Math.random() * 0.25 + 0.75, THREE.SRGBColorSpace);
+				colorsBox.push(color.r, color.g, color.b);
 			}
-			boxGeometry.addAttribute( 'color', new THREE.Float32BufferAttribute( colorsBox, 3 ) );
-			for ( let i = 0; i < 500; i ++ ) {
-				const boxMaterial = new THREE.MeshPhongMaterial( { specular: 0xffffff, flatShading: true, vertexColors: true } );
-				boxMaterial.color.setHSL( Math.random() * 0.3 + 0.1, 0.25, Math.random() * 0.25 + 0.75, THREE.SRGBColorSpace );
-				const box = new THREE.Mesh( boxGeometry, boxMaterial );
-				box.position.x = Math.floor( Math.random() * 20 - 10 ) * 300;
-				box.position.y = 30000 + Math.floor( Math.random() * 20 ) * 200 + 100;
-				box.position.z = Math.floor( Math.random() * 20 - 10 ) * 300;
-				game.scene.add( box );
-				game.colliders.push( box );
+			boxGeometry.addAttribute('color', new THREE.Float32BufferAttribute(colorsBox, 3));
+			for (let i = 0; i < 500; i++) {
+				const boxMaterial = new THREE.MeshPhongMaterial({ specular: 0xffffff, flatShading: true, vertexColors: true });
+				boxMaterial.color.setHSL(Math.random() * 0.3 + 0.1, 0.25, Math.random() * 0.25 + 0.75, THREE.SRGBColorSpace);
+				const box = new THREE.Mesh(boxGeometry, boxMaterial);
+				box.position.x = Math.floor(Math.random() * 20 - 10) * 300;
+				box.position.y = 30000 + Math.floor(Math.random() * 20) * 200 + 100;
+				box.position.z = Math.floor(Math.random() * 20 - 10) * 300;
+				game.scene.add(box);
+				game.colliders.push(box);
 			}
 		}
 
 		game.player.object.position.y = 30500;
 		game.player.object.position.x = 0;
 		game.player.object.position.z = 0;
-		
+
 	}
 
 	goToScene4() {
@@ -1348,72 +1376,72 @@ class Game{
 
 			const vertex = new THREE.Vector3();
 			const color = new THREE.Color();
-			let ggg = new THREE.PlaneGeometry( 10000, 10000, 100, 100 );
+			let ggg = new THREE.PlaneGeometry(10000, 10000, 100, 100);
 			let floorGeometry = new THREE.BufferGeometry().fromGeometry(ggg);
-			floorGeometry.rotateX( - Math.PI / 2 );
+			floorGeometry.rotateX(- Math.PI / 2);
 			// vertex displacement
 			// console.log(floorGeometry);
 			let position = floorGeometry.attributes.position;
-			for ( let i = 0, l = position.count; i < l; i ++ ) {
-				vertex.fromBufferAttribute( position, i );
+			for (let i = 0, l = position.count; i < l; i++) {
+				vertex.fromBufferAttribute(position, i);
 				// vertex.x += Math.random() * 20 - 10;
 				vertex.y += 40000;
 				// vertex.z += Math.random() * 20 - 10;
-				position.setXYZ( i, vertex.x, vertex.y, vertex.z );
+				position.setXYZ(i, vertex.x, vertex.y, vertex.z);
 			}
 			floorGeometry = floorGeometry.toNonIndexed(); // ensure each face has unique vertices
 			position = floorGeometry.attributes.position;
 			const colorsFloor = [];
 
-			for ( let i = 0, l = position.count; i < l; i ++ ) {
-				color.setHSL( Math.random() * 0.3 + 0.2, 0.65, Math.random() * 0.25 + 0.65, THREE.SRGBColorSpace );
-				colorsFloor.push( color.r, color.g, color.b );
+			for (let i = 0, l = position.count; i < l; i++) {
+				color.setHSL(Math.random() * 0.3 + 0.2, 0.65, Math.random() * 0.25 + 0.65, THREE.SRGBColorSpace);
+				colorsFloor.push(color.r, color.g, color.b);
 			}
 
-			floorGeometry.addAttribute( 'color', new THREE.Float32BufferAttribute( colorsFloor, 3 ) );
-			const floorMaterial = new THREE.MeshBasicMaterial( { vertexColors: true } );
-			const floor = new THREE.Mesh( floorGeometry, floorMaterial );
+			floorGeometry.addAttribute('color', new THREE.Float32BufferAttribute(colorsFloor, 3));
+			const floorMaterial = new THREE.MeshBasicMaterial({ vertexColors: true });
+			const floor = new THREE.Mesh(floorGeometry, floorMaterial);
 			game.scene.add(floor);
 			game.colliders.push(floor);
 			game.scene4 = {};
 			game.scene4.floor = floor;
 
-			let bbb = new THREE.BoxGeometry( 200, 200, 200 );
+			let bbb = new THREE.BoxGeometry(200, 200, 200);
 			let boxGeometry = new THREE.BufferGeometry().fromGeometry(bbb);
 			boxGeometry = boxGeometry.toNonIndexed();
 			position = boxGeometry.attributes.position;
 			const colorsBox = [];
-			for ( let i = 0, l = position.count; i < l; i ++ ) {
-				color.setHSL( Math.random() * 0.3 + 0.2, 0.65, Math.random() * 0.25 + 0.65, THREE.SRGBColorSpace );
-				colorsBox.push( color.r, color.g, color.b );
+			for (let i = 0, l = position.count; i < l; i++) {
+				color.setHSL(Math.random() * 0.3 + 0.2, 0.65, Math.random() * 0.25 + 0.65, THREE.SRGBColorSpace);
+				colorsBox.push(color.r, color.g, color.b);
 			}
-			boxGeometry.addAttribute( 'color', new THREE.Float32BufferAttribute( colorsBox, 3 ) );
-			for ( let i = 0; i < 500; i ++ ) {
-				const boxMaterial = new THREE.MeshPhongMaterial( { specular: 0xffffff, flatShading: true, vertexColors: true } );
-				boxMaterial.color.setHSL( Math.random() * 0.3 + 0.2, 0.65, Math.random() * 0.25 + 0.65, THREE.SRGBColorSpace );
-				const box = new THREE.Mesh( boxGeometry, boxMaterial );
-				box.position.x = Math.floor( Math.random() * 20 - 10 ) * 300;
-				box.position.y = 40000 + Math.floor( Math.random() * 20 ) * 200 + 100;
-				box.position.z = Math.floor( Math.random() * 20 - 10 ) * 300;
-				game.scene.add( box );
-				game.colliders.push( box );
+			boxGeometry.addAttribute('color', new THREE.Float32BufferAttribute(colorsBox, 3));
+			for (let i = 0; i < 500; i++) {
+				const boxMaterial = new THREE.MeshPhongMaterial({ specular: 0xffffff, flatShading: true, vertexColors: true });
+				boxMaterial.color.setHSL(Math.random() * 0.3 + 0.2, 0.65, Math.random() * 0.25 + 0.65, THREE.SRGBColorSpace);
+				const box = new THREE.Mesh(boxGeometry, boxMaterial);
+				box.position.x = Math.floor(Math.random() * 20 - 10) * 300;
+				box.position.y = 40000 + Math.floor(Math.random() * 20) * 200 + 100;
+				box.position.z = Math.floor(Math.random() * 20 - 10) * 300;
+				game.scene.add(box);
+				game.colliders.push(box);
 			}
 		}
 
 		game.player.object.position.y = 40500;
 		game.player.object.position.x = 0;
 		game.player.object.position.z = 0;
-		
+
 	}
 
-	loadNextAnim(loader){
+	loadNextAnim(loader) {
 		let anim = this.anims.pop();
 		const game = this;
-		loader.load( `${this.assetsPath}fbx/anims/${anim}.fbx`, function( object ){
+		loader.load(`${this.assetsPath}fbx/anims/${anim}.fbx`, function (object) {
 			game.player.animations[anim] = object.animations[0];
-			if (game.anims.length>0){
+			if (game.anims.length > 0) {
 				game.loadNextAnim(loader);
-			}else{
+			} else {
 				delete game.anims;
 				game.action = "Idle";
 				game.mode = game.modes.ACTIVE;
@@ -1421,7 +1449,7 @@ class Game{
 				game.setKeyboardEvent();
 				game.animate();
 			}
-		});	
+		});
 	}
 
 	setKeyboardEvent() {
@@ -1433,9 +1461,9 @@ class Game{
 		game.player.goRight = false;
 		game.player.turnLeft = false;
 		game.player.turnRight = false;
-		const onKeyDown = function ( event ) {
+		const onKeyDown = function (event) {
 			if (game.ischatting == false) {
-				switch ( event.code ) {
+				switch (event.code) {
 					case 'ArrowUp':
 						// console.log('[ArrowUp] go front');
 						game.player.goFront = true;
@@ -1474,10 +1502,10 @@ class Game{
 				}
 			}
 		};
-		
-		const onKeyUp = function ( event ) {
+
+		const onKeyUp = function (event) {
 			if (game.ischatting == false) {
-				switch ( event.code ) {
+				switch (event.code) {
 					case 'ArrowUp':
 						// console.log('[ArrowUp] go front');
 						game.player.goFront = false;
@@ -1515,10 +1543,10 @@ class Game{
 					// 	break;
 					case 'KeyQ':
 						let info = "请输入场景编号(1-4):\n"
-								 + "1: 排序算法演示\n"
-								 + "2: 二叉树遍历演示\n"
-								 + "3: 推箱子小游戏\n"
-								 + "4: 五子棋小游戏\n";
+							+ "1: 排序算法演示\n"
+							+ "2: 二叉树遍历演示\n"
+							+ "3: 推箱子小游戏\n"
+							+ "4: 五子棋小游戏\n";
 						let sceneId = prompt(info);
 						game.goToScene(sceneId);
 						break;
@@ -1551,41 +1579,41 @@ class Game{
 				}
 			}
 		};
-		
-		document.addEventListener( 'keydown', onKeyDown );
-		document.addEventListener( 'keyup', onKeyUp );
+
+		document.addEventListener('keydown', onKeyDown);
+		document.addEventListener('keyup', onKeyUp);
 
 	}
-	
-	playerControl(forward, turn){
+
+	playerControl(forward, turn) {
 		turn = -turn;
-		
-		if (forward>0.3){
-			if (this.player.action!='Walking' && this.player.action!='Running') this.player.action = 'Walking';
-		}else if (forward<-0.3){
-			if (this.player.action!='Walking Backwards') this.player.action = 'Walking Backwards';
-		}else{
+
+		if (forward > 0.3) {
+			if (this.player.action != 'Walking' && this.player.action != 'Running') this.player.action = 'Walking';
+		} else if (forward < -0.3) {
+			if (this.player.action != 'Walking Backwards') this.player.action = 'Walking Backwards';
+		} else {
 			forward = 0;
-			if (Math.abs(turn)>0.1){
+			if (Math.abs(turn) > 0.1) {
 				if (this.player.action != 'Turn') this.player.action = 'Turn';
-			}else if (this.player.action!="Idle"){
+			} else if (this.player.action != "Idle") {
 				this.player.action = 'Idle';
 			}
 		}
-		
+
 		// if (forward==0 && turn==0){
 		// 	delete this.player.motion;
 		// }else{
 		// 	this.player.motion = { forward, turn }; 
 		// }
 
-		this.player.motion = { forward, turn }; 
-		
-		
+		this.player.motion = { forward, turn };
+
+
 		this.player.updateSocket();
 	}
-	
-	createCameras(){
+
+	createCameras() {
 		const offset = new THREE.Vector3(0, 80, 0);
 		const front = new THREE.Object3D();
 		front.position.set(112, 100, 600);
@@ -1606,64 +1634,64 @@ class Game{
 		collect.position.set(40, 82, 94);
 		collect.parent = this.player.object;
 		this.cameras = { front, back, wide, overhead, collect, chat };
-		this.activeCamera = this.cameras.back;	
+		this.activeCamera = this.cameras.back;
 	}
-	
-	showMessage(msg, fontSize=20, onOK=null){
+
+	showMessage(msg, fontSize = 20, onOK = null) {
 		const txt = document.getElementById('message_text');
 		txt.innerHTML = msg;
 		txt.style.fontSize = fontSize + 'px';
 		const btn = document.getElementById('message_ok');
 		const panel = document.getElementById('message');
 		const game = this;
-		if (onOK!=null){
-			btn.onclick = function(){ 
+		if (onOK != null) {
+			btn.onclick = function () {
 				panel.style.display = 'none';
-				onOK.call(game); 
+				onOK.call(game);
 			}
-		}else{
-			btn.onclick = function(){
+		} else {
+			btn.onclick = function () {
 				panel.style.display = 'none';
 			}
 		}
 		panel.style.display = 'flex';
 	}
-	
+
 	onWindowResize() {
 		this.camera.aspect = window.innerWidth / window.innerHeight;
 		this.camera.updateProjectionMatrix();
 
-		this.renderer.setSize( window.innerWidth, window.innerHeight );
+		this.renderer.setSize(window.innerWidth, window.innerHeight);
 
 	}
-	
-	updateRemotePlayers(dt){
+
+	updateRemotePlayers(dt) {
 		// 先更新this.remotePlayers，然后对其中的每个remotePlayer执行update
-		if (this.remoteData===undefined || this.remoteData.length == 0 || this.player===undefined || this.player.id===undefined) return;
-		
+		if (this.remoteData === undefined || this.remoteData.length == 0 || this.player === undefined || this.player.id === undefined) return;
+
 		const newPlayers = [];
 		const game = this;
 		//Get all remotePlayers from remoteData array
 		const remotePlayers = [];
 		const remoteColliders = [];
-		
-		this.remoteData.forEach( function(data){
-			if (game.player.id != data.id){
+
+		this.remoteData.forEach(function (data) {
+			if (game.player.id != data.id) {
 				//Is this player being initialised?
 				let iplayer;
-				game.initialisingPlayers.forEach( function(player){
+				game.initialisingPlayers.forEach(function (player) {
 					if (player.id == data.id) iplayer = player;
 				});
 				//If not being initialised check the remotePlayers array
-				if (iplayer===undefined){
+				if (iplayer === undefined) {
 					let rplayer;
-					game.remotePlayers.forEach( function(player){
+					game.remotePlayers.forEach(function (player) {
 						if (player.id == data.id) rplayer = player;
 					});
-					if (rplayer===undefined){
+					if (rplayer === undefined) {
 						//Initialise player
-						game.initialisingPlayers.push( new Player( game, data ));
-					}else{
+						game.initialisingPlayers.push(new Player(game, data));
+					} else {
 						//Player exists
 						remotePlayers.push(rplayer);
 						remoteColliders.push(rplayer.collider);
@@ -1671,42 +1699,42 @@ class Game{
 				}
 			}
 		});
-		
-		this.scene.children.forEach( function(object){
-			if (object.userData.remotePlayer && game.getRemotePlayerById(object.userData.id)==undefined){
+
+		this.scene.children.forEach(function (object) {
+			if (object.userData.remotePlayer && game.getRemotePlayerById(object.userData.id) == undefined) {
 				game.scene.remove(object);
-			}	
+			}
 		});
-		
+
 		this.remotePlayers = remotePlayers;
 		this.remoteColliders = remoteColliders;
-		this.remotePlayers.forEach(function(player){ player.update( dt ); });	
+		this.remotePlayers.forEach(function (player) { player.update(dt); });
 	}
-	
-	onMouseDown( event ) {
-		if (this.remoteColliders===undefined || this.remoteColliders.length==0 || this.speechBubble===undefined || this.speechBubble.mesh===undefined) return;
-		
+
+	onMouseDown(event) {
+		if (this.remoteColliders === undefined || this.remoteColliders.length == 0 || this.speechBubble === undefined || this.speechBubble.mesh === undefined) return;
+
 		// calculate mouse position in normalized device coordinates
 		// (-1 to +1) for both components
 
 		const mouse = new THREE.Vector2();
-		mouse.x = ( event.clientX / this.renderer.domElement.clientWidth ) * 2 - 1;
-		mouse.y = - ( event.clientY / this.renderer.domElement.clientHeight ) * 2 + 1;
+		mouse.x = (event.clientX / this.renderer.domElement.clientWidth) * 2 - 1;
+		mouse.y = - (event.clientY / this.renderer.domElement.clientHeight) * 2 + 1;
 
 		const raycaster = new THREE.Raycaster();
-		raycaster.setFromCamera( mouse, this.camera );
-		
-		const intersects = raycaster.intersectObjects( this.remoteColliders );
+		raycaster.setFromCamera(mouse, this.camera);
+
+		const intersects = raycaster.intersectObjects(this.remoteColliders);
 		const chat = document.getElementById('chat');
-		
-		if (intersects.length>0){
+
+		if (intersects.length > 0) {
 			const object = intersects[0].object;
-			const players = this.remotePlayers.filter( function(player){
-				if (player.collider!==undefined && player.collider==object){
+			const players = this.remotePlayers.filter(function (player) {
+				if (player.collider !== undefined && player.collider == object) {
 					return true;
 				}
 			});
-			if (players.length>0){
+			if (players.length > 0) {
 				const player = players[0];
 				console.log(`onMouseDown: player ${player.id}`);
 				this.speechBubble.player = player;
@@ -1715,15 +1743,15 @@ class Game{
 				this.chatSocketId = player.id;
 				chat.style.bottom = '0px';
 				this.activeCamera = this.cameras.chat;
-				
+
 				// 显示出消息输入框，此时键盘仅用于打字
 				this.ischatting = true;
 			}
-		}else{
+		} else {
 			//Is the chat panel visible?
-			if (chat.style.bottom=='0px' && (window.innerHeight - event.clientY)>40){
+			if (chat.style.bottom == '0px' && (window.innerHeight - event.clientY) > 40) {
 				console.log("onMouseDown: No player found");
-				if (this.speechBubble.mesh.parent!==null) this.speechBubble.mesh.parent.remove(this.speechBubble.mesh);
+				if (this.speechBubble.mesh.parent !== null) this.speechBubble.mesh.parent.remove(this.speechBubble.mesh);
 				delete this.speechBubble.player;
 				delete this.chatSocketId;
 				chat.style.bottom = '-50px';
@@ -1731,33 +1759,32 @@ class Game{
 
 				// 消息输入框不再显示，此时键盘用于控制。
 				this.ischatting = false;
-			}else{
+			} else {
 				console.log("onMouseDown: typing");
 			}
 		}
 	}
-	
-	getRemotePlayerById(id){
-		if (this.remotePlayers===undefined || this.remotePlayers.length==0) return;
-		
-		const players = this.remotePlayers.filter(function(player){
+
+	getRemotePlayerById(id) {
+		if (this.remotePlayers === undefined || this.remotePlayers.length == 0) return;
+
+		const players = this.remotePlayers.filter(function (player) {
 			if (player.id == id) return true;
-		});	
-		
-		if (players.length==0) return;
-		
+		});
+
+		if (players.length == 0) return;
+
 		return players[0];
 	}
-	
+
 	animate() {
 		const game = this;
 		const dt = this.clock.getDelta();
-		
-		requestAnimationFrame( function(){ game.animate(); } );
+
+		requestAnimationFrame(function () { game.animate(); });
 
 		//更新NPC动画
-		if(this.NPCmixer)
-		{
+		if (this.NPCmixer) {
 			this.NPCmixer.update(0.02);
 		}
 		// 场景中自定义的动画
@@ -1765,121 +1792,121 @@ class Game{
 
 		// 远程玩家位置的移动
 		this.updateRemotePlayers(dt);
-		
+
 		// 本地玩家动作的变化
-		if (this.player.mixer!=undefined && this.mode==this.modes.ACTIVE) this.player.mixer.update(dt);
-		if (this.player.action=='Walking'){
+		if (this.player.mixer != undefined && this.mode == this.modes.ACTIVE) this.player.mixer.update(dt);
+		if (this.player.action == 'Walking') {
 			const elapsedTime = Date.now() - this.player.actionTime;
-			if (elapsedTime>1000 && this.player.motion.forward>0){
+			if (elapsedTime > 1000 && this.player.motion.forward > 0) {
 				this.player.action = 'Running';
 			}
 		}
-		
+
 		// 本地玩家位置的移动
 		if (this.player.motion !== undefined) this.player.move(dt);
-		
+
 		// 设置相机相对位置
-		if (this.cameras!=undefined && this.cameras.active!=undefined && this.player!==undefined && this.player.object!==undefined){
+		if (this.cameras != undefined && this.cameras.active != undefined && this.player !== undefined && this.player.object !== undefined) {
 			this.camera.position.lerp(this.cameras.active.getWorldPosition(new THREE.Vector3()), 0.05);
 			const pos = this.player.object.position.clone();
-			if (this.cameras.active==this.cameras.chat){
+			if (this.cameras.active == this.cameras.chat) {
 				pos.y += 200;
-			}else{
+			} else {
 				pos.y += 300;
 			}
 			this.camera.lookAt(pos);
 		}
-		
+
 		// 太阳的位置（点光源）
-		if (this.sun !== undefined){
-			this.sun.position.copy( this.camera.position );
+		if (this.sun !== undefined) {
+			this.sun.position.copy(this.camera.position);
 			this.sun.position.y += 10;
 		}
-		
+
 		// 对话框
-		if (this.speechBubble!==undefined) this.speechBubble.show(this.camera.position);
-		
-		this.renderer.render( this.scene, this.camera );
+		if (this.speechBubble !== undefined) this.speechBubble.show(this.camera.position);
+
+		this.renderer.render(this.scene, this.camera);
 	}
 }
 
-class Player{
-	constructor(game, options){
+class Player {
+	constructor(game, options) {
 		this.local = true;
-		this.motion = {forward:0, turn:0};
+		this.motion = { forward: 0, turn: 0 };
 
 		let model, colour;
-									
-		if (options===undefined){
+
+		if (options === undefined) {
 			// 此处通过填写表单自选皮肤（颜色、角色）
 			colour = sessionStorage.getItem("colour");
 			model = sessionStorage.getItem("model");
 			if (colour === null || model === null) {
 				window.location.href = "./choose_skin.html";
 			}
-		
+
 			// const colours = ['Black', 'Brown', 'White'];
 			// colour = colours[Math.floor(Math.random()*colours.length)];
 			// const people = ['BeachBabe', 'BusinessMan', 'Doctor', 'FireFighter', 'Housewife', 'Policeman', 'Prostitute', 'Punk', 'RiotCop', 'Roadworker', 'Robber', 'Sheriff', 'Streetman', 'Waitress'];
 			// model = people[Math.floor(Math.random()*people.length)];
-		}else if (typeof options =='object'){
+		} else if (typeof options == 'object') {
 			this.local = false;
 			this.options = options;
 			this.id = options.id;
 			model = options.model;
 			colour = options.colour;
-		}else{
+		} else {
 			model = options;
 		}
 		this.model = model;
 		this.colour = colour;
 		this.game = game;
 		this.animations = this.game.animations;
-		
+
 		const loader = new THREE.FBXLoader();
 		const player = this;
-		
-		loader.load( `${game.assetsPath}fbx/people/${model}.fbx`, function ( object ) {
 
-			object.mixer = new THREE.AnimationMixer( object );
+		loader.load(`${game.assetsPath}fbx/people/${model}.fbx`, function (object) {
+
+			object.mixer = new THREE.AnimationMixer(object);
 			player.root = object;
 			player.mixer = object.mixer;
-			
+
 			object.name = "Person";
-					
-			object.traverse( function ( child ) {
-				if ( child.isMesh ) {
+
+			object.traverse(function (child) {
+				if (child.isMesh) {
 					child.castShadow = true;
-					child.receiveShadow = true;		
+					child.receiveShadow = true;
 				}
-			} );
-			
-			
+			});
+
+
 			const textureLoader = new THREE.TextureLoader();
-			
-			textureLoader.load(`${game.assetsPath}images/SimplePeople_${model}_${colour}.png`, function(texture){
-				object.traverse( function ( child ) {
-					if ( child.isMesh ){
+
+			textureLoader.load(`${game.assetsPath}images/SimplePeople_${model}_${colour}.png`, function (texture) {
+				object.traverse(function (child) {
+					if (child.isMesh) {
 						child.material.map = texture;
 					}
-				} );
+				});
 			});
-			
+
 			player.object = new THREE.Object3D();
 			player.object.position.set(3122, 0, -173);
 			player.object.rotation.set(0, 2.6, 0);
-			
+
 			player.object.add(object);
-			if (player.deleted===undefined) game.scene.add(player.object);
-			
-			if (player.local){
+			if (player.deleted === undefined) game.scene.add(player.object);
+
+			if (player.local) {
 				game.createCameras();
 				game.sun.target = game.player.object;
 				game.animations.Idle = object.animations[0];
-				if (player.initSocket!==undefined) player.initSocket();
-			}else{
-				const geometry = new THREE.BoxGeometry(100,300,100);
-				const material = new THREE.MeshBasicMaterial({visible:false});
+				if (player.initSocket !== undefined) player.initSocket();
+			} else {
+				const geometry = new THREE.BoxGeometry(100, 300, 100);
+				const material = new THREE.MeshBasicMaterial({ visible: false });
 				const box = new THREE.Mesh(geometry, material);
 				box.name = "Collider";
 				box.position.set(0, 150, 0);
@@ -1890,40 +1917,40 @@ class Player{
 				const players = game.initialisingPlayers.splice(game.initialisingPlayers.indexOf(this), 1);
 				game.remotePlayers.push(players[0]);
 			}
-			
-			if (game.animations.Idle!==undefined) player.action = "Idle";
-		} );
+
+			if (game.animations.Idle !== undefined) player.action = "Idle";
+		});
 	}
-	
-	set action(name){
+
+	set action(name) {
 		//Make a copy of the clip if this is a remote player
 		if (this.actionName == name) return;
-		const clip = (this.local) ? this.animations[name] : THREE.AnimationClip.parse(THREE.AnimationClip.toJSON(this.animations[name])); 
-		const action = this.mixer.clipAction( clip );
-        action.time = 0;
+		const clip = (this.local) ? this.animations[name] : THREE.AnimationClip.parse(THREE.AnimationClip.toJSON(this.animations[name]));
+		const action = this.mixer.clipAction(clip);
+		action.time = 0;
 		this.mixer.stopAllAction();
 		this.actionName = name;
 		this.actionTime = Date.now();
-		
-		action.fadeIn(0.5);	
+
+		action.fadeIn(0.5);
 		action.play();
 	}
-	
-	get action(){
+
+	get action() {
 		return this.actionName;
 	}
-	
-	update(dt){
+
+	update(dt) {
 		this.mixer.update(dt);
-		
-		if (this.game.remoteData.length>0){
+
+		if (this.game.remoteData.length > 0) {
 			let found = false;
-			for(let data of this.game.remoteData){
+			for (let data of this.game.remoteData) {
 				if (data.id != this.id) continue;
 				//Found the player
-				this.object.position.set( data.x, data.y, data.z );
+				this.object.position.set(data.x, data.y, data.z);
 				const euler = new THREE.Euler(data.pb, data.heading, data.pb);
-				this.object.quaternion.setFromEuler( euler );
+				this.object.quaternion.setFromEuler(euler);
 				this.action = data.action;
 				found = true;
 			}
@@ -1932,47 +1959,47 @@ class Player{
 	}
 }
 
-class PlayerLocal extends Player{
-	constructor(game, model){
+class PlayerLocal extends Player {
+	constructor(game, model) {
 		super(game, model);
-		
+
 		const player = this;
 		const socket = io.connect();
 		this.velocityY = 0;
 
-		socket.on('setId', function(data){
+		socket.on('setId', function (data) {
 			player.id = data.id;
 
 			const roomId = sessionStorage.getItem("roomId");
-			socket.emit('join room', {roomId: roomId});
+			socket.emit('join room', { roomId: roomId });
 		});
-		socket.on('remoteData', function(data){
+		socket.on('remoteData', function (data) {
 			game.remoteData = data;
 		});
-		socket.on('deletePlayer', function(data){
-			const players = game.remotePlayers.filter(function(player){
-				if (player.id == data.id){
+		socket.on('deletePlayer', function (data) {
+			const players = game.remotePlayers.filter(function (player) {
+				if (player.id == data.id) {
 					return player;
 				}
 			});
-			if (players.length>0){
+			if (players.length > 0) {
 				let index = game.remotePlayers.indexOf(players[0]);
-				if (index!=-1){
-					game.remotePlayers.splice( index, 1 );
+				if (index != -1) {
+					game.remotePlayers.splice(index, 1);
 					game.scene.remove(players[0].object);
 				}
-            }else{
-                index = game.initialisingPlayers.indexOf(data.id);
-                if (index!=-1){
-                    const player = game.initialisingPlayers[index];
-                    player.deleted = true;
-                    game.initialisingPlayers.splice(index, 1);
-                }
+			} else {
+				index = game.initialisingPlayers.indexOf(data.id);
+				if (index != -1) {
+					const player = game.initialisingPlayers[index];
+					player.deleted = true;
+					game.initialisingPlayers.splice(index, 1);
+				}
 			}
 		});
-        
+
 		// 接受别人发来的消息
-		socket.on('chat message', function(data){
+		socket.on('chat message', function (data) {
 			document.getElementById('chat').style.bottom = '0px';
 			const player = game.getRemotePlayerById(data.id);
 			game.speechBubble.player = player;
@@ -1980,21 +2007,21 @@ class PlayerLocal extends Player{
 			game.activeCamera = game.cameras.chat;
 			game.speechBubble.update(data.message);
 		});
-        
+
 		// 向别人发消息
-		$('#msg-form').submit(function(e){
-			socket.emit('chat message', { id:game.chatSocketId, message:$('#m').val() });
+		$('#msg-form').submit(function (e) {
+			socket.emit('chat message', { id: game.chatSocketId, message: $('#m').val() });
 			$('#m').val('');
 			return false;
 		});
-		
+
 		this.socket = socket;
 	}
-	
-	initSocket(){
+
+	initSocket() {
 		//console.log("PlayerLocal.initSocket");
-		this.socket.emit('init', { 
-			model:this.model, 
+		this.socket.emit('init', {
+			model: this.model,
 			colour: this.colour,
 			x: this.object.position.x,
 			y: this.object.position.y,
@@ -2003,9 +2030,9 @@ class PlayerLocal extends Player{
 			pb: this.object.rotation.x
 		});
 	}
-	
-	updateSocket(){
-		if (this.socket !== undefined){
+
+	updateSocket() {
+		if (this.socket !== undefined) {
 			//console.log(`PlayerLocal.updateSocket - rotation(${this.object.rotation.x.toFixed(1)},${this.object.rotation.y.toFixed(1)},${this.object.rotation.z.toFixed(1)})`);
 			this.socket.emit('update', {
 				x: this.object.position.x,
@@ -2019,8 +2046,8 @@ class PlayerLocal extends Player{
 			// console.log(`(${this.object.position.x},${this.object.position.y},${this.object.position.z})`);
 		}
 	}
-	
-	move(dt){
+
+	move(dt) {
 		// const ppp = this.object.position;
 		// console.log(`(${ppp.x},${ppp.y},${ppp.z})`);
 		// const rrr = this.object.rotation;
@@ -2031,18 +2058,18 @@ class PlayerLocal extends Player{
 		// 这一段代码将使得joystick失去作用
 		if (this.goFront) {
 			this.motion.forward = 1;
-			if (this.action!='Walking' && this.action!='Running') {
+			if (this.action != 'Walking' && this.action != 'Running') {
 				this.action = 'Walking';
 			}
 		} else if (this.goBack) {
 			this.motion.forward = -1;
-			if (this.action!='Walking Backwards') {
+			if (this.action != 'Walking Backwards') {
 				this.action = 'Walking Backwards';
 			}
 		} else {
 			this.motion.forward = 0;
 		}
-		
+
 		if (this.turnLeft || this.turnRight) {
 			if (this.motion.forward == 0) {
 				if (this.action != 'Turn') {
@@ -2067,97 +2094,97 @@ class PlayerLocal extends Player{
 		pos.y += 60;
 		let dir = new THREE.Vector3();
 		this.object.getWorldDirection(dir);
-		if (this.motion.forward<0) dir.negate();
+		if (this.motion.forward < 0) dir.negate();
 		let raycaster = new THREE.Raycaster(pos, dir);
 		let blocked = false;
 		const colliders = this.game.colliders;
-	
-		if (colliders!==undefined){ 
+
+		if (colliders !== undefined) {
 			const intersect = raycaster.intersectObjects(colliders);
-			if (intersect.length>0){
-				if (intersect[0].distance<50) blocked = true;
+			if (intersect.length > 0) {
+				if (intersect[0].distance < 50) blocked = true;
 			}
 		}
-		
-		if (!blocked){
-			if (this.motion.forward>0){
-				const speed = (this.action=='Running') ? 500*6 : 150*6;
-				this.object.translateZ(dt*speed);
+
+		if (!blocked) {
+			if (this.motion.forward > 0) {
+				const speed = (this.action == 'Running') ? 500 * 6 : 150 * 6;
+				this.object.translateZ(dt * speed);
 			} else if (this.action != "Idle") {
-				this.object.translateZ(-dt*30);
+				this.object.translateZ(-dt * 30);
 			}
 		}
-		
-		if (colliders!==undefined){
+
+		if (colliders !== undefined) {
 			//cast left
-			dir.set(-1,0,0);
+			dir.set(-1, 0, 0);
 			dir.applyMatrix4(this.object.matrix);
 			dir.normalize();
 			raycaster = new THREE.Raycaster(pos, dir);
 
 			let intersect = raycaster.intersectObjects(colliders);
-			if (intersect.length>0){
-				if (intersect[0].distance<50) this.object.translateX(100-intersect[0].distance);
+			if (intersect.length > 0) {
+				if (intersect[0].distance < 50) this.object.translateX(100 - intersect[0].distance);
 			}
-			
+
 			//cast right
-			dir.set(1,0,0);
+			dir.set(1, 0, 0);
 			dir.applyMatrix4(this.object.matrix);
 			dir.normalize();
 			raycaster = new THREE.Raycaster(pos, dir);
 
 			intersect = raycaster.intersectObjects(colliders);
-			if (intersect.length>0){
-				if (intersect[0].distance<50) this.object.translateX(intersect[0].distance-100);
+			if (intersect.length > 0) {
+				if (intersect[0].distance < 50) this.object.translateX(intersect[0].distance - 100);
 			}
-			
+
 			//cast down
-			dir.set(0,-1,0);
+			dir.set(0, -1, 0);
 			pos.y += 200;
 			raycaster = new THREE.Raycaster(pos, dir);
 			const gravity = 30;
 
 			intersect = raycaster.intersectObjects(colliders);
-			if (intersect.length>0){
+			if (intersect.length > 0) {
 				const targetY = pos.y - intersect[0].distance;
 
 				// console.log("targetY", targetY);
 				// console.log("y", this.object.position.y);
-				if (targetY <= this.object.position.y || this.velocityY < 0){
+				if (targetY <= this.object.position.y || this.velocityY < 0) {
 					//Falling
 					// console.log("pos.y", this.object.position.y);
 
-					if (this.velocityY==undefined) this.velocityY = 0;
+					if (this.velocityY == undefined) this.velocityY = 0;
 					this.velocityY += dt * gravity;
 					this.object.position.y -= this.velocityY;
-					if (this.object.position.y < targetY){
+					if (this.object.position.y < targetY) {
 						this.velocityY = 0;
 						this.object.position.y = targetY;
 					}
-				} else if (targetY > this.object.position.y){
+				} else if (targetY > this.object.position.y) {
 					//Going up
 					this.object.position.y = 0.8 * this.object.position.y + 0.2 * targetY;
 					// this.object.position.y = targetY;
 					this.velocityY = 0;
 				}
 			}
-		
-			this.object.rotateY(this.motion.turn*dt);
-			
+
+			this.object.rotateY(this.motion.turn * dt);
+
 			this.updateSocket();
 		}
 	}
 }
 
-class SpeechBubble{
-	constructor(game, msg, size=1){
-		this.config = { font:'Calibri', size:24, padding:10, colour:'#222', width:256, height:256 };
-		
+class SpeechBubble {
+	constructor(game, msg, size = 1) {
+		this.config = { font: 'Calibri', size: 24, padding: 10, colour: '#222', width: 256, height: 256 };
+
 		const planeGeometry = new THREE.PlaneGeometry(size, size);
 		const planeMaterial = new THREE.MeshBasicMaterial()
 		this.mesh = new THREE.Mesh(planeGeometry, planeMaterial);
 		game.scene.add(this.mesh);
-		
+
 		const self = this;
 		const loader = new THREE.TextureLoader();
 		loader.load(
@@ -2165,31 +2192,31 @@ class SpeechBubble{
 			`${game.assetsPath}images/speech.png`,
 
 			// onLoad callback
-			function ( texture ) {
+			function (texture) {
 				// in this example we create the material when the texture is loaded
 				self.img = texture.image;
 				self.mesh.material.map = texture;
 				self.mesh.material.transparent = true;
 				self.mesh.material.needsUpdate = true;
-				if (msg!==undefined) self.update(msg);
+				if (msg !== undefined) self.update(msg);
 			},
 
 			// onProgress callback currently not supported
 			undefined,
 
 			// onError callback
-			function ( err ) {
-				console.error( 'An error happened.' );
+			function (err) {
+				console.error('An error happened.');
 			}
 		);
 	}
-	
-	update(msg){
-		if (this.mesh===undefined) return;
-		
+
+	update(msg) {
+		if (this.mesh === undefined) return;
+
 		let context = this.context;
-		
-		if (this.mesh.userData.context===undefined){
+
+		if (this.mesh.userData.context === undefined) {
 			const canvas = this.createOffscreenCanvas(this.config.width, this.config.height);
 			this.context = canvas.getContext('2d');
 			context = this.context;
@@ -2198,57 +2225,57 @@ class SpeechBubble{
 			context.textAlign = 'center';
 			this.mesh.material.map = new THREE.CanvasTexture(canvas);
 		}
-		
+
 		const bg = this.img;
 		context.clearRect(0, 0, this.config.width, this.config.height);
 		context.drawImage(bg, 0, 0, bg.width, bg.height, 0, 0, this.config.width, this.config.height);
 		this.wrapText(msg, context);
-		
+
 		this.mesh.material.map.needsUpdate = true;
 	}
-	
+
 	createOffscreenCanvas(w, h) {
 		const canvas = document.createElement('canvas');
 		canvas.width = w;
 		canvas.height = h;
 		return canvas;
 	}
-	
-	wrapText(text, context){
+
+	wrapText(text, context) {
 		const words = text.split(' ');
-        let line = '';
+		let line = '';
 		const lines = [];
-		const maxWidth = this.config.width - 2*this.config.padding;
+		const maxWidth = this.config.width - 2 * this.config.padding;
 		const lineHeight = this.config.size + 8;
 
 		// line对应的是当前行
 		// lines对应的是最终实际显示的行。
 		// 尝试将词写到当前行的末尾。
 		// 如果超过了一行的最大长度，就把不带有该词的上一行作为确定的一行，记录在lines中。
-		words.forEach( function(word){
+		words.forEach(function (word) {
 			const testLine = `${line}${word} `;
-        	const metrics = context.measureText(testLine);
-        	const testWidth = metrics.width;
+			const metrics = context.measureText(testLine);
+			const testWidth = metrics.width;
 			if (testWidth > maxWidth) {
 				lines.push(line);
 				line = `${word} `;
-			}else {
+			} else {
 				line = testLine;
 			}
 		});
-		
+
 		if (line != '') lines.push(line);
-		
-		let y = (this.config.height - lines.length * lineHeight)/2;
-		
-		lines.forEach( function(line){
+
+		let y = (this.config.height - lines.length * lineHeight) / 2;
+
+		lines.forEach(function (line) {
 			context.fillText(line, 128, y);
 			y += lineHeight;
 		});
 	}
-	
-	show(pos){
-		if (this.mesh!==undefined && this.player!==undefined){
+
+	show(pos) {
+		if (this.mesh !== undefined && this.player !== undefined) {
 			this.mesh.position.set(this.player.object.position.x, this.player.object.position.y + 380, this.player.object.position.z);
 			this.mesh.lookAt(pos);
 		}

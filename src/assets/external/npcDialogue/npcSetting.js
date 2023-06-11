@@ -1,6 +1,10 @@
 var dialogueData = {
-    npc1: {
+    Mouse: {
         initialStage: "stage1",
+        fbx:"fbx/character/mouse/Idle.fbx",
+        position:[3122,0,-175],
+        scale:[2,2,2],
+        rotation:[0,Math.PI,0],
         stages: {
             stage1: {
                 dialogue: "欢迎来到碧蓝航线！你想和我聊些什么？",
