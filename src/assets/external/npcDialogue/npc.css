@@ -1,0 +1,63 @@
+.npc-popup {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    width: 100%;
+    height: auto;
+    background-color: rgba(248, 248, 248, 0.5);
+    padding: 20px;
+    box-sizing: border-box;
+    display: none;
+    z-index: 9999;
+    padding: 20px;
+}
+
+#npc-message {
+    white-space: nowrap;
+    overflow: hidden;
+    min-height: 40%;
+    padding: 20px;
+    min-width: 30px;
+    animation: showChars 1s steps(100);
+}
+
+@keyframes showChars {
+    0% {
+        width: 0;
+    }
+
+    100% {
+        width: 100%;
+    }
+}
+
+#options-popup {
+    position: fixed;
+    top: 0;
+    right: 0;
+    width: 200px;
+    height: 100%;
+    padding: 20px;
+    box-sizing: border-box;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: flex-end;
+}
+
+.child-div {
+    max-width: 100px;
+    height: auto;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    flex: 0 0 auto;
+    margin: 10px 10px;
+    padding: 10px;
+    background-color: rgba(248, 248, 248, 0.5);
+    border-radius: 5px;
+}
+
+.child-div:not(:last-child) {
+    margin-bottom: 20px;
+}

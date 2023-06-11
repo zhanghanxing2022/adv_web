@@ -1,111 +1,165 @@
 <!DOCTYPE html>
 <html lang="en">
-	<head>
-		<title>Blockland - a multi-player game</title>
-		<meta charset="utf-8">
-		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
-		<meta name="description" content="Blockland is a multi-player game. Using the Three.js library. author:Nik Lever ©2018 category:application-javascript" />
-		<meta property="og:url" content="http://niksgames.com/blockland" />
-		<meta property="og:type" content="product" />
-		<meta property="og:title" content="Blockland - a multi-player game" />
-		<meta property="og:description" content="Blockland is a multi-player game. Using the Three.js library. author:Nik Lever ©2018 category:application-javascript" />
-		<meta property="og:image" content="http://niksgames.com/blockland/assets/blockland-og.jpg" />
-		<meta property="og:image:type" content="image/jpeg" />
-		<meta property="og:image:width" content="1265" />
-		<meta property="og:image:height" content="817" />
-		<meta property="og:image:alt" content="Blockland - a multi-player game" />
-		<meta property='og:video' content='https://www.youtube.com/v/1r9V_JEEMlA' />
-		<link href="https://fonts.googleapis.com/css?family=IBM+Plex+Sans|Kavivanar" rel="stylesheet">
-		<style>
-			body {
-				font-family: Monospace;
-				background-color: #000;
-				color: #fff;
-				margin: 0px;
-				overflow: hidden;
-			}
-			#message{
-				position:absolute;
-				left: 50%;
-				top: 50%;
-				transform: translateX(-50%) translateY(-50%);
-				font-family: 'Kavivanar', san-serif;
-				font-size: 40px;
-				width:80%;
-				max-width:280px;
-				padding: 15px 15px 50px 15px;
-				text-align: center;
-				display:none;
-				align-content: center;
-				justify-content: center;
-				background-color: aliceblue;
-				border: medium solid #3D455C;
-				border-radius: 20px;
-				color: #3D455C;
-				z-index: 99;
-			}
-			#message_ok{
-				position: absolute;
-				bottom: 10px;
-				padding: 10px 20px 10px 20px;
-				font-family: sans-serif;
-				font-size: 20px;
-				background-color: #3D455C;
-				color: #fff;
-				border-radius: 8px;
-				border: medium solid #696882;
-			}
-			#chat{
-				position: absolute;
-				width: 100%;
-				height: 40px;
-				bottom: -40px;
-				transition: all 0.5s;
-			}
-			form { background: #000; padding: 3px; width: 100%; }
-      		form input { border: 0; padding: 10px; width: 88%; margin-right: .5%; }
-      		form button { width: 8%; background: rgb(130, 224, 255); border: none; padding: 10px; }
-		</style>
-	</head>
 
-	<body>
-		<p>aaaaaaaaaa</p>
-		<div id="message">
-			<p id="message_text"></p>
-			<button id="message_ok">OK</button>
-		</div>
-		<div id="chat">
-			<form id="msg-form" action="">
-      			<input id="m" autocomplete="off" /><button>Send</button>
-    		</form>
-		</div>
+<head>
+	<title>Blockland - a multi-player game</title>
+	<meta charset="utf-8">
+	<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+	<meta name="description"
+		content="Blockland is a multi-player game. Using the Three.js library. author:Nik Lever ©2018 category:application-javascript" />
+	<meta property="og:url" content="http://niksgames.com/blockland" />
+	<meta property="og:type" content="product" />
+	<meta property="og:title" content="Blockland - a multi-player game" />
+	<meta property="og:description"
+		content="Blockland is a multi-player game. Using the Three.js library. author:Nik Lever ©2018 category:application-javascript" />
+	<meta property="og:image" content="http://niksgames.com/blockland/assets/blockland-og.jpg" />
+	<meta property="og:image:type" content="image/jpeg" />
+	<meta property="og:image:width" content="1265" />
+	<meta property="og:image:height" content="817" />
+	<meta property="og:image:alt" content="Blockland - a multi-player game" />
+	<meta property='og:video' content='https://www.youtube.com/v/1r9V_JEEMlA' />
+	<link href="https://fonts.googleapis.com/css?family=IBM+Plex+Sans|Kavivanar" rel="stylesheet">
+	<style>
+		body {
+			font-family: Monospace;
+			background-color: #000;
+			color: #fff;
+			margin: 0px;
+			overflow: hidden;
+		}
 
-		<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/92/three.min.js"></script>
-		<script src="https://code.jquery.com/jquery-1.11.1.js"></script>
-		<script src="socket.io-client-4.6.2/dist/socket.io.js"></script>
-		
-		<script src= "./libs/inflate.min.js"></script>
-		<script src="./libs/FBXLoader.js"></script>
-		<script src="./libs/Detector.js"></script>
-		<script src="./libs/toon3d.js"></script>
-		<script src="game.js"></script>
-		<script src="changeEnvironment.js"></script>
-		<script>
-			// 此处改为通过填写表单自选皮肤（颜色、角色）
-			let model, colour;
-			colour = sessionStorage.getItem("colour");
-			model = sessionStorage.getItem("model");
-			roomId = sessionStorage.getItem("roomId");
-			if (colour === null || model === null || roomId === null) {
-				window.location.href = "./choose_skin.html";
-			}
+		#message {
+			position: absolute;
+			left: 50%;
+			top: 50%;
+			transform: translateX(-50%) translateY(-50%);
+			font-family: 'Kavivanar', san-serif;
+			font-size: 40px;
+			width: 80%;
+			max-width: 280px;
+			padding: 15px 15px 50px 15px;
+			text-align: center;
+			display: none;
+			align-content: center;
+			justify-content: center;
+			background-color: aliceblue;
+			border: medium solid #3D455C;
+			border-radius: 20px;
+			color: #3D455C;
+			z-index: 99;
+		}
 
-			// blockland小游戏
-			var game;
-			window.alert( sessionStorage.getItem("email"));
-			document.addEventListener("DOMContentLoaded", function(){ game = new Game(); });
-		</script>
-	</body>
+		#message_ok {
+			position: absolute;
+			bottom: 10px;
+			padding: 10px 20px 10px 20px;
+			font-family: sans-serif;
+			font-size: 20px;
+			background-color: #3D455C;
+			color: #fff;
+			border-radius: 8px;
+			border: medium solid #696882;
+		}
+
+		#chat {
+			position: absolute;
+			width: 100%;
+			height: 40px;
+			bottom: -40px;
+			transition: all 0.5s;
+		}
+
+		form {
+			background: #000;
+			padding: 3px;
+			width: 100%;
+		}
+
+		form input {
+			border: 0;
+			padding: 10px;
+			width: 88%;
+			margin-right: .5%;
+		}
+
+		form button {
+			width: 8%;
+			background: rgb(130, 224, 255);
+			border: none;
+			padding: 10px;
+		}
+	</style>
+	<link rel="stylesheet" href="./npcDialogue/npc.css">
+</head>
+
+<body>
+	<div id="message">
+		<p id="message_text"></p>
+		<button id="message_ok">OK</button>
+	</div>
+	<div id="chat">
+		<form id="msg-form" action="">
+			<input id="m" autocomplete="off" /><button>Send</button>
+		</form>
+	</div>
+	<div id="options-popup"></div>
+	<div id="npc-popup" class="npc-popup">
+		<div id="npc-message"></div>
+	</div>
+	<button onclick="loadNPCDialogue(currentStage)">Start Dialogue</button>
+
+	<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/92/three.min.js"></script>
+	<script src="https://code.jquery.com/jquery-1.11.1.js"></script>
+	<script src="socket.io-client-4.6.2/dist/socket.io.js"></script>
+
+	<script src="./libs/inflate.min.js"></script>
+	<script src="./libs/FBXLoader.js"></script>
+	<script src="./libs/Detector.js"></script>
+	<script src="./libs/toon3d.js"></script>
+	<script src="game.js"></script>
+	<script src="changeEnvironment.js"></script>
+	<script src="./npcDialogue/npc.js"></script>
+	<script src="./npcDialogue/npcSetting.js"></script>
+
+	<script>
+		// 此处改为通过填写表单自选皮肤（颜色、角色）
+		let model, colour;
+		colour = sessionStorage.getItem("colour");
+		model = sessionStorage.getItem("model");
+		roomId = sessionStorage.getItem("roomId");
+		if (colour === null || model === null || roomId === null) {
+			window.location.href = "./choose_skin.html";
+		}
+
+		// blockland小游戏
+		var game;
+		window.alert(sessionStorage.getItem("email"));
+		document.addEventListener("DOMContentLoaded", function () { game = new Game(); });
+		//NPC init
+		window.onload = npcINit
+		npcINit();
+
+		// 检查是否需要重置对话状态
+		window.addEventListener("beforeunload", function () {
+			resetDialogue();
+		});
+		//
+		var currentStage = localStorage.getItem("npcDialogueStage") || dialogueData.npc1.initialStage;
+		// NPC 对话内容
+		var npcDialogueStage = "";
+		var currentChar = 0; // 当前显示的字符索引
+
+		var npcPopup = document.getElementById("npc-popup");
+		var npcMessage = document.getElementById("npc-message");
+		var optionsPopup = document.getElementById("options-popup");
+		// 添加一个事件监听器，当窗口大小改变时重新调整弹窗高度
+		window.addEventListener("resize", function () {
+			npcPopup.style.height = npcMessage.offsetHeight + "px";
+		});
+
+		// 初始化 NPC 对话
+		loadNPCDialogue(currentStage);
+	</script>
+</body>
+
 </html>
-
-

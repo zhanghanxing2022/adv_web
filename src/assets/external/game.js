@@ -123,6 +123,7 @@ class Game{
 		this.player = new PlayerLocal(this);
 		
 		this.loadEnvironment(loader);	// 默认blockland场景
+		this.loadNPC(loader);
 		
 		this.speechBubble = new SpeechBubble(this, "", 150);
 		this.speechBubble.mesh.position.set(0, 350, 0);
@@ -145,8 +146,28 @@ class Game{
 		}
 		
 		window.addEventListener( 'resize', () => game.onWindowResize(), false );
+		
 	}
-	
+	loadNPC(loader)
+	{
+		loader.load(`${this.assetsPath}fbx/character/mouse/Idle.fbx`,(obj)=>
+		{
+			game.scene.add(obj);
+			obj.position.set(3122, 0, -173);
+			obj.scale.set(2,2,2);
+			obj.rotation.set(0, Math.PI, 0);
+			//定义动画
+			this.NPCmixer = new THREE.AnimationMixer( obj );
+			obj.animations.forEach((clip)=>
+			{
+				const clips = this.NPCmixer.clipAction(clip)
+				clips.play();
+			})
+			
+			
+		})
+		
+	}
 	loadEnvironment(loader){
 		const game = this;
 		loader.load(`${this.assetsPath}fbx/town.fbx`, function(object){
@@ -1734,6 +1755,11 @@ class Game{
 		
 		requestAnimationFrame( function(){ game.animate(); } );
 
+		//更新NPC动画
+		if(this.NPCmixer)
+		{
+			this.NPCmixer.update(0.02);
+		}
 		// 场景中自定义的动画
 		this.sceneAnimation(dt);
 
