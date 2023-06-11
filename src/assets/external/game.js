@@ -153,11 +153,9 @@ class Game {
 	}
 	loadNPC(loader) {
 		//根据配置文件加载npc并设置好逻辑
-		for( let a in dialogueData)
-		{
+		for (let a in dialogueData) {
 			loader.load(`${this.assetsPath}${dialogueData[a].fbx}`, (obj) => {
 				this.scene.add(obj);
-				console.log(obj)
 				obj.position.set(...dialogueData[a].position);
 				obj.scale.set(...dialogueData[a].scale);
 				obj.rotation.set(...dialogueData[a].rotation);
@@ -169,32 +167,34 @@ class Game {
 				})
 				const raycaster = new THREE.Raycaster();
 				const mouse = new THREE.Vector2();
-	
-	
+
+
 				const npcMouse = (event) => {
-					console.log(a)
 					// 将鼠标点击位置归一化为屏幕坐标系
 					mouse.x = (event.clientX / window.innerWidth) * 2 - 1;
 					mouse.y = -(event.clientY / window.innerHeight) * 2 + 1;
-	
+
 					// 更新射线的起点和方向
-	
+
 					raycaster.setFromCamera(mouse, game.camera);
 					// 执行射线和物体的交互检测
-	
+
 					const intersects = raycaster.intersectObject(obj, true);
 					// 处理点击事件
-					console.log(intersects)
 					if (intersects.length > 0) {
-	
 						// 点击了物体
-						loadNPCDialogue(a);
+						if (sessionStorage.getItem("communicate") == null) {
+							sessionStorage.setItem("communicate", a);
+							loadNPCDialogue(a);
+						} else {
+							console.log("aaa")
+						}
 					}
 				}
 				document.addEventListener("click", npcMouse, false);
 			})
 		}
-		
+
 	}
 	loadEnvironment(loader) {
 		const game = this;

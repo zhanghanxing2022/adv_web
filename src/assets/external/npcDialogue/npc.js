@@ -1,10 +1,10 @@
 // 获取存储状态或设置初始状态
-function npcINit()
-{
+
+function npcINit() {
     // NPC 对话内容
     var npcDialogueStage = "";
     var currentChar = 0; // 当前显示的字符索引
-    
+
     // 获取弹窗和选项元素
     var npcPopup = document.getElementById("npc-popup");
     var npcMessage = document.getElementById("npc-message");
@@ -13,17 +13,18 @@ function npcINit()
 
 
 var listeners;
-function loadNPCDialogue(npc)
-{
-    loadNPCDialogueStep(npc,dialogueData[npc].initialStage)
+function loadNPCDialogue(npc) {
+    loadNPCDialogueStep(npc, dialogueData[npc].initialStage)
 }
 // 关闭对话
-function closeDialogue()
-{
+function closeDialogue() {
+    optionsPopup.style.display = "none";
     npcPopup.style.display = "none";
+    console.log("remove");
+    sessionStorage.removeItem("communicate");
 }
 // 逐字显示 NPC 对话
-function loadNPCDialogueStep(npc,stage) {
+function loadNPCDialogueStep(npc, stage) {
     npcINit();
     npcPopup.style.display = "block";
 
@@ -31,39 +32,33 @@ function loadNPCDialogueStep(npc,stage) {
     npcMessage.textContent = "";
     // 逐字显示 NPC 对话
     currentChar = 0;
-    document.getElementById("npc-name").textContent=npc;
+    document.getElementById("npc-name").textContent = npc;
     // 保存当前阶段到本地存储
-    localStorage.setItem("npcDialogueStage", stage);
     // npcPopup.style.height = npcMessage.offsetHeight+40 + "px";
     var timer = setInterval(function () {
         npcMessage.textContent += npcDialogueStage.dialogue[currentChar];
         currentChar++;
         if (currentChar >= npcDialogueStage.dialogue.length) {
             clearInterval(timer);
-            showOptionsPopup(npc,npcDialogueStage.options);
+            if (npcDialogueStage.end) {
+                setTimeout(() => {
+                    closeDialogue();
+                }, 1000);
+            } else {
+                showOptionsPopup(npc, npcDialogueStage.options);
+            }
         }
     }, 50);
 
     // 调整弹窗高度
-    
+
 }
 
 // 显示选项弹窗
-function showOptionsPopup(npc,options) {
+function showOptionsPopup(npc, options) {
     optionsPopup.innerHTML = "";
     // 创建选项按钮
-    if(options.length==0)
-    {
-        
-        setInterval(()=>
-            {
-                closeDialogue();
-                optionsPopup.style.display = "none";
-            },1000);
-        
-        return
 
-    }
     options.forEach(function (option) {
         var optionBtn = document.createElement("div");
         optionBtn.textContent = option.content;
@@ -73,7 +68,7 @@ function showOptionsPopup(npc,options) {
                 return opt.id === option.id;
             });
             if (selectedOption) {
-                loadNPCDialogueStep(npc,selectedOption.res);
+                loadNPCDialogueStep(npc, selectedOption.res);
             }
         });
         optionsPopup.appendChild(optionBtn);
