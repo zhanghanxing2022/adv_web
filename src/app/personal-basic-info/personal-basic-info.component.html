@@ -1,0 +1,14 @@
+<mat-list role="list">
+    <mat-list-item role="listitem">
+        <strong>用户编号: </strong> {{ (user != undefined) ? user.userID : "暂无数据" }}
+    </mat-list-item>
+    <mat-list-item role="listitem">
+        <strong>用户名称: </strong> {{ (user != undefined) ? user.username : "暂无数据" }}
+    </mat-list-item>
+    <mat-list-item role="listitem">
+        <strong>电子邮件: </strong> {{ (user != undefined) ? user.email : "暂无数据" }}
+    </mat-list-item>
+    <mat-list-item role="listitem">
+        <strong>电话号码: </strong> {{ (user != undefined) ? user.phone : "暂无数据" }}
+    </mat-list-item>
+</mat-list>

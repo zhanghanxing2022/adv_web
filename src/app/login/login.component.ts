@@ -3,6 +3,7 @@ import { HttpClient } from '@angular/common/http';
 import { FormControl } from '@angular/forms';
 import { Validators } from '@angular/forms';
 import { Router } from '@angular/router';
+import {UserService} from "../user.service";
 
 @Component({
   selector: 'app-login',
@@ -10,40 +11,24 @@ import { Router } from '@angular/router';
   styleUrls: ['./login.component.css']
 })
 export class LoginComponent {
-  constructor(public http : HttpClient, public router : Router){}
-  // private ip = "34.201.157.50";
-  private ip = "localhost"
-  private url = `http://${this.ip}:8080/user/`;
+  constructor(public http : HttpClient, public router : Router, private userService : UserService){}
   emailFormControl = new FormControl('', [Validators.required, Validators.email]);
   passwordFormControl = new FormControl('', [Validators.pattern('^[A-Za-z0-9]+$'), Validators.minLength(6)]);
 
   login(){
+    // 校验输入
     if (this.emailFormControl.invalid || this.passwordFormControl.invalid){
       alert("输入有误")
       return;
     }
-    sessionStorage.setItem("email",String(this.emailFormControl.value));
-    this.router.navigateByUrl("user/game");
-    return;
-
-    let body = {
-      id : 0,
-      email : this.emailFormControl.value,
-      username : "",
-      password : this.passwordFormControl.value
-    }
-    this.http.post(this.url + "login", body).subscribe(
+    // 请求登录
+    this.userService.login(this.emailFormControl.value, this.passwordFormControl.value).subscribe(
       (response : any) => {
         console.log(response);
-        if (response.data === null){
-          alert("账号或密码错误");
-          return;
-        }
         alert("登录成功");
         sessionStorage.setItem("token", response.token);
-        this.router.navigateByUrl("user/personalInfo")
-      }, response => {
-        console.log(response);
+        this.router.navigateByUrl("user/personalInfo");
+      }, (response : any) => {
         window.alert(response.error);
       }
     )

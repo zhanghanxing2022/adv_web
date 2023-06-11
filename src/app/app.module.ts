@@ -28,6 +28,9 @@ import { MatSelectModule } from '@angular/material/select';
 import { MatToolbarModule } from '@angular/material/toolbar'
 import { MatGridListModule } from '@angular/material/grid-list';
 import { MatIconModule } from '@angular/material/icon';
+import {MatTabsModule} from "@angular/material/tabs";
+import { PersonalBasicInfoComponent } from './personal-basic-info/personal-basic-info.component';
+import { ChangePasswordComponent } from './change-password/change-password.component';
 
 @NgModule({
   declarations: [
@@ -40,34 +43,37 @@ import { MatIconModule } from '@angular/material/icon';
     GameComponent,
     PersonalCenterComponent,
     TestComponent,
+    PersonalBasicInfoComponent,
+    ChangePasswordComponent,
   ],
-  imports: [
-    BrowserModule,
-    BrowserAnimationsModule,
-    MatInputModule,
-    ReactiveFormsModule,
-    MatButtonModule,
-    HttpClientModule,
-    MatSidenavModule,
-    MatListModule,
-    FormsModule,
-    MatCardModule,
-    CommonModule,
-    MatRadioModule,
-    MatSelectModule,
-    MatToolbarModule,
-    MatGridListModule,
-    MatIconModule,
-    RouterModule.forRoot([
-      { path : "", component : HomepageComponent },
-      { path : "user/login", component : LoginComponent },
-      { path : "user/register", component : RegisterComponent},
-      { path : "user/game",component:GameComponent},
-      { path : "user/personalInfo", component : PersonalInfoComponent },
-      { path : "user/personalCenter", component : PersonalCenterComponent},
-      { path : "test", component : TestComponent }
-    ]),
-  ],
+    imports: [
+        BrowserModule,
+        BrowserAnimationsModule,
+        MatInputModule,
+        ReactiveFormsModule,
+        MatButtonModule,
+        HttpClientModule,
+        MatSidenavModule,
+        MatListModule,
+        FormsModule,
+        MatCardModule,
+        CommonModule,
+        MatRadioModule,
+        MatSelectModule,
+        MatToolbarModule,
+        MatGridListModule,
+        MatIconModule,
+        RouterModule.forRoot([
+            {path: "", component: HomepageComponent},
+            {path: "user/login", component: LoginComponent},
+            {path: "user/register", component: RegisterComponent},
+            {path: "user/game", component: GameComponent},
+            {path: "user/personalInfo", component: PersonalInfoComponent},
+            {path: "user/personalCenter", component: PersonalCenterComponent},
+            {path: "test", component: TestComponent}
+        ]),
+        MatTabsModule,
+    ],
   providers: [
   ],
   bootstrap: [AppComponent]

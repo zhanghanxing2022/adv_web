@@ -1,6 +1,11 @@
 export interface User{
-    // id : number;
-    email : string;
+    userID : number;
     username : string;
-    password : string;
+    email : string;
+    phone : string;
+    figure: string;
+    skin: string;
+    algorithm: string;
+    learn: string;
+    practice: string;
 }

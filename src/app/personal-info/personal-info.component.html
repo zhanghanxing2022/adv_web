@@ -1,12 +1,5 @@
-<<<<<<< HEAD
-<div *ngIf="user">
-    <p>{{ user.username }} Details</p>
-    <p> {{ user.email }} </p>
-<!--    <div><span>id: </span>{{user.id}}</div>-->
-</div>
-=======
 <mat-toolbar>
-    Personal Center
+    个人信息中心
     <button mat-icon-button class="mat-icon-button">
       <mat-icon>
         home
@@ -18,18 +11,21 @@
       </mat-icon>
     </button>
 </mat-toolbar>
-
 <mat-card>
     <mat-card-content>
-      <h2>个人信息</h2>
-  
-      <p><strong>ID:</strong> 123</p>
-      <p><strong>名字:</strong> John</p>
-      <p><strong>游玩时长:</strong> 10 hours</p>
-      <p><strong>最喜欢的角色:</strong> Mario</p>
-      <p><strong>最常用的皮肤:</strong> 粉色妖精小兔♪</p>
-      <p><strong></strong></p>
+        <mat-tab-group>
+            <mat-tab label="基本信息">
+                <app-personal-basic-info [user]="user"></app-personal-basic-info>
+            </mat-tab>
+            <mat-tab label="修改密码">
+                <app-change-password></app-change-password>
+            </mat-tab>
+            <mat-tab label="形象历史">
+
+            </mat-tab>
+            <mat-tab label="学习历史">
+
+            </mat-tab>
+        </mat-tab-group>
     </mat-card-content>
 </mat-card>
-  
->>>>>>> ffe440ef20d1dbcf9e341d4fa756b793ca12432a
