@@ -12,11 +12,14 @@ export interface ChatMessage{
 export class ChatComponent implements OnInit {
   @ViewChild("bubble")bubble:any;
   @ViewChild("drawer")drawer:any;
+  @ViewChild("game")game:any;
+  @ViewChild("room")room:any;
   roomList: string[] = ["123", "1233"];
   player_id = 0;
   newRoom: string = "";
   new_mess_author="";
   new_mess_text="";
+  gameSrc='../../assets/external/index.html';
   messList:ChatMessage[]=[];
   mess = "";
   timeout!: NodeJS.Timeout;
@@ -55,6 +58,7 @@ export class ChatComponent implements OnInit {
       this.new_mess_text = data.message;
       this.showBubble();
     })
+    
 
   }
   ngAfterViewInit():void{
@@ -63,6 +67,12 @@ export class ChatComponent implements OnInit {
     // let box2=document.getElementById('box2');
     // console.log(box2?.innerText);
     console.log(this.drawer);
+    window.addEventListener('keydown', (e) => {
+      console.log(e)
+      if (e.code === "Escape") {
+          this.drawer.toggle();
+      }
+    },false);
     this.closeBubble();
   }
   join_room(roomName: string) {
@@ -72,6 +82,9 @@ export class ChatComponent implements OnInit {
   create_room() {
     if(this.newRoom)
     this.socket.emit('new room', this.newRoom);
+    this.room.nativeElement.style.display="none";
+    this.game.nativeElement.style.display="";
+    this.game.nativeElement.src=this.gameSrc;
   }
   send_message() {
     if(this.mess) {
