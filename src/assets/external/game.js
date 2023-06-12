@@ -42,7 +42,12 @@ class Game {
 
 		const game = this;
 		this.anims = ['Walking', 'Walking Backwards', 'Turn', 'Running', 'Pointing', 'Talking', 'Pointing Gesture'];
+<<<<<<< Updated upstream
 
+=======
+		this.anims2 = ['Idle', 'Walking', 'Walking Backwards', 'TurnLeft', 'TurnRight', 'Running'];
+		
+>>>>>>> Stashed changes
 		const options = {
 			assets: [
 				`${this.assetsPath}images/nx.jpg`,
@@ -56,8 +61,21 @@ class Game {
 				game.init();
 			}
 		}
+<<<<<<< Updated upstream
 
 		this.anims.forEach(function (anim) { options.assets.push(`${game.assetsPath}fbx/anims/${anim}.fbx`) });
+=======
+		
+		game.anims2_dict = []
+		this.anims.forEach( function(anim){ options.assets.push(`${game.assetsPath}fbx/anims/${anim}.fbx`)});
+		this.anims2.forEach( function(anim){
+			let characterList = ['amy', 'jimmy', 'mouse', 'rabbit'];
+			characterList.forEach( function(character) {
+				options.assets.push(`${game.assetsPath}fbx/character/${character}/${anim}.fbx`)
+				game.anims2_dict.push({"character": character, "anim": anim});
+			})
+		});
+>>>>>>> Stashed changes
 		options.assets.push(`${game.assetsPath}fbx/town.fbx`);
 
 		this.mode = this.modes.PRELOAD;
@@ -1447,6 +1465,48 @@ class Game {
 				game.loadNextAnim(loader);
 			} else {
 				delete game.anims;
+
+				console.log('begin loadMyAnim');
+				game.loadMyAnim(loader);
+				// console.log('end loadMyAnim');
+
+				// console.log('game.animations2', game.animations);
+				
+
+				// game.action = "Idle";
+				// game.mode = game.modes.ACTIVE;
+
+				// game.setKeyboardEvent();
+				// game.animate();
+			}
+		});	
+	}
+
+	loadMyAnim(loader) {
+		const game = this;
+		let dict = game.anims2_dict.pop();
+		let character = dict["character"];
+		let anim = dict["anim"];
+		// console.log(`loadMyAnim [${character}][${anim}]`);
+		loader.load(`${game.assetsPath}fbx/character/${character}/${anim}.fbx`, function( object ){
+			if (game.animations2 === undefined) {
+				game.animations2 = {};
+			}
+			if (game.animations2[character] === undefined) {
+				game.animations2[character] = {};
+			}
+			if (character != game.player.selected_character || anim != "Idle") {
+				game.animations2[character][anim] = object.animations[0];
+			}
+			if (game.anims2_dict.length>0){
+				game.loadMyAnim(loader);
+			}else{
+				delete game.anims2_dict;
+
+				console.log('end loadMyAnim');
+
+				console.log('game.animations2', game.animations2);
+				
 				game.action = "Idle";
 				game.mode = game.modes.ACTIVE;
 
@@ -1875,14 +1935,26 @@ class Player {
 		const loader = new THREE.FBXLoader();
 		const player = this;
 
+<<<<<<< Updated upstream
 		loader.load(`${game.assetsPath}fbx/people/${model}.fbx`, function (object) {
 
 			object.mixer = new THREE.AnimationMixer(object);
+=======
+		player.selected_skin = "黑旋风";
+		player.selected_character = "rabbit";
+		
+		// loader.load( `${game.assetsPath}fbx/people/${model}.fbx`, function ( object ) {
+		loader.load( `${game.assetsPath}fbx/character/${player.selected_character}/Idle.fbx`, function ( object ) {
+			
+			object.scale.set(16, 16, 16);
+			object.mixer = new THREE.AnimationMixer( object );
+>>>>>>> Stashed changes
 			player.root = object;
 			player.mixer = object.mixer;
 
 			object.name = "Person";
 
+<<<<<<< Updated upstream
 			object.traverse(function (child) {
 				if (child.isMesh) {
 					child.castShadow = true;
@@ -1901,6 +1973,23 @@ class Player {
 				});
 			});
 
+=======
+			object.traverse((child) => {
+				if (child.isMesh && config.optionsMap.has(player.selected_skin)) {
+					for (const option of config.optionsMap.get(player.selected_skin)) {
+						console.log('option', option);
+						child.material[option['material']].color.set(option['color']);
+					}
+				}
+				//变换
+				let scale = config.transformMap.get(player.selected_character)['scale'];
+				object.scale.x = scale;
+				object.scale.y = scale;
+				object.scale.z = scale;
+				object.position.y = config.transformMap.get(player.selected_character)['y'];	
+			})
+			
+>>>>>>> Stashed changes
 			player.object = new THREE.Object3D();
 			player.object.position.set(3122, 0, -173);
 			player.object.rotation.set(0, 2.6, 0);
@@ -1912,10 +2001,29 @@ class Player {
 				game.createCameras();
 				game.sun.target = game.player.object;
 				game.animations.Idle = object.animations[0];
+<<<<<<< Updated upstream
 				if (player.initSocket !== undefined) player.initSocket();
 			} else {
 				const geometry = new THREE.BoxGeometry(100, 300, 100);
 				const material = new THREE.MeshBasicMaterial({ visible: false });
+=======
+				if (game.animations2 === undefined) {
+					game.animations2 = {};
+				}
+				if (game.animations2[player.selected_character] === undefined) {
+					game.animations2[player.selected_character] = {};
+				}
+				game.animations2[player.selected_character]["Idle"] = object.animations[0];
+
+				console.log('create PlayerLocal Object');
+				console.log('game.animations', game.animations);
+				console.log('player.animations', player.animations);
+
+				if (player.initSocket!==undefined) player.initSocket();
+			}else{
+				const geometry = new THREE.BoxGeometry(100,300,100);
+				const material = new THREE.MeshBasicMaterial({visible:false});
+>>>>>>> Stashed changes
 				const box = new THREE.Mesh(geometry, material);
 				box.name = "Collider";
 				box.position.set(0, 150, 0);
@@ -1926,17 +2034,34 @@ class Player {
 				const players = game.initialisingPlayers.splice(game.initialisingPlayers.indexOf(this), 1);
 				game.remotePlayers.push(players[0]);
 			}
+<<<<<<< Updated upstream
 
 			if (game.animations.Idle !== undefined) player.action = "Idle";
 		});
+=======
+			
+			if (game.animations.Idle!==undefined) {
+				player.action = "Idle";
+			}
+		} );
+>>>>>>> Stashed changes
 	}
 
 	set action(name) {
 		//Make a copy of the clip if this is a remote player
+		const player = this;
+		const game = player.game;
 		if (this.actionName == name) return;
+<<<<<<< Updated upstream
 		const clip = (this.local) ? this.animations[name] : THREE.AnimationClip.parse(THREE.AnimationClip.toJSON(this.animations[name]));
 		const action = this.mixer.clipAction(clip);
 		action.time = 0;
+=======
+		const clip = (this.local) ? game.animations2[player.selected_character][name] : THREE.AnimationClip.parse(THREE.AnimationClip.toJSON(game.animations2[player.selected_character][name])); 
+
+		const action = this.mixer.clipAction( clip );
+        action.time = 0;
+>>>>>>> Stashed changes
 		this.mixer.stopAllAction();
 		this.actionName = name;
 		this.actionTime = Date.now();
@@ -2080,15 +2205,21 @@ class PlayerLocal extends Player {
 		}
 
 		if (this.turnLeft || this.turnRight) {
-			if (this.motion.forward == 0) {
-				if (this.action != 'Turn') {
-					this.action = 'Turn';
-				}
-			}
+			// if (this.motion.forward == 0) {
+			// 	if (this.action != 'Turn') {
+			// 		this.action = 'Turn';
+			// 	}
+			// }
 			if (this.turnLeft) {
 				this.motion.turn = 1;
+				if (this.motion.forward == 0) {
+					this.action = "TurnLeft";
+				}
 			} else {
 				this.motion.turn = -1;
+				if (this.motion.forward == 0) {
+					this.action = "TurnRight";
+				}
 			}
 		} else {
 			this.motion.turn = 0;
