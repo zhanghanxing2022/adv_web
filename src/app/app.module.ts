@@ -33,7 +33,6 @@ import { PersonalBasicInfoComponent } from './personal-basic-info/personal-basic
 import { ChangePasswordComponent } from './change-password/change-password.component';
 import { PersonalFigureHistoryComponent } from './personal-figure-history/personal-figure-history.component';
 import { PersonalAlgorithmHistoryComponent } from './personal-algorithm-history/personal-algorithm-history.component';
-import { EchartsTestComponent } from './echarts-test/echarts-test.component'
 
 @NgModule({
   declarations: [
@@ -50,7 +49,6 @@ import { EchartsTestComponent } from './echarts-test/echarts-test.component'
     ChangePasswordComponent,
     PersonalFigureHistoryComponent,
     PersonalAlgorithmHistoryComponent,
-    EchartsTestComponent,
   ],
     imports: [
         BrowserModule,
