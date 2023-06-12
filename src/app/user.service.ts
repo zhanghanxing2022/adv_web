@@ -69,4 +69,11 @@ export class UserService {
             });
     }
 
+    figures() {
+        let httpOptions = this.httpOption();
+        return this.http.get(this.url + "figures", {
+                headers: httpOptions
+            });
+    }
+
 }
