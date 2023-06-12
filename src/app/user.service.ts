@@ -76,4 +76,11 @@ export class UserService {
             });
     }
 
+    algorithms() {
+        let httpOptions = this.httpOption();
+        return this.http.get(this.url + "algorithms", {
+            headers: httpOptions
+        });
+    }
+
 }

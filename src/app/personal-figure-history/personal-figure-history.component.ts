@@ -30,7 +30,7 @@ export class PersonalFigureHistoryComponent {
             (response : any) => {
                 let xAxisData = new Array<number>();
                 let yAxisData = new Array<number>();
-                let skin = new Map<number, string>();
+                let tip = new Map<number, string>();
                 this.figures = JSON.parse(JSON.stringify(response)).figures;
                 console.log(this.figures);
                 // 开始下标
@@ -40,9 +40,9 @@ export class PersonalFigureHistoryComponent {
                     xAxisData.push(i - start + 1);
                     yAxisData.push(this.figure2index.get(this.figures[i].figure) as number);
                     // 设置index和皮肤间的关系
-                    skin.set(i - start + 1, this.figures[i].skin);
+                    tip.set(i - start + 1, "皮肤：" + this.figures[i].skin + "<br>" + "时间：" + this.figures[i].time);
                 }
-                this.initLine(xAxisData, yAxisData, skin);
+                this.initLine(xAxisData, yAxisData, tip);
                 // 设置map统计次数
                 let counting = new Map<string, number>();
                 for (var i = 0; i < this.figures.length; i++) {
@@ -75,7 +75,7 @@ export class PersonalFigureHistoryComponent {
         this.data();
     }
 
-    initLine(xAxisData: Array<number>, yAxisData: Array<number>, skin: Map<number, string>) {
+    initLine(xAxisData: Array<number>, yAxisData: Array<number>, tip: Map<number, string>) {
         let component = this;
         // 设置图表
         var myChart = echarts.init(document.getElementById("figure-history-echarts-line") as HTMLElement);;
@@ -86,7 +86,7 @@ export class PersonalFigureHistoryComponent {
             tooltip: {
                 trigger: 'axis',
                 formatter: function (param : any) {
-                    return "皮肤：" + skin.get(Number(param[0].name));
+                    return tip.get(Number(param[0].name));
                 }
             },
             xAxis: {
