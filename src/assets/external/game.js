@@ -1466,6 +1466,11 @@ class Game {
 		game.player.turnLeft = false;
 		game.player.turnRight = false;
 		const onKeyDown = function (event) {
+			if (event.keyCode === 27) {
+				console.log(event);
+				event.preventDefault(); // 阻止默认行为
+				window.parent.postMessage('keydown:esc', '*');
+			}
 			if (game.ischatting == false) {
 				switch (event.code) {
 					case 'ArrowUp':
