@@ -153,6 +153,10 @@ class Game {
 	}
 	loadNPC(loader) {
 		//根据配置文件加载npc并设置好逻辑
+		dialogueData.Mouse.stages.stage5.options[0].callback.push(this.goToScene1.bind(this));
+		dialogueData.Mouse.stages.stage5.options[1].callback.push(this.goToScene2.bind(this));
+		dialogueData.Mouse.stages.stage5.options[2].callback.push(this.goToScene3.bind(this));
+		dialogueData.Mouse.stages.stage5.options[3].callback.push(this.goToScene4.bind(this));
 		for (let a in dialogueData) {
 			loader.load(`${this.assetsPath}${dialogueData[a].fbx}`, (obj) => {
 				this.scene.add(obj);

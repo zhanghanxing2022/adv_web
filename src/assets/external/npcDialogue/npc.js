@@ -16,11 +16,14 @@ var listeners;
 function loadNPCDialogue(npc) {
     loadNPCDialogueStep(npc, dialogueData[npc].initialStage)
 }
+var callbackList=[];
 // 关闭对话
 function closeDialogue() {
     optionsPopup.style.display = "none";
     npcPopup.style.display = "none";
     console.log("remove");
+    callbackList.flat(2).forEach(f=>f());
+    callbackList = [];
     sessionStorage.removeItem("communicate");
 }
 // 逐字显示 NPC 对话
@@ -64,10 +67,15 @@ function showOptionsPopup(npc, options) {
         optionBtn.textContent = option.content;
         optionBtn.classList.add("child-div")
         optionBtn.addEventListener("click", function () {
+            optionsPopup.innerHTML = "";
+
             var selectedOption = options.find(function (opt) {
                 return opt.id === option.id;
             });
             if (selectedOption) {
+
+                callbackList.push(selectedOption.callback);
+                console.log(selectedOption)
                 loadNPCDialogueStep(npc, selectedOption.res);
             }
         });
