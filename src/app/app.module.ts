@@ -79,7 +79,7 @@ import { ChatInRoomService } from './chat-in-room.service';
             {path: "user/personalInfo", component: PersonalInfoComponent},
             {path: "user/personalCenter", component: PersonalCenterComponent},
             {path: "cube", component: CubeComponent},
-            {path: "test", component: TestComponent}
+            {path: "test", component: ChatComponent}
         ]),
         MatTabsModule
     ],

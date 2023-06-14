@@ -25,8 +25,8 @@ io.sockets.on('connection', function (socket) {
 		socket.userData.roomId = data.roomId;
 		console.log(`${socket.id} join room ${data.roomId}`);
 		// 检查房间是否存在，如果不存在则创建
-		if (!rooms[roomId]) {
-			rooms[roomId] = {
+		if (!rooms[data.roomId]) {
+			rooms[data.roomId] = {
 				// 初始化房间数据
 				players: [],
 				// 其他房间相关数据...
