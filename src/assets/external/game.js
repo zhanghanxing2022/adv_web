@@ -42,12 +42,9 @@ class Game {
 
 		const game = this;
 		this.anims = ['Walking', 'Walking Backwards', 'Turn', 'Running', 'Pointing', 'Talking', 'Pointing Gesture'];
-<<<<<<< Updated upstream
 
-=======
 		this.anims2 = ['Idle', 'Walking', 'Walking Backwards', 'TurnLeft', 'TurnRight', 'Running'];
 		
->>>>>>> Stashed changes
 		const options = {
 			assets: [
 				`${this.assetsPath}images/nx.jpg`,
@@ -61,10 +58,6 @@ class Game {
 				game.init();
 			}
 		}
-<<<<<<< Updated upstream
-
-		this.anims.forEach(function (anim) { options.assets.push(`${game.assetsPath}fbx/anims/${anim}.fbx`) });
-=======
 		
 		game.anims2_dict = []
 		this.anims.forEach( function(anim){ options.assets.push(`${game.assetsPath}fbx/anims/${anim}.fbx`)});
@@ -75,7 +68,6 @@ class Game {
 				game.anims2_dict.push({"character": character, "anim": anim});
 			})
 		});
->>>>>>> Stashed changes
 		options.assets.push(`${game.assetsPath}fbx/town.fbx`);
 
 		this.mode = this.modes.PRELOAD;
@@ -84,6 +76,7 @@ class Game {
 
 		const preloader = new Preloader(options);
 
+		console.log("aaaa")
 		window.onError = function (error) {
 			console.error(JSON.stringify(error));
 		}
@@ -1935,11 +1928,6 @@ class Player {
 		const loader = new THREE.FBXLoader();
 		const player = this;
 
-<<<<<<< Updated upstream
-		loader.load(`${game.assetsPath}fbx/people/${model}.fbx`, function (object) {
-
-			object.mixer = new THREE.AnimationMixer(object);
-=======
 		player.selected_skin = "黑旋风";
 		player.selected_character = "rabbit";
 		
@@ -1948,32 +1936,11 @@ class Player {
 			
 			object.scale.set(16, 16, 16);
 			object.mixer = new THREE.AnimationMixer( object );
->>>>>>> Stashed changes
 			player.root = object;
 			player.mixer = object.mixer;
 
 			object.name = "Person";
 
-<<<<<<< Updated upstream
-			object.traverse(function (child) {
-				if (child.isMesh) {
-					child.castShadow = true;
-					child.receiveShadow = true;
-				}
-			});
-
-
-			const textureLoader = new THREE.TextureLoader();
-
-			textureLoader.load(`${game.assetsPath}images/SimplePeople_${model}_${colour}.png`, function (texture) {
-				object.traverse(function (child) {
-					if (child.isMesh) {
-						child.material.map = texture;
-					}
-				});
-			});
-
-=======
 			object.traverse((child) => {
 				if (child.isMesh && config.optionsMap.has(player.selected_skin)) {
 					for (const option of config.optionsMap.get(player.selected_skin)) {
@@ -1989,7 +1956,6 @@ class Player {
 				object.position.y = config.transformMap.get(player.selected_character)['y'];	
 			})
 			
->>>>>>> Stashed changes
 			player.object = new THREE.Object3D();
 			player.object.position.set(3122, 0, -173);
 			player.object.rotation.set(0, 2.6, 0);
@@ -2001,12 +1967,6 @@ class Player {
 				game.createCameras();
 				game.sun.target = game.player.object;
 				game.animations.Idle = object.animations[0];
-<<<<<<< Updated upstream
-				if (player.initSocket !== undefined) player.initSocket();
-			} else {
-				const geometry = new THREE.BoxGeometry(100, 300, 100);
-				const material = new THREE.MeshBasicMaterial({ visible: false });
-=======
 				if (game.animations2 === undefined) {
 					game.animations2 = {};
 				}
@@ -2023,7 +1983,6 @@ class Player {
 			}else{
 				const geometry = new THREE.BoxGeometry(100,300,100);
 				const material = new THREE.MeshBasicMaterial({visible:false});
->>>>>>> Stashed changes
 				const box = new THREE.Mesh(geometry, material);
 				box.name = "Collider";
 				box.position.set(0, 150, 0);
@@ -2034,17 +1993,11 @@ class Player {
 				const players = game.initialisingPlayers.splice(game.initialisingPlayers.indexOf(this), 1);
 				game.remotePlayers.push(players[0]);
 			}
-<<<<<<< Updated upstream
-
-			if (game.animations.Idle !== undefined) player.action = "Idle";
-		});
-=======
 			
 			if (game.animations.Idle!==undefined) {
 				player.action = "Idle";
 			}
 		} );
->>>>>>> Stashed changes
 	}
 
 	set action(name) {
@@ -2052,16 +2005,10 @@ class Player {
 		const player = this;
 		const game = player.game;
 		if (this.actionName == name) return;
-<<<<<<< Updated upstream
-		const clip = (this.local) ? this.animations[name] : THREE.AnimationClip.parse(THREE.AnimationClip.toJSON(this.animations[name]));
-		const action = this.mixer.clipAction(clip);
-		action.time = 0;
-=======
 		const clip = (this.local) ? game.animations2[player.selected_character][name] : THREE.AnimationClip.parse(THREE.AnimationClip.toJSON(game.animations2[player.selected_character][name])); 
 
 		const action = this.mixer.clipAction( clip );
         action.time = 0;
->>>>>>> Stashed changes
 		this.mixer.stopAllAction();
 		this.actionName = name;
 		this.actionTime = Date.now();
