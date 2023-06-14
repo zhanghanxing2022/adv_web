@@ -28,3 +28,13 @@ export let optionsMap = new Map([
         {"material" : 3, "color" : 0xC8C2BC}
     ]]
 ])
+
+export let introductionMap = new Map([
+    ["rabbit", "兔兔の原皮"],
+    ["粉色妖精小兔♪", "可爱的美少女无所不能"],
+    ["黑旋风", "......帅！"],
+    ["jimmy", "其实他的名字是timmy，工作人员不小心打错了他的名字!"],
+    ["amy", "金克斯(精神正常版)"],
+    ["mouse", "Yes Sir♂"],
+    ["强健体魄", "其实它只有一个皮肤，只是强行多加了一个皮肤"]
+])

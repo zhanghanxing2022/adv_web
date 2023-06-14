@@ -69,6 +69,7 @@ class Game {
 			})
 		});
 		options.assets.push(`${game.assetsPath}fbx/town.fbx`);
+		options.assets.push(`${game.assetsPath}SimSun_Regular.json`);
 
 		this.mode = this.modes.PRELOAD;
 
@@ -386,28 +387,16 @@ class Game {
 
 			// 木板的相关代码
 			game.scene1.info = false; // 当前是否在阅读信息
-			game.scene1.textGeometry = new THREE.TextGeometry('click me', {
-				font: undefined,
-				size: 10,
-				height: 0.5,
-				curveSegments: 12, // 曲线段数
-  				bevelEnabled: false // 不启用斜角
-			});
-			game.scene1.textMaterial = new THREE.MeshBasicMaterial({ color: 0xffffff });
-			game.scene1.textMesh = new THREE.Mesh(game.scene1.textGeometry, game.scene1.textMaterial);
-
 			game.scene1.boardGeometry = new THREE.BoxGeometry(200, 200, 200);
-			game.scene1.loader = new THREE.TextureLoader();
-			game.scene1.loader.load('./images/wood-grain-texture.jpeg', (texture) => {
-				let material = THREE.MeshBasicMaterial(texture);
-				game.scene1.boardMesh = new THREE.Mesh(game.scene1.boardGeometry, material);
-				game.scene1.boardMesh.add(game.scene1.textMesh);
-				game.scene1.textMesh.position.set(0, 0, 100);
-				game.scene.add(game.scene1.boardMesh);
-				game.scene1.boardMesh.position.set(3122, 0, -173);
-				game.scene1.boardMesh.isBoard1 = true;
-				game.colliders.push(game.scene1.boardMesh);
-			})
+			// game.scene1.loader = new THREE.TextureLoader();
+			game.scene1.boardMaterial = new THREE.MeshLambertMaterial({ map: new THREE.CanvasTexture(game.scene1.utils.getInsCanvas("  help", '#884A39', '#21FFB8')) })
+			game.scene1.boardMesh = new THREE.Mesh(game.scene1.boardGeometry, game.scene1.boardMaterial);
+
+			console.log(game.scene1.boardMesh);
+			game.scene.add(game.scene1.boardMesh);
+			game.scene1.boardMesh.position.set(-2110, 10100, 750);
+			game.scene1.boardMesh.isBoard1 = true;
+			game.colliders.push(game.scene1.boardMesh);
 
 			const EVENT_MOUSEDOWN_onBoard1 = (ev) => {
 				if (game.scene1.info === true)	
@@ -417,15 +406,19 @@ class Game {
 				mouse.y = -(ev.clientY / window.innerHeight) * 2 + 1;
 				const raycaster = new THREE.Raycaster();
 				raycaster.setFromCamera(mouse, game.camera);
-				const intersects = raycaster.intersectObject(game.colliders);
+				const intersects = raycaster.intersectObjects(game.colliders);
+				console.log(intersects[0]);
 				if (intersects.length === 0 )
 					return;
-				if (intersects[0].isBoard1) {
+				if (intersects[0].object.isBoard1) {
 					let info = document.getElementById("info");
-					info.textContent("你好，这是一个说明！");
+					let content = document.getElementById("info_content");
+					content.textContent = config.readMe[0]
 					info.className = "show";
 					game.scene1.info = true;
 				}
+
+				document.addEventListener('mousedown', EVENT_CLICK_onInfo);
 			}
 
 			const EVENT_CLICK_onInfo = (ev) => {
@@ -434,10 +427,11 @@ class Game {
 				let info = document.getElementById("info");
 				game.scene1.info = false;
 				info.className = "hide";
+
+				document.removeEventListener('mousedown', EVENT_CLICK_onInfo);
 			}
 
 			document.addEventListener('mousedown', EVENT_MOUSEDOWN_onBoard1, false);
-			document.addEventListener('click', EVENT_CLICK_onInfo, false);
 			
 
 			// [冒泡排序]
@@ -482,9 +476,9 @@ class Game {
 					boxGeometry,
 					new THREE.MeshLambertMaterial({ map: new THREE.CanvasTexture(game.scene1.utils.getInsCanvas(insList[i], '#D2D518', '#21FFB8')) })
 				);
-				box.position.x = -900 - 1610 - 400 * i;
-				box.position.y = 10000 + 100;
-				box.position.z = 0 + 2400 - 1650;
+				box.position.x = -900 - 1610 - 400 * i; // -2510 -400 * i
+				box.position.y = 10000 + 100;	  // 10100		
+				box.position.z = 0 + 2400 - 1650; // 750
 				game.scene.add(box);
 				game.colliders.push(box);
 
@@ -507,6 +501,7 @@ class Game {
 				// 计算物体和射线的焦点
 				let bubbleSortButtonList = game.scene1.bubbleSort.boxButtonList;
 				const intersects = raycaster.intersectObjects(bubbleSortButtonList);
+			
 
 				if (intersects.length > 0) {
 					for (let i = 0; i < 3; i++) {
@@ -714,9 +709,15 @@ class Game {
 		game.player.object.position.y = 10000 + 500;
 		game.player.object.position.x = -900 - 1210;
 		game.player.object.position.z = 2400 - 2450;
+		// -2110, 10500, -50
 		game.player.object.rotation.x = 0;
 		game.player.object.rotation.y = 0;
 		game.player.object.rotation.z = 0;
+
+		$("#location_content").text("冒 泡 排 序");
+		$("#location").attr("class", "location");
+		$("#location").fadeIn(2000);
+		$("#location").fadeOut(3000);
 	}
 
 	goToScene2() {
@@ -1286,6 +1287,60 @@ class Game {
 			game.colliders.push(floor);
 			game.scene2.floor = floor;
 
+			// board
+			// 木板的相关代码
+			game.scene2.info = false; // 当前是否在阅读信息
+			game.scene2.boardGeometry = new THREE.BoxGeometry(200, 200, 200);
+			// game.scene2.loader = new THREE.TextureLoader();
+			game.scene2.boardMaterial = new THREE.MeshLambertMaterial({ map: new THREE.CanvasTexture(game.scene2.utils.getInsCanvas("  help", '#884A39', '#21FFB8')) })
+			game.scene2.boardMesh = new THREE.Mesh(game.scene2.boardGeometry, game.scene2.boardMaterial);
+
+			console.log(game.scene2.boardMesh);
+			game.scene.add(game.scene2.boardMesh);
+			game.scene2.boardMesh.position.set(0, 20100, -4000);
+			game.scene2.boardMesh.isBoard2 = true;
+			game.colliders.push(game.scene2.boardMesh);
+
+			const EVENT_MOUSEDOWN_onBoard2 = (ev) => {
+				if (game.scene2.info === true)	
+					return;
+				const mouse = new THREE.Vector2();
+				mouse.x = (ev.clientX / window.innerWidth) * 2 - 1;
+				mouse.y = -(ev.clientY / window.innerHeight) * 2 + 1;
+				const raycaster = new THREE.Raycaster();
+				raycaster.setFromCamera(mouse, game.camera);
+				const intersects = raycaster.intersectObjects(game.colliders);
+				console.log(intersects[0]);
+				if (intersects.length === 0 )
+					return;
+				if (intersects[0].object.isBoard2) {
+					let info = document.getElementById("info");
+					let content = document.getElementById("info_content");
+					content.textContent = config.readMe[1];
+					info.className = "show";
+					game.scene2.info = true;
+				}
+
+				document.addEventListener('mousedown', EVENT_CLICK_onInfo);
+			}
+
+			const EVENT_CLICK_onInfo = (ev) => {
+				if (game.scene2.info === false)
+					return;
+				let info = document.getElementById("info");
+				game.scene2.info = false;
+				info.className = "hide";
+
+				document.removeEventListener('mousedown', EVENT_CLICK_onInfo);
+			}
+
+
+			document.addEventListener('mousedown', EVENT_MOUSEDOWN_onBoard2, false);
+
+			
+
+
+
 			// [二叉树遍历场景]
 			let valList = [];
 			for (let i = 1; i <= 20; i++) {
@@ -1322,7 +1377,7 @@ class Game {
 				} else {
 					box.position.x = 400 - 400 * i;
 				}
-				box.position.y = 20000 + 100;
+				box.position.y = 20000 + 100;  // 0, 20100, -4000
 				box.position.z = -4000;
 				game.scene.add(box);
 				game.colliders.push(box);
@@ -1410,7 +1465,14 @@ class Game {
 		game.player.object.rotation.x = 0;
 		game.player.object.rotation.y = 0;
 		game.player.object.rotation.z = 0;
+
+		$("#location_content").text("二  叉  树");
+		$("#location").attr("class", "location");
+		$("#location").fadeIn(2000);
+		$("#location").fadeOut(3000);
 	}
+
+
 
 	goToScene3() {
 		// $.ajax({
@@ -1549,6 +1611,57 @@ class Game {
 			game.scene3.selectSort.record = game.scene3.utils.getSelectSortRecord();
 			game.scene3.selectSort.cur_ins = 0;	// 下一条应该执行的指令
 
+			// board
+			// 木板的相关代码
+			game.scene3.info = false; // 当前是否在阅读信息
+			game.scene3.boardGeometry = new THREE.BoxGeometry(200, 200, 200);
+			// game.scene3.loader = new THREE.TextureLoader();
+			game.scene3.boardMaterial = new THREE.MeshLambertMaterial({ map: new THREE.CanvasTexture(game.scene3.utils.getInsCanvas("  help", '#884A39', '#21FFB8')) })
+			game.scene3.boardMesh = new THREE.Mesh(game.scene3.boardGeometry, game.scene3.boardMaterial);
+
+			console.log(game.scene3.boardMesh);
+			game.scene.add(game.scene3.boardMesh);
+			game.scene3.boardMesh.position.set(-2500, 30100, -850);
+			game.scene3.boardMesh.isBoard3 = true;
+			game.colliders.push(game.scene3.boardMesh);
+
+			const EVENT_MOUSEDOWN_onBoard3 = (ev) => {
+				if (game.scene3.info === true)	
+					return;
+				const mouse = new THREE.Vector2();
+				mouse.x = (ev.clientX / window.innerWidth) * 2 - 1;
+				mouse.y = -(ev.clientY / window.innerHeight) * 2 + 1;
+				const raycaster = new THREE.Raycaster();
+				raycaster.setFromCamera(mouse, game.camera);
+				const intersects = raycaster.intersectObjects(game.colliders);
+				console.log(intersects[0]);
+				if (intersects.length === 0 )
+					return;
+				if (intersects[0].object.isBoard3) {
+					let info = document.getElementById("info");
+					let content = document.getElementById("info_content");
+					content.textContent = config.readMe[2];
+					info.className = "show";
+					game.scene3.info = true;
+				}
+
+				document.addEventListener('mousedown', EVENT_CLICK_onInfo, false);
+			}
+
+			const EVENT_CLICK_onInfo = (ev) => {
+				if (game.scene3.info === false)
+					return;
+				let info = document.getElementById("info");
+				game.scene3.info = false;
+				info.className = "hide";
+
+				document.removeEventListener('mousedown', EVENT_CLICK_onInfo, false);
+			}
+
+
+			document.addEventListener('mousedown', EVENT_MOUSEDOWN_onBoard3, false);
+
+
 			// [选择排序]
 			// 8个立方体，对应待排序的8个数字
 			let bbb = new THREE.BoxGeometry(200, 200, 200);
@@ -1584,6 +1697,7 @@ class Game {
 				box.position.z = 0 - 2400 + 1650;
 				game.scene.add(box);
 				game.colliders.push(box);
+				// -2500, 30100, -850
 
 				boxButtonList2.push(box);
 				// boxButtonXList2.push(box.position.x);
@@ -1837,6 +1951,10 @@ class Game {
 		game.player.object.rotation.y = Math.PI;
 		game.player.object.rotation.z = 0;
 
+		$("#location_content").text("选 择 排 序");
+		$("#location").attr("class", "location");
+		$("#location").fadeIn(2000);
+		$("#location").fadeOut(3000);
 	}
 
 	goToScene4() {
@@ -1876,6 +1994,8 @@ class Game {
 			game.colliders.push(floor);
 			game.scene4 = {};
 			game.scene4.floor = floor;
+			
+
 
 			let bbb = new THREE.BoxGeometry(200, 200, 200);
 			let boxGeometry = new THREE.BufferGeometry().fromGeometry(bbb);

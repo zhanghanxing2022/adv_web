@@ -89,6 +89,52 @@
 			border: none;
 			padding: 10px;
 		}
+
+		.hide {
+			display: none;
+		}
+
+		.show {
+			position: absolute;
+			z-index: 999;
+			width: 90%;
+			height: 80vh;
+			left: 5%;
+			background-color: #00000091;
+		}
+
+		.show h2 {
+			text-align: center;
+			font-size: 30px;
+		}
+
+		.show div {
+			text-align: center;
+			width: 80%;
+			margin: 0 auto;
+			font-size: 25px;
+		}
+
+		.location {
+			position: absolute;
+			z-index: 999;
+			width: 100%;
+			height: 30vh;
+			top: 35vh;
+			background-color: #00000091;
+		}
+
+		.location div {
+			text-align: center;
+			font-size: large;
+			font-weight: bold;
+			top: 85px;
+			display: block;
+			position: relative;
+			font-size: 40px;
+		}
+
+
 	</style>
 	<link rel="stylesheet" href="./npcDialogue/npc.css">
 </head>
@@ -165,6 +211,13 @@
 		// 初始化 NPC 对话
 		// loadNPCDialogue(currentStage);
 	</script>
+	<div id="info" class="hide">
+		<h2>Readme</h2>
+		<div id="info_content"></div>
+	</div>
+	<div id="location" class="hide">
+		<div id="location_content"></div>
+	</div>
 </body>
 
 </html>

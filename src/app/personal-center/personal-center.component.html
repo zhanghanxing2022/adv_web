@@ -28,8 +28,8 @@
       </div>
       <div id="overlay">
         <div class="text-box">
-          <h2>Welcome to the Scene</h2>
-          <p>This is a description of the scene.</p>
+          <h2>{{ this.selected_skin }}</h2>
+          <p>{{ this.introductions.get(this.selected_skin) }}</p>
         </div>
       </div>
     </mat-grid-tile>

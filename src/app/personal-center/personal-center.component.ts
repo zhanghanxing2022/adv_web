@@ -2,7 +2,7 @@ import { Component, ElementRef, ViewChild, OnChanges, SimpleChanges, Input } fro
 import * as THREE from 'three'
 import { OrbitControls } from 'three-orbitcontrols-ts';
 import { FBXLoader } from 'three/examples/jsm/loaders/FBXLoader';
-import { characters, optionsMap, skinMap, transformMap } from './model-config';
+import { characters, introductionMap, optionsMap, skinMap, transformMap } from './model-config';
 import { FormControl, Validators } from '@angular/forms';
 import { Router } from '@angular/router';
 import { UserService } from '../user.service';
@@ -29,6 +29,7 @@ export class PersonalCenterComponent implements OnChanges{
   selected_character = "rabbit";
   selected_skin = "rabbit";
   selected_action = "Idle";
+  introductions = introductionMap;
 
   ngOnChanges(changes: SimpleChanges): void {
     console.log("hello");

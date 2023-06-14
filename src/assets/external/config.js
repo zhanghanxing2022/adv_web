@@ -29,3 +29,9 @@ config.optionsMap = new Map([
         {"material" : 3, "color" : 0xC8C2BC}
     ]]
 ])
+
+const text1 = "这是冒泡排序"
+const text2 = ""
+const text3 = ""
+const text4 = ""
+config.readMe = [text1, text2, text3, text4];
