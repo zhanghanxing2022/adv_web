@@ -266,10 +266,31 @@ class Game {
 		if (game.scene1 !== undefined && game.scene1.animate !== undefined) {
 			game.scene1.animate(dt);
 		}
+		if (game.scene3 !== undefined && game.scene3.animate !== undefined) {
+			game.scene3.animate(dt);
+		}
 
 	}
 
 	goToScene1() {
+		// $.ajax({
+		// 	type: "POST",
+		// 	url: "",
+		// 	data: {
+		// 		"algorithm": "冒泡排序",
+		// 		"type": "LEARN"
+		// 	},
+		// 	beforeSend: function (XMLHttpRequest) {
+		// 		let token = sessionStorage.getItem("token");
+		// 		if (token !== undefined && token !== null) {
+		// 			XMLHttpRequest.setRequestHeader("token", token);
+		// 		}
+		// 	},
+		// 	dataType: "json",
+		// 	ContentType: "application/json",
+		// 	success: function () {}
+		// });
+
 		const game = this;
 
 		if (game.scene1 === undefined) {
@@ -1593,10 +1614,101 @@ class Game {
 	}
 
 	goToScene3() {
+		// $.ajax({
+		// 	type: "POST",
+		// 	url: "",
+		// 	data: {
+		// 		"algorithm": "选择排序",
+		// 		"type": "LEARN"
+		// 	},
+		// 	beforeSend: function (XMLHttpRequest) {
+		// 		let token = sessionStorage.getItem("token");
+		// 		if (token !== undefined && token !== null) {
+		// 			XMLHttpRequest.setRequestHeader("token", token);
+		// 		}
+		// 	},
+		// 	dataType: "json",
+		// 	ContentType: "application/json",
+		// 	success: function () {}
+		// });
+
 		const game = this;
 
 		if (game.scene3 === undefined) {
 			console.log('loading scene3');
+
+			// 存储到game.scene3之中
+			game.scene3 = {};
+
+			// 一些工具函数
+			game.scene3.utils = {};
+			game.scene3.utils.getNumCanvas = function (i, bgc, fc) {
+				var width = 512, height = 512;
+				var canvas = document.createElement('canvas');
+				canvas.width = width;
+				canvas.height = height;
+				var ctx = canvas.getContext('2d');
+				ctx.fillStyle = bgc;	// 背景颜色
+				ctx.fillRect(0, 0, width, height);
+
+				let str = `${i}`;
+				ctx.fillStyle = fc;		// 字体颜色
+				if (str.length == 1) {
+					ctx.font = 512 + 'px " bold';
+					ctx.fillText(`${i}`, 110, 450);
+				} else if (str.length == 2) {
+					ctx.font = 448 + 'px " bold';
+					ctx.fillText(`${i}`, 0, 450);
+				}
+
+				return canvas;
+			}
+			game.scene3.utils.getInsCanvas = function (i, bgc, fc) {
+				var width = 512, height = 512;
+				var canvas = document.createElement('canvas');
+				canvas.width = width;
+				canvas.height = height;
+				var ctx = canvas.getContext('2d');
+				ctx.fillStyle = bgc;	// 背景颜色
+				ctx.fillRect(0, 0, width, height);
+				ctx.fillStyle = fc;		// 字体颜色
+				ctx.font = 128 + 'px " bold';
+				ctx.fillText(`${i}`, 50, 300);
+				return canvas;
+			}
+			game.scene3.utils.getSelectSortRecord = function () {
+				let record = [];
+				let list = game.scene3.selectSort.valList.concat();
+
+				for (let i = 0; i <= list.length - 1; i++) {
+					let min_val = undefined;
+					let min_i = undefined;
+					for (let j = i; j <= list.length - 1; j++) {
+						if (min_val === undefined || min_i === undefined) {
+							min_val = list[j];
+							min_i = j;
+						} else {
+							if (list[j] < min_val) {
+								min_val = list[j];
+								min_i = j;
+							}
+						}
+					}
+					let action = {"light_min": [min_i, list[min_i]]};
+
+					if (min_i != i) {
+						action["swap"] = [i, min_i, list[i], list[min_i]];
+					}
+
+					record.push(action);
+
+					let temp = list[i];
+					list[i] = list[min_i];
+					list[min_i] = temp;
+				}
+					console.log('selectSort record', record);
+				return record;
+			}
 
 			const vertex = new THREE.Vector3();
 			const color = new THREE.Color();
@@ -1627,29 +1739,296 @@ class Game {
 			const floor = new THREE.Mesh(floorGeometry, floorMaterial);
 			game.scene.add(floor);
 			game.colliders.push(floor);
-			game.scene3 = {};
 			game.scene3.floor = floor;
 
+
+			let valList = [1, 2, 3, 4, 5, 6, 7, 8];
+			valList.sort(function () { return Math.random() > 0.5 ? -1 : 1; });
+			game.scene3.selectSort = {};
+			game.scene3.selectSort.valList = valList.concat();
+
+			game.scene3.selectSort.record = game.scene3.utils.getSelectSortRecord();
+			game.scene3.selectSort.cur_ins = 0;	// 下一条应该执行的指令
+
+			// [选择排序]
+			// 8个立方体，对应待排序的8个数字
 			let bbb = new THREE.BoxGeometry(200, 200, 200);
-			let boxGeometry = new THREE.BufferGeometry().fromGeometry(bbb);
-			boxGeometry = boxGeometry.toNonIndexed();
-			position = boxGeometry.attributes.position;
-			const colorsBox = [];
-			for (let i = 0, l = position.count; i < l; i++) {
-				color.setHSL(Math.random() * 0.3 + 0.1, 0.25, Math.random() * 0.25 + 0.75, THREE.SRGBColorSpace);
-				colorsBox.push(color.r, color.g, color.b);
+			let boxGeometry = new THREE.BufferGeometry().fromGeometry(bbb).toNonIndexed();
+			let boxMaterialList2 = [];
+			for (let i = 0; i < 10; i++) {
+				boxMaterialList2.push(new THREE.MeshLambertMaterial({ map: new THREE.CanvasTexture(game.scene3.utils.getNumCanvas(i, '#700BE1', '#FFD795')) }));
 			}
-			boxGeometry.addAttribute('color', new THREE.Float32BufferAttribute(colorsBox, 3));
-			for (let i = 0; i < 500; i++) {
-				const boxMaterial = new THREE.MeshPhongMaterial({ specular: 0xffffff, flatShading: true, vertexColors: true });
-				boxMaterial.color.setHSL(Math.random() * 0.3 + 0.1, 0.25, Math.random() * 0.25 + 0.75, THREE.SRGBColorSpace);
-				const box = new THREE.Mesh(boxGeometry, boxMaterial);
-				box.position.x = Math.floor(Math.random() * 20 - 10) * 300;
-				box.position.y = 30000 + Math.floor(Math.random() * 20) * 200 + 100;
-				box.position.z = Math.floor(Math.random() * 20 - 10) * 300;
+			let boxList2 = [];
+			for (let i = 0; i < 8; i++) {
+				const box = new THREE.Mesh(boxGeometry, boxMaterialList2[valList[i]]);
+				box.position.x = -3700 + 400 * i;
+				box.position.y = 30000 + 500;
+				box.position.z = 0 - 2400;
 				game.scene.add(box);
 				game.colliders.push(box);
+
+				boxList2.push(box);
 			}
+			game.scene3.selectSort.boxList = boxList2.concat();
+
+			// 3个立方体，表示3个功能按钮，可以点击
+			let boxButtonList2 = [];
+			// let boxButtonXList2 = [];
+			let insList = [' next  ', 'restart', 'shuffle'];
+			for (let i = 0; i < 3; i++) {
+				const box = new THREE.Mesh(
+					boxGeometry,
+					new THREE.MeshLambertMaterial({ map: new THREE.CanvasTexture(game.scene3.utils.getInsCanvas(insList[i], '#D2D518', '#21FFB8')) })
+				);
+				box.position.x = -1710 + 400 * i;
+				box.position.y = 30000 + 100;
+				box.position.z = 0 - 2400 + 1650;
+				game.scene.add(box);
+				game.colliders.push(box);
+
+				boxButtonList2.push(box);
+				// boxButtonXList2.push(box.position.x);
+			}
+
+			game.scene3.selectSort.boxButtonList = boxButtonList2.concat();
+			// game.scene3.selectSort.boxButtonXList = boxButtonXList2;
+			game.scene3.selectSort.insList = insList;
+
+			// 与按钮方块进行交互
+			const mouseUpBoxButton = (e) => {
+				// 将鼠标位置归一化为设备坐标。x 和 y 方向的取值范围是 (-1 to +1)
+				const mouse = new THREE.Vector2();
+				mouse.x = (e.clientX / window.innerWidth) * 2 - 1;
+				mouse.y = -(e.clientY / window.innerHeight) * 2 + 1;
+				const raycaster = new THREE.Raycaster();
+				raycaster.setFromCamera(mouse, game.camera);
+				// 计算物体和射线的焦点
+				let selectSortButtonList = game.scene3.selectSort.boxButtonList
+				const intersects = raycaster.intersectObjects(selectSortButtonList);
+
+				if (intersects.length > 0) {
+					for (let i = 0; i < 3; i++) {
+						if (game.scene3.selectSort.boxButtonList[i] == intersects[0].object) {
+							let ins = game.scene3.selectSort.insList[i];
+							console.log(`[scene3] mouseup selectSort ${ins}`);
+							intersects[0].object.material.map = new THREE.CanvasTexture(game.scene3.utils.getInsCanvas(ins, '#D2D518', '#21FFB8'));
+
+							if (i == 0) {
+								if (game.scene3 !== undefined) {
+									if (game.scene3.selectSort.state != undefined && game.scene3.selectSort.state == 'free') {
+										game.scene3.selectSort.instruction = 'next';
+										game.scene3.selectSort.state = 'busy';
+									}
+								}
+							} else if (i == 1) {
+								if (game.scene3 !== undefined) {
+									if (game.scene3.selectSort.state != undefined && game.scene3.selectSort.state == 'free') {
+										game.scene3.selectSort.instruction = 'restart';
+										game.scene3.selectSort.state = 'busy';
+									}
+								}
+							} else if (i == 2) {
+								if (game.scene3 !== undefined) {
+									if (game.scene3.selectSort.state != undefined && game.scene3.selectSort.state == 'free') {
+										game.scene3.selectSort.instruction = 'shuffle';
+										game.scene3.selectSort.state = 'busy';
+									}
+								}
+							}
+						}
+					}
+				}
+			};
+
+			const mouseDownBoxButton = (e) => {
+				// 将鼠标位置归一化为设备坐标。x 和 y 方向的取值范围是 (-1 to +1)
+				const mouse = new THREE.Vector2();
+				mouse.x = (e.clientX / window.innerWidth) * 2 - 1;
+				mouse.y = -(e.clientY / window.innerHeight) * 2 + 1;
+				const raycaster = new THREE.Raycaster();
+				raycaster.setFromCamera(mouse, game.camera);
+				// 计算物体和射线的焦点
+				let selectSortButtonList = game.scene3.selectSort.boxButtonList
+				const intersects = raycaster.intersectObjects(selectSortButtonList);
+
+				if (intersects.length > 0) {
+					for (let i = 0; i < 3; i++) {
+						if (game.scene3.selectSort.boxButtonList[i] == intersects[0].object) {
+							let ins = game.scene3.bubbleSort.insList[i];
+							console.log(`[scene3] mousedown selectSort ${ins}`);
+							intersects[0].object.material.map = new THREE.CanvasTexture(game.scene3.utils.getInsCanvas(ins, '#989A15', '#17C18B'))
+						}
+					}
+				}
+			};
+
+			document.addEventListener("mousedown", mouseDownBoxButton, false);
+			document.addEventListener("mouseup", mouseUpBoxButton, false);
+
+			game.scene3.selectSort.state = "free";	// free表示可以执行指令，busy表示正在执行指令
+
+			// 排序动画演示
+			game.scene3.animate = function (dt) {
+				// console.log('[scene3]');
+				// console.log('[scene3] state:', game.scene3.bubbleSort.state);
+				// console.log('[scene3] instruction:', game.scene3.bubbleSort.instruction);
+				// console.log('[scene3] cur_ins:', game.scene3.bubbleSort.cur_ins);
+
+				// 选择排序动画逻辑
+				if (game.scene3.selectSort.state == 'busy') {
+					if (game.scene3.selectSort.instruction == 'next') {
+						// do next
+						if (game.scene3.selectSort.cur_ins < game.scene3.selectSort.record.length) {
+							console.log('doing next...');
+
+							// ap在bp的右侧。左侧是x轴负方向，上侧是y轴正方向。
+							let action = game.scene3.selectSort.record[game.scene3.selectSort.cur_ins];
+							
+							let swap_pair;
+							let ap, bp;
+							let a, b;
+							let av, bv;
+
+							if (action["swap"] != undefined) {
+								swap_pair = action["swap"];
+								if (swap_pair[0] > swap_pair[1]) {
+									ap = game.scene3.selectSort.boxList[swap_pair[0]].position;
+									bp = game.scene3.selectSort.boxList[swap_pair[1]].position;
+									a = game.scene3.selectSort.boxList[swap_pair[0]];
+									b = game.scene3.selectSort.boxList[swap_pair[1]];
+									av = swap_pair[2];
+									bv = swap_pair[3];
+								} else {
+									bp = game.scene3.selectSort.boxList[swap_pair[0]].position;
+									ap = game.scene3.selectSort.boxList[swap_pair[1]].position;
+									b = game.scene3.selectSort.boxList[swap_pair[0]];
+									a = game.scene3.selectSort.boxList[swap_pair[1]];
+									bv = swap_pair[2];
+									av = swap_pair[3];
+								}
+							}
+
+							// stage的定义与切换
+							if (game.scene3.selectSort.swap_state === undefined) {
+								game.scene3.selectSort.swap_state = 'stage0';
+								// 高亮当前轮取值最小的方块，红色
+								game.scene3.selectSort.boxList[action["light_min"][0]].material.map = new THREE.CanvasTexture(game.scene3.utils.getNumCanvas(action["light_min"][1], '#FF4B4B', '#4B76FF'));
+								game.scene3.selectSort.stage0counter = 0;
+								game.scene3.selectSort.stage0counterObj = 50;
+							} else if (game.scene3.selectSort.swap_state == 'stage0') {
+								if (game.scene3.selectSort.stage0counter == game.scene3.selectSort.stage0counterObj) {
+									delete game.scene3.selectSort.stage0counter;
+									delete game.scene3.selectSort.stage0counterObj;
+									if (action["swap"] === undefined) {
+										game.scene3.selectSort.swap_state = 'finish';
+										// 高亮被交换至正确位置的红色方块，绿色
+										game.scene3.selectSort.boxList[action["light_min"][0]].material.map = new THREE.CanvasTexture(game.scene3.utils.getNumCanvas(action["light_min"][1], '#8FFF4B', '#FFD94B'));
+									} else {
+										game.scene3.selectSort.swap_state = 'stage1';
+										// stage1 目标
+
+										game.scene3.selectSort.swap_ap = ap.y - 300;
+										game.scene3.selectSort.swap_bp = bp.y + 300;
+									}
+								}
+							} else if (game.scene3.selectSort.swap_state == 'stage1') {
+								if (ap.y <= game.scene3.selectSort.swap_ap && bp.y >= game.scene3.selectSort.swap_bp) {
+									game.scene3.selectSort.swap_state = 'stage2';
+									// stage2 目标
+									game.scene3.selectSort.swap_ap = bp.x;
+									game.scene3.selectSort.swap_bp = ap.x;
+								}
+							} else if (game.scene3.selectSort.swap_state == 'stage2') {
+								if (ap.x <= game.scene3.selectSort.swap_ap && bp.x >= game.scene3.selectSort.swap_bp) {
+									game.scene3.selectSort.swap_state = 'stage3';
+									// stage3 目标
+									game.scene3.selectSort.swap_ap = ap.y + 300;
+									game.scene3.selectSort.swap_bp = bp.y - 300;
+								}
+							} else if (game.scene3.selectSort.swap_state == 'stage3') {
+								if (ap.y >= game.scene3.selectSort.swap_ap && bp.y <= game.scene3.selectSort.swap_bp) {
+									game.scene3.selectSort.swap_state = 'finish';
+									// 高亮被交换至正确位置的红色方块，绿色
+									game.scene3.selectSort.boxList[action["light_min"][0]].material.map = new THREE.CanvasTexture(game.scene3.utils.getNumCanvas(action["light_min"][1], '#8FFF4B', '#FFD94B'));
+								}
+							}
+
+							// 根据stage进行动画
+							if (game.scene3.selectSort.swap_state == 'stage0') {
+								game.scene3.selectSort.stage0counter++;
+							} else if (game.scene3.selectSort.swap_state == 'stage1') {
+								// ap.y = ap.y - 300/30;
+								// bp.y = bp.y + 300/30;
+								ap.y = ap.y - 10;
+								bp.y = bp.y + 10;
+							} else if (game.scene3.selectSort.swap_state == 'stage2') {
+								let ap_obj = game.scene3.selectSort.swap_ap;
+								let bp_obj = game.scene3.selectSort.swap_bp;
+								// ap.x = ap.x - (bp_obj - ap_obj)/30;
+								// bp.x = bp.x + (bp_obj - ap_obj)/30;
+								ap.x = ap.x - 10;
+								bp.x = bp.x + 10;
+							} else if (game.scene3.selectSort.swap_state == 'stage3') {
+								// ap.y = ap.y + 300/30;
+								// bp.y = bp.y - 300/30;
+								ap.y = ap.y + 10;
+								bp.y = bp.y - 10;
+							} else if (game.scene3.selectSort.swap_state == 'finish') {
+								// 交换完成，无需取消高亮
+								if (action["swap"] != undefined) {
+									let temp_box = game.scene3.selectSort.boxList[swap_pair[0]];
+									game.scene3.selectSort.boxList[swap_pair[0]] = game.scene3.selectSort.boxList[swap_pair[1]];
+									game.scene3.selectSort.boxList[swap_pair[1]] = temp_box;
+								}
+							}
+						} else {
+							game.scene3.selectSort.swap_state = 'finish';
+						}
+
+						// once done, become free
+						if (game.scene3.selectSort.swap_state == 'finish') {
+							console.log('next is done');
+							game.scene3.selectSort.cur_ins += 1;
+							game.scene3.selectSort.state = 'free'
+							delete game.scene3.selectSort.swap_state;
+						}
+
+					} else if (game.scene3.selectSort.instruction == 'restart') {
+						// do restart
+						console.log('doing restart...');
+
+						let list = game.scene3.selectSort.valList;
+						for (let i = 0; i < list.length; i++) {
+							game.scene3.selectSort.boxList[i].material.map = new THREE.CanvasTexture(game.scene3.utils.getNumCanvas(list[i], '#700BE1', '#FFD795'));
+						}
+
+						// once done, become free
+						console.log('restart is done');
+						game.scene3.selectSort.cur_ins = 0;
+						game.scene3.selectSort.state = 'free'
+					} else if (game.scene3.selectSort.instruction == 'shuffle') {
+						// do shuffle
+						console.log('doing shuffle...');
+
+						let valList = [1, 2, 3, 4, 5, 6, 7, 8];
+						valList.sort(function () { return Math.random() > 0.5 ? -1 : 1; });
+						game.scene3.selectSort.valList = valList.concat();
+						game.scene3.selectSort.record = game.scene3.utils.getSelectSortRecord();
+
+						let list = game.scene3.selectSort.valList;
+						for (let i = 0; i < list.length; i++) {
+							game.scene3.selectSort.boxList[i].material.map = new THREE.CanvasTexture(game.scene3.utils.getNumCanvas(list[i], '#700BE1', '#FFD795'));
+						}
+
+						// once done, become free
+						console.log('shuffle is done');
+						game.scene3.selectSort.cur_ins = 0;
+						game.scene3.selectSort.state = 'free';
+					}
+				}
+			}
+
+
 		}
 
 		game.player.object.position.y = 30500;
@@ -1872,8 +2251,8 @@ class Game {
 						let info = "请输入场景编号(1-4):\n"
 							+ "1: 排序算法演示\n"
 							+ "2: 二叉树遍历演示\n"
-							+ "3: 推箱子小游戏\n"
-							+ "4: 五子棋小游戏\n";
+							+ "3: 未知方块世界1\n"
+							+ "4: 未知方块世界2\n";
 						let sceneId = prompt(info);
 						game.goToScene(sceneId);
 						break;
@@ -2210,21 +2589,20 @@ class Player {
 	constructor(game, options) {
 		this.local = true;
 		this.motion = { forward: 0, turn: 0 };
+		const player = this;
 
 		let model, colour;
 
 		if (options === undefined) {
 			// 此处通过填写表单自选皮肤（颜色、角色）
-			colour = sessionStorage.getItem("colour");
-			model = sessionStorage.getItem("model");
-			if (colour === null || model === null) {
-				window.location.href = "./choose_skin.html";
+			let skin = sessionStorage.getItem("color");
+			let character = sessionStorage.getItem("model");
+			player.selected_skin = skin;
+			player.selected_character = character;
+			if (skin === null || character === null) {
+				player.selected_skin = "黑旋风";
+				player.selected_character = "rabbit";
 			}
-
-			// const colours = ['Black', 'Brown', 'White'];
-			// colour = colours[Math.floor(Math.random()*colours.length)];
-			// const people = ['BeachBabe', 'BusinessMan', 'Doctor', 'FireFighter', 'Housewife', 'Policeman', 'Prostitute', 'Punk', 'RiotCop', 'Roadworker', 'Robber', 'Sheriff', 'Streetman', 'Waitress'];
-			// model = people[Math.floor(Math.random()*people.length)];
 		} else if (typeof options == 'object') {
 			this.local = false;
 			this.options = options;
@@ -2240,10 +2618,6 @@ class Player {
 		this.animations = this.game.animations;
 
 		const loader = new THREE.FBXLoader();
-		const player = this;
-
-		player.selected_skin = "黑旋风";
-		player.selected_character = "rabbit";
 
 		// loader.load( `${game.assetsPath}fbx/people/${model}.fbx`, function ( object ) {
 		loader.load(`${game.assetsPath}fbx/character/${player.selected_character}/Idle.fbx`, function (object) {
