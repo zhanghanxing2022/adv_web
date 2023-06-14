@@ -1,14 +1,14 @@
 <mat-toolbar>
     个人信息中心
-    <button mat-icon-button class="mat-icon-button">
-      <mat-icon>
-        home
-      </mat-icon>
+    <button mat-icon-button class="mat-icon-button" (click)="home()">
+        <mat-icon>
+            home
+        </mat-icon>
     </button>
-    <button mat-icon-button class="mat-icon-button">
-      <mat-icon>
-        info
-      </mat-icon>
+    <button mat-icon-button class="mat-icon-button" (click)="logout()">
+        <mat-icon>
+            logout
+        </mat-icon>
     </button>
 </mat-toolbar>
 <mat-card>

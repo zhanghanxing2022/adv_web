@@ -1,51 +1,69 @@
-<html>
-  <form class="example-form">
+<mat-toolbar>
+    用户注册
+    <button mat-icon-button class="mat-icon-button" (click)="home()">
+        <mat-icon>
+            home
+        </mat-icon>
+    </button>
+    <button mat-icon-button class="mat-icon-button" (click)="info()">
+        <mat-icon>
+            info
+        </mat-icon>
+    </button>
+    <button mat-icon-button class="mat-icon-button" (click)="login()">
+        <mat-icon>
+            key
+        </mat-icon>
+    </button>
+</mat-toolbar>
+<mat-card>
+    <form class="example-form">
 
-      <mat-form-field class="example-full-width">
-        <mat-label>UserName</mat-label>
-        <input type="text" matInput [formControl]="nameFormControl" placeholder="Ex. jefferyLi">
-        <mat-error *ngIf="!nameFormControl.hasError('pattern') && nameFormControl.hasError('minlength')">
-          At least 6 characters are <strong>required</strong>
-        </mat-error>
-        <mat-error *ngIf="nameFormControl.hasError('pattern')">
-          Please enter a valid name
-        </mat-error>
-      </mat-form-field>
+        <mat-form-field class="example-full-width">
+            <mat-label>UserName</mat-label>
+            <input type="text" matInput [formControl]="nameFormControl" placeholder="Ex. jefferyLi">
+            <mat-error *ngIf="!nameFormControl.hasError('pattern') && nameFormControl.hasError('minlength')">
+                At least 6 characters are <strong>required</strong>
+            </mat-error>
+            <mat-error *ngIf="nameFormControl.hasError('pattern')">
+                Please enter a valid name
+            </mat-error>
+        </mat-form-field>
 
-      <mat-form-field class="example-full-width">
-        <mat-label>Password</mat-label>
-        <input type="password" matInput [formControl]="passwordFormControl" placeholder="Ex. jefferyLi01">
-        <mat-error *ngIf="!passwordFormControl.hasError('pattern') && passwordFormControl.hasError('minlength')">
-          At least 6 characters are <strong>required</strong>
-        </mat-error>
-        <mat-error *ngIf="passwordFormControl.hasError('pattern')">
-          Please enter a valid password
-        </mat-error>
-      </mat-form-field>
+        <mat-form-field class="example-full-width">
+            <mat-label>Password</mat-label>
+            <input type="password" matInput [formControl]="passwordFormControl" placeholder="Ex. jefferyLi01">
+            <mat-error *ngIf="!passwordFormControl.hasError('pattern') && passwordFormControl.hasError('minlength')">
+                At least 6 characters are <strong>required</strong>
+            </mat-error>
+            <mat-error *ngIf="passwordFormControl.hasError('pattern')">
+                Please enter a valid password
+            </mat-error>
+        </mat-form-field>
 
-      <mat-form-field class="example-full-width">
-          <mat-label>Email</mat-label>
-          <input type="email" matInput [formControl]="emailFormControl" placeholder="Ex. pat@example.com">
-          <mat-error *ngIf="emailFormControl.hasError('email') && !emailFormControl.hasError('required')">
-              Please enter a valid email address
-          </mat-error>
-          <mat-error *ngIf="emailFormControl.hasError('required')">
-              Email is <strong>required</strong>
-          </mat-error>
-      </mat-form-field>
+        <mat-form-field class="example-full-width">
+            <mat-label>Email</mat-label>
+            <input type="email" matInput [formControl]="emailFormControl" placeholder="Ex. pat@example.com">
+            <mat-error *ngIf="emailFormControl.hasError('email') && !emailFormControl.hasError('required')">
+                Please enter a valid email address
+            </mat-error>
+            <mat-error *ngIf="emailFormControl.hasError('required')">
+                Email is <strong>required</strong>
+            </mat-error>
+        </mat-form-field>
 
-      <mat-form-field class="example-full-width">
-          <mat-label>Phone</mat-label>
-          <input type="password" matInput [formControl]="phoneFormControl" placeholder="Ex. jefferyLi01">
-          <mat-error *ngIf="!phoneFormControl.hasError('pattern')">
-              Error phone <strong>required</strong>
-          </mat-error>
-          <mat-error *ngIf="phoneFormControl.hasError('pattern')">
-              Please enter a valid phone
-          </mat-error>
-      </mat-form-field>
-      <div class="example-button-row">
-        <button type="button" mat-raised-button color="primary" (click)="register()">Register</button>
-      </div>
-  </form>
-</html>
+        <mat-form-field class="example-full-width">
+            <mat-label>Phone</mat-label>
+            <input type="password" matInput [formControl]="phoneFormControl" placeholder="Ex. jefferyLi01">
+            <mat-error *ngIf="!phoneFormControl.hasError('pattern')">
+                Error phone <strong>required</strong>
+            </mat-error>
+            <mat-error *ngIf="phoneFormControl.hasError('pattern')">
+                Please enter a valid phone
+            </mat-error>
+        </mat-form-field>
+        <div class="example-button-row">
+            <button type="button" mat-raised-button color="primary" (click)="register()">Register</button>
+        </div>
+    </form>
+</mat-card>

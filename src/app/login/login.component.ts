@@ -33,4 +33,16 @@ export class LoginComponent {
       }
     )
   }
+
+  home() {
+    this.router.navigateByUrl("user/personalCenter");
+  }
+
+  info() {
+    this.router.navigateByUrl("user/personalInfo");
+  }
+
+  register() {
+    this.router.navigateByUrl("user/register");
+  }
 }
