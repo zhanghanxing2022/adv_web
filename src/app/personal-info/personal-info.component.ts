@@ -25,7 +25,7 @@ export class PersonalInfoComponent implements OnInit {
                     window.alert("请登录！");
                     this.router.navigateByUrl("user/login");
                 } else {
-                    window.alert(response.error);
+                    window.alert("服务器错误！");
                 }
             })
     }

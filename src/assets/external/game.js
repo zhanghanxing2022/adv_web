@@ -384,6 +384,62 @@ class Game {
 			game.colliders.push(floor);
 			game.scene1.floor = floor;
 
+			// 木板的相关代码
+			game.scene1.info = false; // 当前是否在阅读信息
+			game.scene1.textGeometry = new THREE.TextGeometry('click me', {
+				font: undefined,
+				size: 10,
+				height: 0.5,
+				curveSegments: 12, // 曲线段数
+  				bevelEnabled: false // 不启用斜角
+			});
+			game.scene1.textMaterial = new THREE.MeshBasicMaterial({ color: 0xffffff });
+			game.scene1.textMesh = new THREE.Mesh(game.scene1.textGeometry, game.scene1.textMaterial);
+
+			game.scene1.boardGeometry = new THREE.BoxGeometry(200, 200, 200);
+			game.scene1.loader = new THREE.TextureLoader();
+			game.scene1.loader.load('./images/wood-grain-texture.jpeg', (texture) => {
+				let material = THREE.MeshBasicMaterial(texture);
+				game.scene1.boardMesh = new THREE.Mesh(game.scene1.boardGeometry, material);
+				game.scene1.boardMesh.add(game.scene1.textMesh);
+				game.scene1.textMesh.position.set(0, 0, 100);
+				game.scene.add(game.scene1.boardMesh);
+				game.scene1.boardMesh.position.set(3122, 0, -173);
+				game.scene1.boardMesh.isBoard1 = true;
+				game.colliders.push(game.scene1.boardMesh);
+			})
+
+			const EVENT_MOUSEDOWN_onBoard1 = (ev) => {
+				if (game.scene1.info === true)	
+					return;
+				const mouse = new THREE.Vector2();
+				mouse.x = (ev.clientX / window.innerWidth) * 2 - 1;
+				mouse.y = -(ev.clientY / window.innerHeight) * 2 + 1;
+				const raycaster = new THREE.Raycaster();
+				raycaster.setFromCamera(mouse, game.camera);
+				const intersects = raycaster.intersectObject(game.colliders);
+				if (intersects.length === 0 )
+					return;
+				if (intersects[0].isBoard1) {
+					let info = document.getElementById("info");
+					info.textContent("你好，这是一个说明！");
+					info.className = "show";
+					game.scene1.info = true;
+				}
+			}
+
+			const EVENT_CLICK_onInfo = (ev) => {
+				if (game.scene1.info === false)
+					return;
+				let info = document.getElementById("info");
+				game.scene1.info = false;
+				info.className = "hide";
+			}
+
+			document.addEventListener('mousedown', EVENT_MOUSEDOWN_onBoard1, false);
+			document.addEventListener('click', EVENT_CLICK_onInfo, false);
+			
+
 			// [冒泡排序]
 			// 8个立方体，对应待排序的8个数字
 			let boxList = [];
