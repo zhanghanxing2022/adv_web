@@ -5,7 +5,7 @@ import { ChatMessage } from './chat/chat.component';
 @Injectable({
   providedIn: 'root'
 })
-class ChatInRoomService {
+export class ChatInRoomService {
   private url = 'http://localhost:3000';  // 后台服务端口
   private socket: Socket;
   constructor() {
@@ -40,14 +40,14 @@ class ChatInRoomService {
       });
     })
   }
-  getMessage(): Observable<ChatMessage> {
+  getMessage(): Observable<any> {
     return new Observable(observer => {
-      this.socket.on('chat message', (data: ChatMessage) {
+      this.socket.on('chat message', (data) =>{
         observer.next(data);
       },)
     })
   }
-  send_message(data:ChatMessage){
+  send_message(data:any){
     this.socket.emit('chat message',data);
   }
 
