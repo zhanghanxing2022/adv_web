@@ -45,13 +45,15 @@ export class PersonalCenterComponent implements OnChanges{
 
 
   ngAfterViewInit() {
-    // this.userService.profile().subscribe(
-    //   (response) => {}, 
-    //   (response) => {
-    //     window.alert("请登录！");
-    //     this.router.navigateByUrl("user/login");
-    //   }
-    // );
+    this.userService.profile().subscribe(
+      (response : any) => {
+        sessionStorage.setItem('username', response.username)
+      }, 
+      (response) => {
+        window.alert("请登录！");
+        this.router.navigateByUrl("user/login");
+      }
+    );
 
     console.log(this.skinList);
 

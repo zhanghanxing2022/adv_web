@@ -168,11 +168,23 @@ mat-sidenav {
     margin-right: 20px; /* 可根据需要调整元素之间的间距 */
     margin-left: 20px;
   }
+
+  .enter p {
+    display: inline-block;
+    bottom: 12px;
+    position: relative;
+    width: 139px;
+  }
+
+  .world-form {
+    margin-left: 17%;
+  }
   
   .enter button {
     margin-left: 70px; /* 可根据需要调整元素之间的间距 */
     width: 80px;
     height: 45px;
     background-color: rgba(0, 255, 255, 0.647);
+    bottom: 12px;
   }
   
