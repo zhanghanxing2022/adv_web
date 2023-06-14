@@ -31,6 +31,8 @@ import { MatIconModule } from '@angular/material/icon';
 import {MatTabsModule} from "@angular/material/tabs";
 import { PersonalBasicInfoComponent } from './personal-basic-info/personal-basic-info.component';
 import { ChangePasswordComponent } from './change-password/change-password.component';
+import { PersonalFigureHistoryComponent } from './personal-figure-history/personal-figure-history.component';
+import { PersonalAlgorithmHistoryComponent } from './personal-algorithm-history/personal-algorithm-history.component';
 
 @NgModule({
   declarations: [
@@ -45,6 +47,8 @@ import { ChangePasswordComponent } from './change-password/change-password.compo
     TestComponent,
     PersonalBasicInfoComponent,
     ChangePasswordComponent,
+    PersonalFigureHistoryComponent,
+    PersonalAlgorithmHistoryComponent,
   ],
     imports: [
         BrowserModule,
@@ -72,7 +76,7 @@ import { ChangePasswordComponent } from './change-password/change-password.compo
             {path: "user/personalCenter", component: PersonalCenterComponent},
             {path: "test", component: TestComponent}
         ]),
-        MatTabsModule,
+        MatTabsModule
     ],
   providers: [
   ],

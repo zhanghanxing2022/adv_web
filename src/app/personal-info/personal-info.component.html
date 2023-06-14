@@ -15,16 +15,24 @@
     <mat-card-content>
         <mat-tab-group>
             <mat-tab label="基本信息">
-                <app-personal-basic-info [user]="user"></app-personal-basic-info>
+                <ng-template matTabContent>
+                    <app-personal-basic-info [user]="user"></app-personal-basic-info>
+                </ng-template>
             </mat-tab>
             <mat-tab label="修改密码">
-                <app-change-password></app-change-password>
+                <ng-template matTabContent>
+                    <app-change-password></app-change-password>
+                </ng-template>
             </mat-tab>
             <mat-tab label="形象历史">
-
+                <ng-template matTabContent>
+                    <app-personal-figure-history></app-personal-figure-history>
+                </ng-template>
             </mat-tab>
             <mat-tab label="学习历史">
-
+                <ng-template matTabContent>
+                    <app-personal-algorithm-history></app-personal-algorithm-history>
+                </ng-template>
             </mat-tab>
         </mat-tab-group>
     </mat-card-content>
