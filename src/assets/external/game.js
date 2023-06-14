@@ -197,8 +197,8 @@ class Game {
 					// 处理点击事件
 					if (intersects.length > 0) {
 						// 点击了物体
-						if (communicate == false) {
-							communicate = true
+						if (NPCcommunicate == false) {
+							NPCcommunicate = true
 							loadNPCDialogue(a);
 						} else {
 							console.log("aaa")
@@ -2159,12 +2159,12 @@ class Game {
 		});
 
 		this.remotePlayers = remotePlayers;
-		console.log(this.remotePlayers)
 		this.remoteColliders = remoteColliders;
 		this.remotePlayers.forEach(function (player) { player.update(dt); });
 	}
 
 	onMouseDown(event) {
+		return
 		if (this.remoteColliders === undefined || this.remoteColliders.length == 0 || this.speechBubble === undefined || this.speechBubble.mesh === undefined) return;
 
 		// calculate mouse position in normalized device coordinates
@@ -2501,7 +2501,6 @@ class PlayerLocal extends Player {
 		});
 		socket.on('remoteData', function (data) {
 			game.remoteData = data;
-			console.log(data)
 		});
 		socket.on('deletePlayer', function (data) {
 			const players = game.remotePlayers.filter(function (player) {

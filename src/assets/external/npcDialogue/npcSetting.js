@@ -50,4 +50,4 @@ var dialogueData = {
         }
     }
 };
-var communicate = false;
+var NPCcommunicate = false;
