@@ -54,15 +54,15 @@ export class ChatComponent implements OnInit {
         this.showBubble();
       }
     )
-    if(sessionStorage.getItem("username")==null)
-    {
-      window.alert("请登录")
-      this.router.navigateByUrl("user/login")
-      this.player_name =this.generateRandomString()
-    }else
-    {
-      this.player_name = String(sessionStorage.getItem("username"))
-    }
+    // if(sessionStorage.getItem("username")==null)
+    // {
+    //   window.alert("请登录")
+    //   this.router.navigateByUrl("user/login")
+    //   this.player_name =this.generateRandomString()
+    // }else
+    // {
+    //   this.player_name = String(sessionStorage.getItem("username"))
+    // }
       
   }
   generateRandomString(): string {

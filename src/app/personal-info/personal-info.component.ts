@@ -21,8 +21,12 @@ export class PersonalInfoComponent implements OnInit {
                 this.user = JSON.parse(JSON.stringify(response));
             },
             response => {
-                window.alert("请登录！");
-                this.router.navigateByUrl("user/login");
+                if (response.status === 0) {
+                    window.alert("请登录！");
+                    this.router.navigateByUrl("user/login");
+                } else {
+                    window.alert("服务器错误！");
+                }
             })
     }
 
