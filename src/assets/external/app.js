@@ -37,7 +37,7 @@ io.sockets.on('connection', function (socket) {
 	});
 	socket.on("scene1 getCurrent",function()
 	{
-		
+
 	})
 	socket.on('disconnect', function () {
 		socket.broadcast.emit('deletePlayer', { id: socket.id });
@@ -78,9 +78,10 @@ io.sockets.on('connection', function (socket) {
 		socket.userData.x = data.x;
 		socket.userData.y = data.y;
 		socket.userData.z = data.z;
+		socket.userData.name = data.name;
 		socket.userData.heading = data.h;
 		socket.userData.pb = data.pb,
-			socket.userData.action = "Idle";
+		socket.userData.action = "Idle";
 	});
 
 	socket.on('update', function (data) {
@@ -128,6 +129,7 @@ setInterval(function () {
 					x: socket.userData.x,
 					y: socket.userData.y,
 					z: socket.userData.z,
+					name:socket.userData.name,
 					heading: socket.userData.heading,
 					pb: socket.userData.pb,
 					action: socket.userData.action
@@ -149,6 +151,7 @@ setInterval(function () {
 				pack[socket.userData.roomId].push({
 					id: socket.id,
 					model: socket.userData.model,
+					name:socket.userData.name,
 					colour: socket.userData.colour,
 					x: socket.userData.x,
 					y: socket.userData.y,

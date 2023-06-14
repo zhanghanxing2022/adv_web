@@ -256,6 +256,10 @@ export class PersonalCenterComponent implements OnChanges{
   }
 
   submit() {
+    if(this.worldFormControl.value=="")
+    {
+      return
+    }
     this.userService.addFigure(this.selected_character, this.selected_skin).subscribe(
       (response) => {
         sessionStorage.setItem('roomId', this.worldFormControl.value!);

@@ -2406,12 +2406,14 @@ class Player {
 				player.selected_skin = "黑旋风";
 				player.selected_character = "rabbit";
 			}
+			player.name_text =sessionStorage.getItem("username")
 		} else if (typeof options == 'object') {
 			this.local = false;
 			this.options = options;
 			this.id = options.id;
 			player.selected_character = options.model;
 			player.selected_skin  = options.colour;
+			player.name_text = options.name
 		} else {
 			model = options;
 		}
@@ -2454,7 +2456,7 @@ class Player {
 
 			player.object.add(object);
 			
-			player.name = createTextSprite('Hello World', 'rgba(0, 255, 0, 0.5)', 'white');
+			player.name = createTextSprite(player.name_text, 'rgba(0, 255, 0, 0.5)', 'white');
 		
 			player.name.position.y = 300
 			player.name.rotation.y = -Math.PI/2
@@ -2609,7 +2611,8 @@ class PlayerLocal extends Player {
 			y: this.object.position.y,
 			z: this.object.position.z,
 			h: this.object.rotation.y,
-			pb: this.object.rotation.x
+			pb: this.object.rotation.x,
+			name:this.name_text
 		});
 	}
 

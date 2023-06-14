@@ -28,40 +28,6 @@
 			overflow: hidden;
 		}
 
-		#message {
-			position: absolute;
-			left: 50%;
-			top: 50%;
-			transform: translateX(-50%) translateY(-50%);
-			font-family: 'Kavivanar', san-serif;
-			font-size: 40px;
-			width: 80%;
-			max-width: 280px;
-			padding: 15px 15px 50px 15px;
-			text-align: center;
-			display: none;
-			align-content: center;
-			justify-content: center;
-			background-color: aliceblue;
-			border: medium solid #3D455C;
-			border-radius: 20px;
-			color: #3D455C;
-			z-index: 99;
-		}
-
-		#message_ok {
-			position: absolute;
-			bottom: 10px;
-			padding: 10px 20px 10px 20px;
-			font-family: sans-serif;
-			font-size: 20px;
-			display: none;
-			background-color: #3D455C;
-			color: #fff;
-			border-radius: 8px;
-			border: medium solid #696882;
-		}
-
 		#chat {
 			position: absolute;
 			width: 100%;
@@ -95,8 +61,8 @@
 
 <body>
 	<div id="message">
-		<p id="message_text"></p>
-		<button id="message_ok">OK</button>
+		<p id="message_text" style="display: none;"></p>
+		<button id="message_ok" style="display: none;"></button>
 	</div>
 	<div id="chat">
 		<form id="msg-form" action="">
@@ -106,7 +72,7 @@
 	<div id="options-popup"></div>
 	<div id="npc-popup" class="npc-popup">
 		<div id ="npc-name">Mouse</div>
-		<div id="npc-message"></div>
+		<div id="npc-message" style="width: 100%;"></div>
 	</div>
 
 	<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/92/three.min.js"></script>
@@ -132,7 +98,6 @@
 		colour = sessionStorage.getItem("colour");
 		model = sessionStorage.getItem("model");
 		roomId = sessionStorage.getItem("roomId");
-		sessionStorage.setItem("roomId","12");
 		// if (colour === null || model === null || roomId === null) {
 		// 	window.location.href = "./choose_skin.html";
 		// }
