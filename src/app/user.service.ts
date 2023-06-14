@@ -51,9 +51,9 @@ export class UserService {
       return this.http.post(this.url + "addFigure", {
         figure: figure,
         skin: skin
-      }), {
+      }, {
         headers: httpOptions,
-      }
+      });
     }
 
     /**
