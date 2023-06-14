@@ -1,0 +1,29 @@
+<mat-list role="list">
+    <mat-list-item role="listitem">
+        <strong>用户编号: </strong> {{ (user != undefined) ? user.userID : "暂无数据" }}
+    </mat-list-item>
+    <mat-list-item role="listitem">
+        <strong>用户名称: </strong> {{ (user != undefined) ? user.username : "暂无数据" }}
+    </mat-list-item>
+    <mat-list-item role="listitem">
+        <strong>电子邮件: </strong> {{ (user != undefined) ? user.email : "暂无数据" }}
+    </mat-list-item>
+    <mat-list-item role="listitem">
+        <strong>电话号码: </strong> {{ (user != undefined) ? user.phone : "暂无数据" }}
+    </mat-list-item>
+    <mat-list-item role="listitem">
+        <strong>最常用的形象: </strong> {{ (user != undefined && user.figure != undefined) ? user.figure : "暂无记录" }}
+    </mat-list-item>
+    <mat-list-item role="listitem">
+        <strong>最常用的皮肤: </strong> {{ (user != undefined && user.skin != undefined) ? user.skin : "暂无记录" }}
+    </mat-list-item>
+    <mat-list-item role="listitem">
+        <strong>最常点击的算法: </strong> {{ (user != undefined && user.algorithm != undefined) ? user.algorithm : "暂无记录" }}
+    </mat-list-item>
+    <mat-list-item role="listitem">
+        <strong>最常学习的算法: </strong> {{ (user != undefined && user.learn != undefined) ? user.learn : "暂无记录" }}
+    </mat-list-item>
+    <mat-list-item role="listitem">
+        <strong>最常学习的算法: </strong> {{ (user != undefined && user.practice != undefined) ? user.practice : "暂无记录" }}
+    </mat-list-item>
+</mat-list>

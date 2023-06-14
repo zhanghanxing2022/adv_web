@@ -2,6 +2,7 @@ import { Component } from '@angular/core';
 import { FormControl, Validators } from '@angular/forms';
 import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { Router } from '@angular/router';
+import {UserService} from "../user.service";
 
 @Component({
   selector: 'app-register',
@@ -9,27 +10,15 @@ import { Router } from '@angular/router';
   styleUrls: ['./register.component.css']
 })
 export class RegisterComponent{
-  constructor(public http : HttpClient, public router : Router){}
-  private ip = "localhost"
-  private url = `http://${this.ip}:8080/user/`
+  constructor(public http : HttpClient, public router : Router, private userService: UserService){}
+
   emailFormControl = new FormControl('', [Validators.required, Validators.email]);
   nameFormControl = new FormControl('', [Validators.pattern('^[A-Za-z0-9]+$'), Validators.minLength(6)]);
   passwordFormControl = new FormControl('', [Validators.pattern('^[A-Za-z0-9]+$'), Validators.minLength(6)]);
-
-  greeting(){
-    const httpOptions = { 
-      headers: new HttpHeaders({ 'Content-Type': 'text/plain' }),
-      responseType : 'text' as const
-    };
-    this.http.get(this.url + "greeting", httpOptions).subscribe(
-      (response : any) => {
-        alert(response);
-        
-      }
-    )
-  }
+  phoneFormControl = new FormControl('', [Validators.required, Validators.pattern('^[A-Za-z0-9]+$')]);
 
   register(){
+    // 注册信息
     if (this.emailFormControl.invalid || this.nameFormControl.invalid
       || this.passwordFormControl.invalid){
         alert("输入有误");
@@ -38,19 +27,31 @@ export class RegisterComponent{
     const httpOptions = { 
       headers: new HttpHeaders({ 'Content-Type': 'application/json' }) 
     };
-    let body = {
-      id : 0,
-      email : this.emailFormControl.value,
-      username : this.nameFormControl.value,
-      password : this.passwordFormControl.value
-    }
-    this.http.post(this.url + "register", body, httpOptions).subscribe(
+    this.userService.register(
+        this.nameFormControl.value,
+        this.passwordFormControl.value,
+        this.emailFormControl.value,
+        this.phoneFormControl.value
+    ).subscribe(
       (response : any) => {
         window.alert("注册成功");
         this.router.navigateByUrl("user/login");
-      }, response => {
+      },
+        response => {
         window.alert(response.error);
       }
     )
+  }
+
+  home() {
+    this.router.navigateByUrl("user/personalCenter");
+  }
+
+  info() {
+    this.router.navigateByUrl("user/personalInfo");
+  }
+
+  login() {
+    this.router.navigateByUrl("user/login");
   }
 }

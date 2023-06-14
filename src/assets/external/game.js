@@ -1461,16 +1461,6 @@ class Game {
 
 				console.log('begin loadMyAnim');
 				game.loadMyAnim(loader);
-				// console.log('end loadMyAnim');
-
-				// console.log('game.animations2', game.animations);
-
-
-				// game.action = "Idle";
-				// game.mode = game.modes.ACTIVE;
-
-				// game.setKeyboardEvent();
-				// game.animate();
 			}
 		});
 	}

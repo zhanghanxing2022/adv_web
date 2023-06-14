@@ -1,34 +1,44 @@
+import { Location } from '@angular/common';
 import { Component, OnInit } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
+import { User } from '../User';
 import { UserService } from '../user.service';
-import { User } from '../User'
-import { Location } from '@angular/common';
 
 @Component({
-  selector: 'app-personal-info',
-  templateUrl: './personal-info.component.html',
-  styleUrls: ['./personal-info.component.css']
+    selector: 'app-personal-info',
+    templateUrl: './personal-info.component.html',
+    styleUrls: ['./personal-info.component.css']
 })
-export class PersonalInfoComponent implements OnInit{
-  user? : User;
-  ngOnInit(): void {
-      // this.getUser();
-  }
+export class PersonalInfoComponent implements OnInit {
+    user?: User;
+    ngOnInit(): void {
+        this.profile();
+    }
 
-  getUser(): void {
-    this.userService.getUser()
-      .subscribe(response => {
-        this.user = JSON.parse(JSON.stringify(response));
-      }, response => {
-        window.alert("请登录！");
+    profile(): void {
+        this.userService.profile().subscribe(
+            response => {
+                this.user = JSON.parse(JSON.stringify(response));
+            },
+            response => {
+                window.alert("请登录！");
+                this.router.navigateByUrl("user/login");
+            })
+    }
+
+    constructor(
+        private route: ActivatedRoute,
+        private userService: UserService,
+        private location: Location,
+        private router: Router
+    ) { }
+
+    home() {
+        this.router.navigateByUrl("user/personalCenter");
+    }
+
+    logout() {
+        sessionStorage.clear();
         this.router.navigateByUrl("user/login");
-      })
-  }
-
-  constructor(
-    private route : ActivatedRoute,
-    private userService : UserService,
-    private location : Location,
-    private router : Router
-  ) { }
+    }
 }
