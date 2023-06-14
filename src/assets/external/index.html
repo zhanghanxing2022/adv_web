@@ -104,9 +104,9 @@
 	</div>
 	<div id="options-popup"></div>
 	<div id="npc-popup" class="npc-popup">
+		<div id ="npc-name">Mouse</div>
 		<div id="npc-message"></div>
 	</div>
-	<button onclick="loadNPCDialogue(currentStage)">Start Dialogue</button>
 
 	<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/92/three.min.js"></script>
 	<script src="https://code.jquery.com/jquery-1.11.1.js"></script>
@@ -116,10 +116,14 @@
 	<script src="./libs/FBXLoader.js"></script>
 	<script src="./libs/Detector.js"></script>
 	<script src="./libs/toon3d.js"></script>
+	<script src="./npcDialogue/npcSetting.js"></script>
+	<script src="./npcDialogue/npc.js"></script>
+
+
+	<script src="config.js"></script>
 	<script src="game.js"></script>
 	<script src="changeEnvironment.js"></script>
-	<script src="./npcDialogue/npc.js"></script>
-	<script src="./npcDialogue/npcSetting.js"></script>
+	
 
 	<script>
 		// 此处改为通过填写表单自选皮肤（颜色、角色）
@@ -137,7 +141,6 @@
 		document.addEventListener("DOMContentLoaded", function () { game = new Game(); });
 		//NPC init
 		window.onload = npcINit
-		npcINit();
 
 		// 检查是否需要重置对话状态
 		window.addEventListener("beforeunload", function () {
@@ -158,7 +161,7 @@
 		});
 
 		// 初始化 NPC 对话
-		loadNPCDialogue(currentStage);
+		// loadNPCDialogue(currentStage);
 	</script>
 </body>
 

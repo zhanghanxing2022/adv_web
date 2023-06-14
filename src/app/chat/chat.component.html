@@ -1,23 +1,22 @@
 <mat-drawer-container class="example-container">
     <mat-drawer #drawer mode="over">
-        
-        <div class="chat-container" 
-        style="align-self: flex-start;vertical-align: middle;">
+
+        <div class="chat-container" style="align-self: flex-start;vertical-align: middle;">
             <mat-card *ngFor="let mess of messList">
                 <mat-card-header>
-                  <mat-card-title>{{mess.name}}</mat-card-title>
+                    <mat-card-title>{{mess.name}}</mat-card-title>
                 </mat-card-header>
                 <mat-card-content>
                     <p>
-                      {{mess.mess}}
+                        {{mess.mess}}
                     </p>
-                  </mat-card-content>
-              </mat-card>
-            </div>
+                </mat-card-content>
+            </mat-card>
+        </div>
         <div style="height: 60px;">
 
         </div>
-        
+
         <div style="position:absolute;
         bottom: 5px;
         padding: 10px; 
@@ -30,34 +29,43 @@
         align-content: center;
         align-self: flex-end;
         ">
-        <mat-divider></mat-divider>
+            <mat-divider></mat-divider>
 
-        <input style="height: 30px;width:300px ; display: block; border-radius: 10px;" type="email" matInput [(ngModel)]="mess" placeholder="message">
-          <button style="height: 30px;width: 50px;display: block; border-radius: 10px;" mat-flat-button color="accent"(click)="send_message()">Send</button>
+            <input style="height: 30px;width:300px ; display: block; border-radius: 10px;" type="email" matInput
+                [(ngModel)]="mess" placeholder="message">
+            <button style="height: 30px;width: 50px;display: block; border-radius: 10px;" mat-flat-button color="accent"
+                (click)="send_message()">Send</button>
 
         </div>
-        
+
 
 
     </mat-drawer>
     <mat-drawer-content>
-        <div style="display:table-cell;display:table-cell;  vertical-align:middle;">
-            <mat-form-field  appearance="fill" style="margin: 10px;;">
-                <input matInput style="height: 20px;" placeholder="Create Room" maxlength="15" [(ngModel)]="newRoom">
-            </mat-form-field>
-            <button  mat-flat-button style="margin: 10px;height: 45px;" color="accent"(click)="create_room()" >Create</button>
-        </div>
-        <div style="width: 400px;">
-            <mat-list >
-                <mat-list-item *ngFor="let room of roomList" style="width: 250px;">
-                    <span style="min-width: 150px;">{{ room}}</span>
-                    <button mat-flat-button color="accent"(click)="join_room(room)">Join</button>
-                </mat-list-item>
-            </mat-list>
-        </div>
-        
+        <div #room>
+            <div style="display:table-cell;display:table-cell;  vertical-align:middle;">
+                <mat-form-field appearance="fill" style="margin: 10px;;">
+                    <input matInput style="height: 20px;" placeholder="Create Room" maxlength="15"
+                        [(ngModel)]="newRoom">
+                </mat-form-field>
+                <button mat-flat-button style="margin: 10px;height: 45px;" color="accent"
+                    (click)="create_room()">Create</button>
+            </div>
+            <div style="width: 400px;">
+                <mat-list>
+                    <mat-list-item *ngFor="let room of roomList" style="width: 250px;">
+                        <span style="min-width: 150px;">{{ room}}</span>
+                        <button mat-flat-button color="accent" (click)="join_room(room)">Join</button>
+                    </mat-list-item>
+                </mat-list>
+            </div>
 
-        <button mat-raised-button (click)="drawer.toggle();closeBubble()">Chat drawer</button>
+
+
+            <button mat-raised-button (click)="drawer.toggle();closeBubble()">Chat drawer</button>
+        </div>
+
+        <iframe #game scr="" style="display: none;width: 100%;height: 100%;"></iframe>
     </mat-drawer-content>
 </mat-drawer-container>
 <div class="bubble" #bubble>
