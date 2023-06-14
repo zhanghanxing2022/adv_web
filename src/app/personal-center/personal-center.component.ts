@@ -46,7 +46,9 @@ export class PersonalCenterComponent implements OnChanges{
 
   ngAfterViewInit() {
     // this.userService.profile().subscribe(
-    //   (response) => {}, 
+    //   (response : any) => {
+    //     sessionStorage.setItem('username', response.username)
+    //   }, 
     //   (response) => {
     //     window.alert("请登录！");
     //     this.router.navigateByUrl("user/login");
@@ -277,7 +279,8 @@ export class PersonalCenterComponent implements OnChanges{
   }
 
   logout() {
-    this.router.navigateByUrl('user/login')
+    sessionStorage.clear();
+    this.router.navigateByUrl('user/login');
   }
 
   Idle() {

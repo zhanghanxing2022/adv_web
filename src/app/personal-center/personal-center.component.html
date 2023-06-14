@@ -1,10 +1,10 @@
 <mat-toolbar>
   Personal Center
-  <button mat-icon-button class="mat-icon-button" (click)="home()">
+  <!-- <button mat-icon-button class="mat-icon-button" (click)="home()">
     <mat-icon>
       home
     </mat-icon>
-  </button>
+  </button> -->
   <button mat-icon-button class="mat-icon-button" (click)="info()">
     <mat-icon>
       info
@@ -18,7 +18,7 @@
 </mat-toolbar>
 <h2 class="head">请选择你的英雄</h2>
 
-<div class="content">
+<mat-card class="content">
   <mat-grid-list cols="4" rowHeight="160px">
     <!-- 左侧 3x1 网格 -->
     <mat-grid-tile colspan="3" rowspan="3">
@@ -34,13 +34,13 @@
       </div>
     </mat-grid-tile>
     <!-- 右侧 3x1 网格 -->
-    <mat-grid-tile [style.backgroundColor]="'#F7F6F6'">
+    <mat-grid-tile [style.backgroundColor]="'#F7F6F6'" class="mat-button">
       <button mat-button [style.backgroundColor]="'#1092F9 '" [style.height]="'60px'" [style.width]="'60%'" (click)="Idle()">Idle</button>
     </mat-grid-tile>
-    <mat-grid-tile [style.backgroundColor]="'#F7F6F6'">
+    <mat-grid-tile [style.backgroundColor]="'#F7F6F6'" class="mat-button">
       <button mat-button [style.backgroundColor]="'#1092F9 '" [style.height]="'60px'" [style.width]="'60%'" (click)="Walking()">Walking</button>
     </mat-grid-tile>
-    <mat-grid-tile [style.backgroundColor]="'#F7F6F6'">
+    <mat-grid-tile [style.backgroundColor]="'#F7F6F6'" class="mat-button">
       <button mat-button [style.backgroundColor]="'#1092F9 '" [style.height]="'60px'" [style.width]="'60%'" (click)="Running()">Running</button>
     </mat-grid-tile>
   </mat-grid-list>
@@ -68,11 +68,11 @@
       </mat-form-field>
     </mat-grid-tile>
   </mat-grid-list>
-</div>
+</mat-card>
 
 <div class="enter">
   <form class="world-form">
-    <p>请选择你的世界</p>
+    <p>请选择你的世界:</p>
     <mat-form-field>
       <mat-label>世界号</mat-label>
       <input type="number" matInput [formControl]="worldFormControl" placeholder="0">
@@ -83,6 +83,6 @@
         需要填写世界号
       </mat-error>
     </mat-form-field>
-    <button mat-raised-button color="accent" (click)="submit()">Accent</button>
+    <button mat-raised-button color="accent" (click)="submit()">Start!</button>
   </form>
 </div>
