@@ -7,7 +7,7 @@ var dialogueData = {
         rotation: [0, Math.PI, 0],
         stages: {
             stage1: {
-                dialogue: "欢迎来到碧蓝航线！你想和我聊些什么？",
+                dialogue: "欢迎来到四盒院！你想和我聊些什么？",
                 options: [
                     { id: "option1", content: "问候", res: "stage2", callback: [] },
                     { id: "option2", content: "询问任务", res: "stage3", callback: [] },

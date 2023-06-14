@@ -24,7 +24,7 @@ function closeDialogue() {
     console.log("remove");
     callbackList.flat(2).forEach(f=>f());
     callbackList = [];
-    sessionStorage.removeItem("communicate");
+    communicate = false;
 }
 // 逐字显示 NPC 对话
 function loadNPCDialogueStep(npc, stage) {

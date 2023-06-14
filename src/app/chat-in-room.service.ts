@@ -30,11 +30,13 @@ export class ChatInRoomService {
     this.socket.emit('new room', newRoom);
     return true;
   }
+  pullRoom(){
+    this.socket.emit('rooms');
+  }
   getRooms(): Observable<string[]> {
     return new Observable(observer => {
 
       this.socket.on('rooms', (data: string[]) => {
-        console.log(data);
         observer.next(data);
 
       });

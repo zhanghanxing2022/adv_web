@@ -1,0 +1,87 @@
+.
+├── app
+│   ├── User.ts
+│   ├── app.component.css
+│   ├── app.component.html
+│   ├── app.component.ts
+│   ├── app.module.ts
+│   ├── change-password
+│   │   ├── change-password.component.css
+│   │   ├── change-password.component.html
+│   │   ├── change-password.component.spec.ts
+│   │   └── change-password.component.ts
+│   ├── chat
+│   │   ├── chat.component.css
+│   │   ├── chat.component.html
+│   │   ├── chat.component.spec.ts
+│   │   └── chat.component.ts
+│   ├── chat-in-room.service.ts
+│   ├── game
+│   │   ├── game.component.css
+│   │   ├── game.component.html
+│   │   ├── game.component.spec.ts
+│   │   └── game.component.ts
+│   ├── homepage
+│   │   ├── homepage.component.css
+│   │   ├── homepage.component.html
+│   │   └── homepage.component.ts
+│   ├── login
+│   │   ├── login.component.css
+│   │   ├── login.component.html
+│   │   └── login.component.ts
+│   ├── personal-algorithm-history
+│   │   ├── personal-algorithm-history.component.css
+│   │   ├── personal-algorithm-history.component.html
+│   │   ├── personal-algorithm-history.component.spec.ts
+│   │   └── personal-algorithm-history.component.ts
+│   ├── personal-basic-info
+│   │   ├── personal-basic-info.component.css
+│   │   ├── personal-basic-info.component.html
+│   │   ├── personal-basic-info.component.spec.ts
+│   │   └── personal-basic-info.component.ts
+│   ├── personal-center
+│   │   ├── model-config.ts
+│   │   ├── personal-center.component.css
+│   │   ├── personal-center.component.html
+│   │   ├── personal-center.component.spec.ts
+│   │   └── personal-center.component.ts
+│   ├── personal-figure-history
+│   │   ├── personal-figure-history.component.css
+│   │   ├── personal-figure-history.component.html
+│   │   ├── personal-figure-history.component.spec.ts
+│   │   └── personal-figure-history.component.ts
+│   ├── personal-info
+│   │   ├── personal-info.component.css
+│   │   ├── personal-info.component.html
+│   │   ├── personal-info.component.spec.ts
+│   │   └── personal-info.component.ts
+│   ├── register
+│   │   ├── register.component.css
+│   │   ├── register.component.html
+│   │   └── register.component.ts
+│   ├── socket-io.service.spec.ts
+│   ├── socket-io.service.ts
+│   ├── test
+│   │   ├── model-config.ts
+│   │   ├── test.component.css
+│   │   ├── test.component.html
+│   │   └── test.component.ts
+│   ├── user.service.spec.ts
+│   └── user.service.ts
+├── assets
+│   ├── external
+│   │   ├── app.js
+│   │   ├── assets
+│   │   │   ├── fbx
+│   │   │   └── images
+│   │   ├── config.js
+│   │   ├── game.js
+│   │   ├── index.html
+│   │   ├── libs
+│   │   ├── npcDialogue
+├── favicon.ico
+├── index.html
+├── main.ts
+└── styles.css
+
+53 directories, 415 files

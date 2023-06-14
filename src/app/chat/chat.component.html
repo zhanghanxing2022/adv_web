@@ -4,7 +4,7 @@
         <div class="chat-container" style="align-self: flex-start;vertical-align: middle;">
             <mat-card>
                 <mat-card-content>
-                  <div *ngFor="let mess of messList" [ngClass]="{'my-message': mess.name === 'me', 'other-message': mess.name === 'others'}">
+                  <div *ngFor="let mess of messList" [ngClass]="{'my-message': mess.name === player_name, 'other-message': mess.name !== player_name}">
                     <p><strong>{{ mess.name }}:</strong></p>
                     
                     <ng-container *ngIf="mess.type=='img'">
@@ -63,29 +63,6 @@
 
     </mat-drawer>
     <mat-drawer-content>
-        <div #room>
-            <div style="display:table-cell;display:table-cell;  vertical-align:middle;">
-                <mat-form-field appearance="fill" style="margin: 10px;;">
-                    <input matInput style="height: 20px;" placeholder="Create Room" maxlength="15"
-                        [(ngModel)]="newRoom">
-                </mat-form-field>
-                <button mat-flat-button style="margin: 10px;height: 45px;" color="accent"
-                    (click)="create_room()">Create</button>
-            </div>
-            <div style="width: 400px;">
-                <mat-list>
-                    <mat-list-item *ngFor="let room of roomList" style="width: 250px;">
-                        <span style="min-width: 150px;">{{ room}}</span>
-                        <button mat-flat-button color="accent" (click)="join_room(room)">Join</button>
-                    </mat-list-item>
-                </mat-list>
-            </div>
-
-
-
-            <button mat-raised-button (click)="drawer.toggle();closeBubble()">Chat drawer</button>
-        </div>
-
         <iframe #game scr="" style="display: none;width: 100%;height: 100%;"></iframe>
     </mat-drawer-content>
 </mat-drawer-container>

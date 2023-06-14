@@ -198,8 +198,8 @@ class Game {
 					// 处理点击事件
 					if (intersects.length > 0) {
 						// 点击了物体
-						if (sessionStorage.getItem("communicate") == null) {
-							sessionStorage.setItem("communicate", a);
+						if (communicate == false) {
+							communicate = true
 							loadNPCDialogue(a);
 						} else {
 							console.log("aaa")
