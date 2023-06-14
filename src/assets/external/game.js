@@ -2159,6 +2159,7 @@ class Game {
 		});
 
 		this.remotePlayers = remotePlayers;
+		console.log(this.remotePlayers)
 		this.remoteColliders = remoteColliders;
 		this.remotePlayers.forEach(function (player) { player.update(dt); });
 	}
@@ -2353,11 +2354,12 @@ class Player {
 			this.local = false;
 			this.options = options;
 			this.id = options.id;
-			model = options.model;
-			colour = options.colour;
+			player.selected_character = options.model;
+			player.selected_skin  = options.colour;
 		} else {
 			model = options;
 		}
+
 		this.model = model;
 		this.colour = colour;
 		this.game = game;
@@ -2499,6 +2501,7 @@ class PlayerLocal extends Player {
 		});
 		socket.on('remoteData', function (data) {
 			game.remoteData = data;
+			console.log(data)
 		});
 		socket.on('deletePlayer', function (data) {
 			const players = game.remotePlayers.filter(function (player) {
@@ -2545,8 +2548,8 @@ class PlayerLocal extends Player {
 	initSocket() {
 		//console.log("PlayerLocal.initSocket");
 		this.socket.emit('init', {
-			model: this.model,
-			colour: this.colour,
+			model: this.selected_character,
+			colour: this.selected_skin,
 			x: this.object.position.x,
 			y: this.object.position.y,
 			z: this.object.position.z,
