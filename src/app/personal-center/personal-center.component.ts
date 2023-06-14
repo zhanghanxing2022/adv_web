@@ -45,6 +45,14 @@ export class PersonalCenterComponent implements OnChanges{
 
 
   ngAfterViewInit() {
+    // this.userService.profile().subscribe(
+    //   (response) => {}, 
+    //   (response) => {
+    //     window.alert("请登录！");
+    //     this.router.navigateByUrl("user/login");
+    //   }
+    // );
+
     console.log(this.skinList);
 
     this.width = this.three.nativeElement.offsetWidth;
@@ -246,8 +254,30 @@ export class PersonalCenterComponent implements OnChanges{
   }
 
   submit() {
-    this.userService.addFigure(this.selected_character, this.selected_skin);
-    this.router.navigateByUrl('user/game');
+    this.userService.addFigure(this.selected_character, this.selected_skin).subscribe(
+      (response) => {
+        sessionStorage.setItem('roomId', this.worldFormControl.value!);
+        sessionStorage.setItem('model', this.selected_character);
+        sessionStorage.setItem('color', this.selected_skin);
+        this.router.navigateByUrl('user/game');
+      }
+      ,
+      (response) => {
+        window.alert("请登录！");
+        this.router.navigateByUrl("user/login");
+    });
+  }
+
+  home() {
+    this.router.navigateByUrl('user/personalCenter');
+  }
+
+  info() {
+    this.router.navigateByUrl('user/personalInfo');
+  }
+
+  logout() {
+    this.router.navigateByUrl('user/login')
   }
 
   Idle() {

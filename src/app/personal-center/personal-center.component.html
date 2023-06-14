@@ -1,25 +1,22 @@
 <mat-toolbar>
   Personal Center
-  <button mat-icon-button class="mat-icon-button">
+  <button mat-icon-button class="mat-icon-button" (click)="home()">
     <mat-icon>
       home
     </mat-icon>
   </button>
-  <button mat-icon-button class="mat-icon-button">
+  <button mat-icon-button class="mat-icon-button" (click)="info()">
     <mat-icon>
       info
     </mat-icon>
   </button>
+  <button mat-icon-button class="mat-icon-button" (click)="logout()">
+    <mat-icon>
+        logout
+    </mat-icon>
+  </button>
 </mat-toolbar>
 <h2 class="head">请选择你的英雄</h2>
-<!-- <mat-sidenav-container>
-  <mat-sidenav mode="side" opened>
-    Hello
-  </mat-sidenav>
-  <mat-sidenav-content>
-    <div class="content mat-elevation-z4"></div>
-  </mat-sidenav-content>
-</mat-sidenav-container> -->
 
 <div class="content">
   <mat-grid-list cols="4" rowHeight="160px">
@@ -86,6 +83,6 @@
         需要填写世界号
       </mat-error>
     </mat-form-field>
+    <button mat-raised-button color="accent" (click)="submit()">Accent</button>
   </form>
-  <button mat-raised-button color="accent" (click)="submit()">Accent</button>
 </div>
