@@ -67,3 +67,25 @@ mat-drawer-content {
     width: 400px;
     padding: 10px;
 }
+.input-container {
+    display: flex;
+    align-items: center;
+  }
+  
+  mat-form-field {
+    flex: 1;
+    margin-right: 10px;
+  }
+
+  .my-message {
+    text-align: right;
+    background-color: #DCF8C6;
+    /* 其他样式属性 */
+  }
+  
+  .other-message {
+    text-align: left;
+    background-color: #EFEFEF;
+    /* 其他样式属性 */
+  }
+  

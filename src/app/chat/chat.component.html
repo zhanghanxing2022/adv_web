@@ -2,39 +2,60 @@
     <mat-drawer #drawer mode="over">
 
         <div class="chat-container" style="align-self: flex-start;vertical-align: middle;">
-            <mat-card *ngFor="let mess of messList">
-                <mat-card-header>
-                    <mat-card-title>{{mess.name}}</mat-card-title>
-                </mat-card-header>
+            <mat-card>
                 <mat-card-content>
-                    <p>
-                        {{mess.mess}}
-                    </p>
+                  <div *ngFor="let mess of messList" [ngClass]="{'my-message': mess.name === 'me', 'other-message': mess.name === 'others'}">
+                    <p><strong>{{ mess.name }}:</strong></p>
+                    
+                    <ng-container *ngIf="mess.type=='img'">
+                      <img [src]="mess.mess" alt="Image"(load)="onImageLoad($event)" />
+                    </ng-container>
+                    
+                    <ng-container *ngIf="mess.type!=='img'">
+                      <p>{{ mess.mess }}</p>
+                    </ng-container>
+                  </div>
                 </mat-card-content>
-            </mat-card>
+              </mat-card>
+              
+              
         </div>
-        <div style="height: 60px;">
-
+        <div style="height: 300px;">
+                <p> </p>
         </div>
 
         <div style="position:absolute;
         bottom: 5px;
-        padding: 10px; 
-        left: 15px;
+        padding: 0px; 
+        width: 100%;
         box-shadow: 0 5 5 5 gray;
         border-radius: 5px;
         background-color: aquamarine;
-        display: flex;
-        justify-content: space-around;
-        align-content: center;
-        align-self: flex-end;
+       
         ">
             <mat-divider></mat-divider>
 
-            <input style="height: 30px;width:300px ; display: block; border-radius: 10px;" type="email" matInput
+            <!-- <input style="height: 30px;width:300px ; display: block; border-radius: 10px;" type="email" matInput
                 [(ngModel)]="mess" placeholder="message">
             <button style="height: 30px;width: 50px;display: block; border-radius: 10px;" mat-flat-button color="accent"
-                (click)="send_message()">Send</button>
+                (click)="send_message()">Send</button> -->
+                <mat-card>
+                    <mat-card-content>
+                      <mat-form-field appearance="fill" style="width: 100%;">
+                        <mat-label>Message</mat-label>
+                        <input matInput [(ngModel)]="mess" placeholder="Enter your message">
+                      </mat-form-field>
+                      <div style="display: flex; align-items: center;">
+                        <input type="file" style="display: none;" #fileInput (change)="onFileSelected($event)" accept="image/*">
+                        <button mat-icon-button (click)="fileInput.click()" aria-label="Upload Image">
+                          <mat-icon>attach_file</mat-icon>
+                        </button>
+                        <button mat-raised-button color="primary" (click)="send_message()">Send</button>
+                      </div>
+                    </mat-card-content>
+                  </mat-card>
+                  
+                  
 
         </div>
 

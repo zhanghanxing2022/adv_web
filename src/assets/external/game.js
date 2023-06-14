@@ -44,7 +44,7 @@ class Game {
 		this.anims = ['Walking', 'Walking Backwards', 'Turn', 'Running', 'Pointing', 'Talking', 'Pointing Gesture'];
 
 		this.anims2 = ['Idle', 'Walking', 'Walking Backwards', 'TurnLeft', 'TurnRight', 'Running'];
-		
+
 		const options = {
 			assets: [
 				`${this.assetsPath}images/nx.jpg`,
@@ -58,14 +58,14 @@ class Game {
 				game.init();
 			}
 		}
-		
+
 		game.anims2_dict = []
-		this.anims.forEach( function(anim){ options.assets.push(`${game.assetsPath}fbx/anims/${anim}.fbx`)});
-		this.anims2.forEach( function(anim){
+		this.anims.forEach(function (anim) { options.assets.push(`${game.assetsPath}fbx/anims/${anim}.fbx`) });
+		this.anims2.forEach(function (anim) {
 			let characterList = ['amy', 'jimmy', 'mouse', 'rabbit'];
-			characterList.forEach( function(character) {
+			characterList.forEach(function (character) {
 				options.assets.push(`${game.assetsPath}fbx/character/${character}/${anim}.fbx`)
-				game.anims2_dict.push({"character": character, "anim": anim});
+				game.anims2_dict.push({ "character": character, "anim": anim });
 			})
 		});
 		options.assets.push(`${game.assetsPath}fbx/town.fbx`);
@@ -1464,7 +1464,7 @@ class Game {
 				// console.log('end loadMyAnim');
 
 				// console.log('game.animations2', game.animations);
-				
+
 
 				// game.action = "Idle";
 				// game.mode = game.modes.ACTIVE;
@@ -1472,7 +1472,7 @@ class Game {
 				// game.setKeyboardEvent();
 				// game.animate();
 			}
-		});	
+		});
 	}
 
 	loadMyAnim(loader) {
@@ -1481,7 +1481,7 @@ class Game {
 		let character = dict["character"];
 		let anim = dict["anim"];
 		// console.log(`loadMyAnim [${character}][${anim}]`);
-		loader.load(`${game.assetsPath}fbx/character/${character}/${anim}.fbx`, function( object ){
+		loader.load(`${game.assetsPath}fbx/character/${character}/${anim}.fbx`, function (object) {
 			if (game.animations2 === undefined) {
 				game.animations2 = {};
 			}
@@ -1491,15 +1491,15 @@ class Game {
 			if (character != game.player.selected_character || anim != "Idle") {
 				game.animations2[character][anim] = object.animations[0];
 			}
-			if (game.anims2_dict.length>0){
+			if (game.anims2_dict.length > 0) {
 				game.loadMyAnim(loader);
-			}else{
+			} else {
 				delete game.anims2_dict;
 
 				console.log('end loadMyAnim');
 
 				console.log('game.animations2', game.animations2);
-				
+
 				game.action = "Idle";
 				game.mode = game.modes.ACTIVE;
 
@@ -1891,7 +1891,56 @@ class Game {
 		this.renderer.render(this.scene, this.camera);
 	}
 }
+// 创建文字精灵的函数
+function createTextSprite(text, backgroundColor, textColor) {
+	const canvas = document.createElement('canvas');
+	const context = canvas.getContext('2d');
+	
+	// 测量文字的宽度
+	context.font = 'Bold 20px Arial';
+	const textWidth = context.measureText(text).width;
+	
+	// 设置矩形的宽度为文字宽度加上一定的边距
+	const padding = 10;
+	const rectWidth = textWidth + padding * 2;
+	const rectHeight = 50;
+	const borderRadius = 10;
+	const shadowBlur = 5;
+	const shadowColor = 'rgba(0, 0, 0, 0.5)';
+	
+	// 绘制背景矩形
+	context.fillStyle = backgroundColor;
+	context.shadowBlur = shadowBlur;
+	context.shadowColor = shadowColor;
+	context.beginPath();
+	context.moveTo(borderRadius, 0);
+	context.lineTo(rectWidth - borderRadius, 0);
+	context.quadraticCurveTo(rectWidth, 0, rectWidth, borderRadius);
+	context.lineTo(rectWidth, rectHeight - borderRadius);
+	context.quadraticCurveTo(rectWidth, rectHeight, rectWidth - borderRadius, rectHeight);
+	context.lineTo(borderRadius, rectHeight);
+	context.quadraticCurveTo(0, rectHeight, 0, rectHeight - borderRadius);
+	context.lineTo(0, borderRadius);
+	context.quadraticCurveTo(0, 0, borderRadius, 0);
+	context.closePath();
+	context.fill();
+  
+	// 绘制文字
+	context.font = 'Bold 20px Arial';
+	context.fillStyle = textColor;
+	context.textAlign = 'center';
+	context.textBaseline = 'middle';
+	context.fillText(text, rectWidth / 2, rectHeight / 2);
+  
+	const texture = new THREE.CanvasTexture(canvas);
+	const spriteMaterial = new THREE.SpriteMaterial({ map: texture });
+	const sprite = new THREE.Sprite(spriteMaterial);
 
+  
+	return sprite;
+  }
+
+  
 class Player {
 	constructor(game, options) {
 		this.local = true;
@@ -1930,12 +1979,12 @@ class Player {
 
 		player.selected_skin = "黑旋风";
 		player.selected_character = "rabbit";
-		
+
 		// loader.load( `${game.assetsPath}fbx/people/${model}.fbx`, function ( object ) {
-		loader.load( `${game.assetsPath}fbx/character/${player.selected_character}/Idle.fbx`, function ( object ) {
-			
+		loader.load(`${game.assetsPath}fbx/character/${player.selected_character}/Idle.fbx`, function (object) {
+
 			object.scale.set(16, 16, 16);
-			object.mixer = new THREE.AnimationMixer( object );
+			object.mixer = new THREE.AnimationMixer(object);
 			player.root = object;
 			player.mixer = object.mixer;
 
@@ -1953,14 +2002,22 @@ class Player {
 				object.scale.x = scale;
 				object.scale.y = scale;
 				object.scale.z = scale;
-				object.position.y = config.transformMap.get(player.selected_character)['y'];	
+				object.position.y = config.transformMap.get(player.selected_character)['y'];
 			})
-			
+
 			player.object = new THREE.Object3D();
 			player.object.position.set(3122, 0, -173);
 			player.object.rotation.set(0, 2.6, 0);
 
 			player.object.add(object);
+			
+			player.name = createTextSprite('Hello World', 'rgba(0, 255, 0, 0.5)', 'white');
+		
+			player.name.position.y = 300
+			player.name.rotation.y = -Math.PI/2
+			player.name.scale.set(150,150,150)
+			player.object.add(player.name)
+			
 			if (player.deleted === undefined) game.scene.add(player.object);
 
 			if (player.local) {
@@ -1979,10 +2036,10 @@ class Player {
 				console.log('game.animations', game.animations);
 				console.log('player.animations', player.animations);
 
-				if (player.initSocket!==undefined) player.initSocket();
-			}else{
-				const geometry = new THREE.BoxGeometry(100,300,100);
-				const material = new THREE.MeshBasicMaterial({visible:false});
+				if (player.initSocket !== undefined) player.initSocket();
+			} else {
+				const geometry = new THREE.BoxGeometry(100, 300, 100);
+				const material = new THREE.MeshBasicMaterial({ visible: false });
 				const box = new THREE.Mesh(geometry, material);
 				box.name = "Collider";
 				box.position.set(0, 150, 0);
@@ -1993,11 +2050,11 @@ class Player {
 				const players = game.initialisingPlayers.splice(game.initialisingPlayers.indexOf(this), 1);
 				game.remotePlayers.push(players[0]);
 			}
-			
-			if (game.animations.Idle!==undefined) {
+
+			if (game.animations.Idle !== undefined) {
 				player.action = "Idle";
 			}
-		} );
+		});
 	}
 
 	set action(name) {
@@ -2005,10 +2062,10 @@ class Player {
 		const player = this;
 		const game = player.game;
 		if (this.actionName == name) return;
-		const clip = (this.local) ? game.animations2[player.selected_character][name] : THREE.AnimationClip.parse(THREE.AnimationClip.toJSON(game.animations2[player.selected_character][name])); 
+		const clip = (this.local) ? game.animations2[player.selected_character][name] : THREE.AnimationClip.parse(THREE.AnimationClip.toJSON(game.animations2[player.selected_character][name]));
 
-		const action = this.mixer.clipAction( clip );
-        action.time = 0;
+		const action = this.mixer.clipAction(clip);
+		action.time = 0;
 		this.mixer.stopAllAction();
 		this.actionName = name;
 		this.actionTime = Date.now();
@@ -2023,7 +2080,7 @@ class Player {
 
 	update(dt) {
 		this.mixer.update(dt);
-
+		
 		if (this.game.remoteData.length > 0) {
 			let found = false;
 			for (let data of this.game.remoteData) {
@@ -2037,6 +2094,7 @@ class Player {
 			}
 			if (!found) this.game.removePlayer(this);
 		}
+		
 	}
 }
 
@@ -2045,7 +2103,7 @@ class PlayerLocal extends Player {
 		super(game, model);
 
 		const player = this;
-		const socket = io.connect();
+		const socket = io.connect("http://localhost:2002/");
 		this.velocityY = 0;
 
 		socket.on('setId', function (data) {
