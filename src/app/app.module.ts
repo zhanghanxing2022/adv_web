@@ -33,6 +33,7 @@ import { PersonalBasicInfoComponent } from './personal-basic-info/personal-basic
 import { ChangePasswordComponent } from './change-password/change-password.component';
 import { PersonalFigureHistoryComponent } from './personal-figure-history/personal-figure-history.component';
 import { PersonalAlgorithmHistoryComponent } from './personal-algorithm-history/personal-algorithm-history.component';
+import { CubeComponent } from './cube/cube.component';
 import * as echarts from 'echarts';
 import { ChatInRoomService } from './chat-in-room.service';
 
@@ -51,6 +52,7 @@ import { ChatInRoomService } from './chat-in-room.service';
     ChangePasswordComponent,
     PersonalFigureHistoryComponent,
     PersonalAlgorithmHistoryComponent,
+    CubeComponent,
   ],
     imports: [
         BrowserModule,
@@ -76,6 +78,7 @@ import { ChatInRoomService } from './chat-in-room.service';
             {path: "user/game", component: GameComponent},
             {path: "user/personalInfo", component: PersonalInfoComponent},
             {path: "user/personalCenter", component: PersonalCenterComponent},
+            {path: "cube", component: CubeComponent},
             {path: "test", component: TestComponent}
         ]),
         MatTabsModule
