@@ -46,6 +46,16 @@ export class UserService {
         });
     }
 
+    addFigure(figure: string | null, skin: string | null) {
+      let httpOptions = this.httpOption();
+      return this.http.post(this.url + "addFigure", {
+        figure: figure,
+        skin: skin
+      }), {
+        headers: httpOptions,
+      }
+    }
+
     /**
      * 携带token请求获得用户信息
      */
