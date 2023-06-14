@@ -18,7 +18,7 @@
 </mat-toolbar>
 <h2 class="head">请选择你的英雄</h2>
 
-<div class="content">
+<mat-card class="content">
   <mat-grid-list cols="4" rowHeight="160px">
     <!-- 左侧 3x1 网格 -->
     <mat-grid-tile colspan="3" rowspan="3">
@@ -34,13 +34,13 @@
       </div>
     </mat-grid-tile>
     <!-- 右侧 3x1 网格 -->
-    <mat-grid-tile [style.backgroundColor]="'#F7F6F6'">
+    <mat-grid-tile [style.backgroundColor]="'#F7F6F6'" class="mat-button">
       <button mat-button [style.backgroundColor]="'#1092F9 '" [style.height]="'60px'" [style.width]="'60%'" (click)="Idle()">Idle</button>
     </mat-grid-tile>
-    <mat-grid-tile [style.backgroundColor]="'#F7F6F6'">
+    <mat-grid-tile [style.backgroundColor]="'#F7F6F6'" class="mat-button">
       <button mat-button [style.backgroundColor]="'#1092F9 '" [style.height]="'60px'" [style.width]="'60%'" (click)="Walking()">Walking</button>
     </mat-grid-tile>
-    <mat-grid-tile [style.backgroundColor]="'#F7F6F6'">
+    <mat-grid-tile [style.backgroundColor]="'#F7F6F6'" class="mat-button">
       <button mat-button [style.backgroundColor]="'#1092F9 '" [style.height]="'60px'" [style.width]="'60%'" (click)="Running()">Running</button>
     </mat-grid-tile>
   </mat-grid-list>
@@ -68,7 +68,7 @@
       </mat-form-field>
     </mat-grid-tile>
   </mat-grid-list>
-</div>
+</mat-card>
 
 <div class="enter">
   <form class="world-form">
