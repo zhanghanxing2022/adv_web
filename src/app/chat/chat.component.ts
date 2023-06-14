@@ -36,13 +36,7 @@ export class ChatComponent implements OnInit {
 
   }
   ngOnInit(): void {
-    this.socket.on("connect", () => {
-      console.log(this.socket.disconnected); // false
-    });
-
-    this.socket.on("disconnect", () => {
-      console.log(this.socket.disconnected); // true
-    });
+    
     this.socket.on('rooms', (data) => {
       this.roomList = data;
     });

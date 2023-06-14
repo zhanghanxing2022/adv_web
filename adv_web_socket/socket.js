@@ -24,7 +24,10 @@ io.on('connection', function (socket) {
 
 	io.emit('rooms', getRooms());
 
-
+	socket.on('rooms',function()
+	{
+		io.emit('rooms',getRooms())
+	})
 	socket.on('disconnect', function () {
 		socket.broadcast.emit('deletePlayer', { id: socket.id });
 	});
