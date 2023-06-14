@@ -8,7 +8,7 @@ import { Router } from '@angular/router';
 export class UserService {
 
     constructor(private http: HttpClient, private router: Router) { }
-    private ip = "localhost"
+    private ip = "3.208.228.114"
     private url = `http://${this.ip}:8080/user/`
 
     httpOption() {
