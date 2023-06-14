@@ -2,6 +2,8 @@ import { Component, OnInit, ViewChild, ViewRef } from '@angular/core';
 import { Router } from '@angular/router';
 import { io, Socket } from 'socket.io-client';
 import { ChatInRoomService } from '../chat-in-room.service';
+import { UserService } from '../user.service';
+import { User } from '../User';
 export interface ChatMessage {
   name: string;
   mess: string;
@@ -22,13 +24,14 @@ export class ChatComponent implements OnInit {
   new_mess_author = "";
   new_mess_text = "";
   my_room = "";
+  user!:User;
   gameSrc = '../../assets/external/index.html';
   messList: ChatMessage[] = [];
   mess = "";
   timeout!: NodeJS.Timeout;
   bubbleOpen = true;
   private url = 'http://localhost:3000';  // 后台服务端口
-  constructor(private socket: ChatInRoomService,public router: Router) {
+  constructor(private socket: ChatInRoomService,public router: Router,private userService:UserService) {
 
     console.log(this.socket);
 
@@ -54,15 +57,24 @@ export class ChatComponent implements OnInit {
         this.showBubble();
       }
     )
-    // if(sessionStorage.getItem("username")==null)
-    // {
-    //   window.alert("请登录")
-    //   this.router.navigateByUrl("user/login")
-    //   this.player_name =this.generateRandomString()
-    // }else
-    // {
-    //   this.player_name = String(sessionStorage.getItem("username"))
-    // }
+    if(sessionStorage.getItem("token")==null)
+    {
+      window.alert("请登录")
+      this.router.navigateByUrl("user/login")
+    }else
+    {
+      this.userService.profile().subscribe((data)=>
+        {
+          console.log(data)
+          this.user = JSON.parse(JSON.stringify(data));
+          if(this.user.username)
+          {
+            this.player_name =this.user.username ;
+            sessionStorage.setItem("username",this.user.username)
+          }
+          
+        })
+    }
       
   }
   generateRandomString(): string {
@@ -72,17 +84,13 @@ export class ChatComponent implements OnInit {
   }
   
   ngAfterViewInit(): void {
-    // let box1=document.getElementById('box1');
-    // console.log(box1?.innerHTML);
-    // let box2=document.getElementById('box2');
-    // console.log(box2?.innerText);
     console.log(this.drawer);
     window.addEventListener('keydown', this.handleKeyDown.bind(this));
     // 在Angular组件中的ngOnInit或其他适当的生命周期钩子中添加以下代码
     window.addEventListener('message', this.handleMessage.bind(this));
     this.closeBubble();
-    this.newRoom = "12";
-    this.join_room("12");
+    this.newRoom = String(sessionStorage.getItem("roomId"));
+    this.join_room(this.newRoom);
   }
 
   handleMessage(event: MessageEvent) {
@@ -103,7 +111,6 @@ export class ChatComponent implements OnInit {
     this.begin_game();
   }
   begin_game() {
-    sessionStorage.setItem("roomId", this.my_room);
     this.game.nativeElement.style.display = "";
     this.game.nativeElement.src = this.gameSrc;
   }

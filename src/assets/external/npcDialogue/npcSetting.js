@@ -7,27 +7,27 @@ var dialogueData = {
         rotation: [0, Math.PI, 0],
         stages: {
             stage1: {
-                dialogue: "欢迎来到四盒院！你想和我聊些什么？",
+                dialogue: "欢迎来到这个3D世界！我是这里的向导，你有什么想要了解的么？",
                 options: [
-                    { id: "option1", content: "问候", res: "stage2", callback: [] },
-                    { id: "option2", content: "询问任务", res: "stage3", callback: [] },
+                    { id: "option1", content: "这里存在的意义是什么", res: "stage2", callback: [] },
+                    { id: "option2", content: "请介绍一下这里吧", res: "stage3", callback: [] },
                     { id: "option3", content: "道别", res: "stage4", callback: [] },
                     { id: "option4", content: "我要前往其他世界", res: "stage5", callback: [] },
                 ],
                 end: false
             },
             stage2: {
-                dialogue: "你好！有什么可以帮助你的吗？",
+                dialogue: "这里存在的意义是用于演示一下一些排序算法和数据结构。",
                 options: [
-                    { id: "option5", content: "继续问候", res: "stage2", callback: [] },
+                    { id: "option5", content: "继续询问", res: "stage1", callback: [] },
                     { id: "option6", content: "结束对话", res: "stage4", callback: [] }
                 ],
                 end: false
             },
             stage3: {
-                dialogue: "现在没有新的任务，你可以先去探索一下世界。",
+                dialogue: "这是一个多人在线web3d平台，在这个世界里，人们可以选择自己的3d人物形象，各个用户在世界内可以相互看见，相互聊天，并且可以一同观察算法的演示。",
                 options: [
-                    { id: "option7", content: "继续询问任务", res: "stage3", callback: [] },
+                    { id: "option7", content: "继续询问", res: "stage1", callback: [] },
                     { id: "option8", content: "结束对话", res: "stage4", callback: [] }
                 ],
                 end: false
@@ -44,10 +44,11 @@ var dialogueData = {
                     { id: "option5_2", content: "2", res: "stage4", callback: [] },
                     { id: "option5_3", content: "3", res: "stage4", callback: [] },
                     { id: "option5_4", content: "4", res: "stage4", callback: [] },
+                    {id:"option5_5",content:"放弃",res:"stage4",callback:[]}
                 ],
                 end: false
             }
         }
     }
 };
-var communicate = false;
+var NPCcommunicate = false;

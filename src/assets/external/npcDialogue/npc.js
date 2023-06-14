@@ -24,7 +24,7 @@ function closeDialogue() {
     console.log("remove");
     callbackList.flat(2).forEach(f=>f());
     callbackList = [];
-    communicate = false;
+    NPCcommunicate = false;
 }
 // 逐字显示 NPC 对话
 function loadNPCDialogueStep(npc, stage) {
@@ -84,12 +84,3 @@ function showOptionsPopup(npc, options) {
     optionsPopup.style.display = "flex";
 }
 
-
-
-// 添加一个事件监听器，当窗口大小改变时重新调整弹窗高度
-window.addEventListener("resize", function () {
-    npcPopup.style.height = npcMessage.offsetHeight + "px";
-});
-
-// // 初始化 NPC 对话
-// loadNPCDialogue(currentStage);

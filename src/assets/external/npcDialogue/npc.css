@@ -14,8 +14,7 @@
 
 #npc-message {
 
-    white-space: nowrap;
-    overflow: hidden;
+    overflow: scroll;
     padding: 20px;
     height: auto;
     min-width: 30px;
