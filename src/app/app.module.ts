@@ -70,7 +70,7 @@ import { ChatInRoomService } from './chat-in-room.service';
         MatGridListModule,
         MatIconModule,
         RouterModule.forRoot([
-            {path: "", component: HomepageComponent},
+            {path: "", component: PersonalCenterComponent},
             {path: "user/login", component: LoginComponent},
             {path: "user/register", component: RegisterComponent},
             {path: "user/game", component: GameComponent},
