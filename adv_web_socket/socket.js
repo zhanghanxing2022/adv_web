@@ -24,7 +24,10 @@ io.on('connection', function (socket) {
 
 	io.emit('rooms', getRooms());
 
-
+	socket.on('rooms',function()
+	{
+		io.emit('rooms',getRooms())
+	})
 	socket.on('disconnect', function () {
 		socket.broadcast.emit('deletePlayer', { id: socket.id });
 	});
@@ -45,7 +48,7 @@ io.on('connection', function (socket) {
 
 	socket.on('chat message', function (data) {
 		console.log(`chat message:${data.id} ${data.message}`);
-		io.in(socket.room).emit('chat message', { id: socket.id, message: data.message });
+		io.in(socket.room).emit('chat message', { id: data.id, message: data.message ,type:data.type});
 	});
 
 	socket.on('set username', function (name) {

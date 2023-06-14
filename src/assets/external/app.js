@@ -1,7 +1,12 @@
 const express = require('express');
 const app = express();
 const http = require('http').Server(app);
-const io = require('socket.io')(http);
+const io = require('socket.io')(http,
+	{
+		cors: {
+			origin: "*"
+		}
+	});
 
 // 关于app.use(express.static(path));
 // https://www.cnblogs.com/slovey/p/9213631.html#:~:text=app.use%20%28express.static%28_dirname%20%2B%20%27%2Fpublic%27%29%29%3B%20%2F%2F%E8%AE%BE%E7%BD%AE%E9%9D%99%E6%80%81%E6%96%87%E4%BB%B6%E7%9B%AE%E5%BD%95%20%E6%B3%A8%EF%BC%9A,%E5%B0%86%E9%9D%99%E6%80%81%E6%96%87%E4%BB%B6%E7%9B%AE%E5%BD%95%E8%AE%BE%E7%BD%AE%E4%B8%BA%E9%A1%B9%E7%9B%AE%E6%A0%B9%E7%9B%AE%E5%BD%95%20%2B%20%E2%80%98%2Fpublic%E2%80%99%EF%BC%8C%E5%8F%AF%E4%BB%A5%E8%BF%99%E6%A0%B7%E5%86%99%20app.use%20%28express.static%28path.join%20%28_dirname%2C%20%27public%27%29%29%29%3B

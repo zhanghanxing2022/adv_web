@@ -44,7 +44,7 @@ class Game {
 		this.anims = ['Walking', 'Walking Backwards', 'Turn', 'Running', 'Pointing', 'Talking', 'Pointing Gesture'];
 
 		this.anims2 = ['Idle', 'Walking', 'Walking Backwards', 'TurnLeft', 'TurnRight', 'Running'];
-		
+
 		const options = {
 			assets: [
 				`${this.assetsPath}images/nx.jpg`,
@@ -58,14 +58,14 @@ class Game {
 				game.init();
 			}
 		}
-		
+
 		game.anims2_dict = []
-		this.anims.forEach( function(anim){ options.assets.push(`${game.assetsPath}fbx/anims/${anim}.fbx`)});
-		this.anims2.forEach( function(anim){
+		this.anims.forEach(function (anim) { options.assets.push(`${game.assetsPath}fbx/anims/${anim}.fbx`) });
+		this.anims2.forEach(function (anim) {
 			let characterList = ['amy', 'jimmy', 'mouse', 'rabbit'];
-			characterList.forEach( function(character) {
+			characterList.forEach(function (character) {
 				options.assets.push(`${game.assetsPath}fbx/character/${character}/${anim}.fbx`)
-				game.anims2_dict.push({"character": character, "anim": anim});
+				game.anims2_dict.push({ "character": character, "anim": anim });
 			})
 		});
 		options.assets.push(`${game.assetsPath}fbx/town.fbx`);
@@ -76,7 +76,6 @@ class Game {
 
 		const preloader = new Preloader(options);
 
-		console.log("aaaa")
 		window.onError = function (error) {
 			console.error(JSON.stringify(error));
 		}
@@ -331,6 +330,39 @@ class Game {
 				}
 				return record;
 			}
+			game.scene1.utils.getSelectSortRecord = function () {
+				let record = [];
+				let list = game.scene1.selectSort.valList.concat();
+
+				for (let i = 0; i <= list.length - 1; i++) {
+					let min_val = undefined;
+					let min_i = undefined;
+					for (let j = i; j <= list.length - 1; j++) {
+						if (min_val === undefined || min_i === undefined) {
+							min_val = list[j];
+							min_i = j;
+						} else {
+							if (list[j] < min_val) {
+								min_val = list[j];
+								min_i = j;
+							}
+						}
+					}
+					let action = {"light_min": [min_i, list[min_i]]};
+
+					if (min_i != i) {
+						action["swap"] = [i, min_i, list[i], list[min_i]];
+					}
+
+					record.push(action);
+
+					let temp = list[i];
+					list[i] = list[min_i];
+					list[min_i] = temp;
+				}
+					console.log('selectSort record', record);
+				return record;
+			}
 
 			// 彩色花纹地板
 			const vertex = new THREE.Vector3();
@@ -364,7 +396,7 @@ class Game {
 			game.colliders.push(floor);
 			game.scene1.floor = floor;
 
-			// [排序场景]
+			// [冒泡排序]
 			// 8个立方体，对应待排序的8个数字
 			let boxList = [];
 
@@ -393,14 +425,12 @@ class Game {
 				game.colliders.push(box);
 
 				boxList.push(box);
-				game.scene1.bubbleSort.boxList = boxList;
 			}
+			game.scene1.bubbleSort.boxList = boxList.concat();
 
 			// 3个立方体，表示3个功能按钮，可以点击
 			let boxButtonList = [];
-
-			let boxButtonMaterialList = [];
-			let boxButtonXList = [];
+			// let boxButtonXList = [];
 			let insList = [' next  ', 'restart', 'shuffle'];
 
 			for (let i = 0; i < 3; i++) {
@@ -415,12 +445,61 @@ class Game {
 				game.colliders.push(box);
 
 				boxButtonList.push(box);
-				boxButtonXList.push(box.position.x);
+				// boxButtonXList.push(box.position.x);
 			}
 
-			game.scene1.bubbleSort.boxButtonList = boxButtonList;
-			game.scene1.bubbleSort.boxButtonXList = boxButtonXList;
+			game.scene1.bubbleSort.boxButtonList = boxButtonList.concat();
+			// game.scene1.bubbleSort.boxButtonXList = boxButtonXList;
 			game.scene1.bubbleSort.insList = insList;
+
+			valList = [1, 2, 3, 4, 5, 6, 7, 8];
+			valList.sort(function () { return Math.random() > 0.5 ? -1 : 1; });
+			game.scene1.selectSort = {};
+			game.scene1.selectSort.valList = valList.concat();
+
+			game.scene1.selectSort.record = game.scene1.utils.getSelectSortRecord();
+			game.scene1.selectSort.cur_ins = 0;	// 下一条应该执行的指令
+
+			// [选择排序]
+			// 8个立方体，对应待排序的8个数字
+			let boxMaterialList2 = [];
+			for (let i = 0; i < 10; i++) {
+				boxMaterialList2.push(new THREE.MeshLambertMaterial({ map: new THREE.CanvasTexture(game.scene1.utils.getNumCanvas(i, '#700BE1', '#FFD795')) }));
+			}
+			let boxList2 = [];
+			for (let i = 0; i < 8; i++) {
+				const box = new THREE.Mesh(boxGeometry, boxMaterialList2[valList[i]]);
+				box.position.x = -3700 + 400 * i;
+				box.position.y = 10000 + 500;
+				box.position.z = 0 - 2400;
+				game.scene.add(box);
+				game.colliders.push(box);
+
+				boxList2.push(box);
+			}
+			game.scene1.selectSort.boxList = boxList2.concat();
+
+			// 3个立方体，表示3个功能按钮，可以点击
+			let boxButtonList2 = [];
+			// let boxButtonXList2 = [];
+			for (let i = 0; i < 3; i++) {
+				const box = new THREE.Mesh(
+					boxGeometry,
+					new THREE.MeshLambertMaterial({ map: new THREE.CanvasTexture(game.scene1.utils.getInsCanvas(insList[i], '#D2D518', '#21FFB8')) })
+				);
+				box.position.x = -1710 + 400 * i;
+				box.position.y = 10000 + 100;
+				box.position.z = 0 - 2400 + 1650;
+				game.scene.add(box);
+				game.colliders.push(box);
+
+				boxButtonList2.push(box);
+				// boxButtonXList2.push(box.position.x);
+			}
+
+			game.scene1.selectSort.boxButtonList = boxButtonList2.concat();
+			// game.scene1.selectSort.boxButtonXList = boxButtonXList2;
+			game.scene1.selectSort.insList = insList;
 
 			// 与按钮方块进行交互
 			const mouseUpBoxButton = (e) => {
@@ -431,13 +510,16 @@ class Game {
 				const raycaster = new THREE.Raycaster();
 				raycaster.setFromCamera(mouse, game.camera);
 				// 计算物体和射线的焦点
-				const intersects = raycaster.intersectObjects(game.scene1.bubbleSort.boxButtonList);
+				let bubbleSortButtonList = game.scene1.bubbleSort.boxButtonList;
+				let selectSortButtonList = game.scene1.selectSort.boxButtonList
+				let clickedButtonList = bubbleSortButtonList.concat(selectSortButtonList);
+				const intersects = raycaster.intersectObjects(clickedButtonList);
 
 				if (intersects.length > 0) {
 					for (let i = 0; i < 3; i++) {
-						if (game.scene1.bubbleSort.boxButtonXList[i] == intersects[0].object.position.x) {
+						if (game.scene1.bubbleSort.boxButtonList[i] == intersects[0].object) {
 							let ins = game.scene1.bubbleSort.insList[i];
-							console.log(`[scene1] mouseup ${ins}`);
+							console.log(`[scene1] mouseup bubbleSort ${ins}`);
 							intersects[0].object.material.map = new THREE.CanvasTexture(game.scene1.utils.getInsCanvas(ins, '#D2D518', '#21FFB8'));
 
 							if (i == 0) {
@@ -463,6 +545,35 @@ class Game {
 								}
 							}
 						}
+
+						if (game.scene1.selectSort.boxButtonList[i] == intersects[0].object) {
+							let ins = game.scene1.selectSort.insList[i];
+							console.log(`[scene1] mouseup selectSort ${ins}`);
+							intersects[0].object.material.map = new THREE.CanvasTexture(game.scene1.utils.getInsCanvas(ins, '#D2D518', '#21FFB8'));
+
+							if (i == 0) {
+								if (game.scene1 !== undefined) {
+									if (game.scene1.selectSort.state != undefined && game.scene1.selectSort.state == 'free') {
+										game.scene1.selectSort.instruction = 'next';
+										game.scene1.selectSort.state = 'busy';
+									}
+								}
+							} else if (i == 1) {
+								if (game.scene1 !== undefined) {
+									if (game.scene1.selectSort.state != undefined && game.scene1.selectSort.state == 'free') {
+										game.scene1.selectSort.instruction = 'restart';
+										game.scene1.selectSort.state = 'busy';
+									}
+								}
+							} else if (i == 2) {
+								if (game.scene1 !== undefined) {
+									if (game.scene1.selectSort.state != undefined && game.scene1.selectSort.state == 'free') {
+										game.scene1.selectSort.instruction = 'shuffle';
+										game.scene1.selectSort.state = 'busy';
+									}
+								}
+							}
+						}
 					}
 				}
 			};
@@ -475,13 +586,22 @@ class Game {
 				const raycaster = new THREE.Raycaster();
 				raycaster.setFromCamera(mouse, game.camera);
 				// 计算物体和射线的焦点
-				const intersects = raycaster.intersectObjects(game.scene1.bubbleSort.boxButtonList);
+				let bubbleSortButtonList = game.scene1.bubbleSort.boxButtonList;
+				let selectSortButtonList = game.scene1.selectSort.boxButtonList
+				let clickedButtonList = bubbleSortButtonList.concat(selectSortButtonList);
+				const intersects = raycaster.intersectObjects(clickedButtonList);
 
 				if (intersects.length > 0) {
 					for (let i = 0; i < 3; i++) {
-						if (game.scene1.bubbleSort.boxButtonXList[i] == intersects[0].object.position.x) {
+						if (game.scene1.bubbleSort.boxButtonList[i] == intersects[0].object) {
 							let ins = game.scene1.bubbleSort.insList[i];
-							console.log(`[scene1] mousedown ${ins}`);
+							console.log(`[scene1] mousedown bubbleSort ${ins}`);
+							intersects[0].object.material.map = new THREE.CanvasTexture(game.scene1.utils.getInsCanvas(ins, '#989A15', '#17C18B'))
+						}
+
+						if (game.scene1.selectSort.boxButtonList[i] == intersects[0].object) {
+							let ins = game.scene1.bubbleSort.insList[i];
+							console.log(`[scene1] mousedown selectSort ${ins}`);
 							intersects[0].object.material.map = new THREE.CanvasTexture(game.scene1.utils.getInsCanvas(ins, '#989A15', '#17C18B'))
 						}
 					}
@@ -492,6 +612,7 @@ class Game {
 			document.addEventListener("mouseup", mouseUpBoxButton, false);
 
 			game.scene1.bubbleSort.state = "free";	// free表示可以执行指令，busy表示正在执行指令
+			game.scene1.selectSort.state = "free";	// free表示可以执行指令，busy表示正在执行指令
 
 			// 排序动画演示
 			game.scene1.animate = function (dt) {
@@ -500,6 +621,7 @@ class Game {
 				// console.log('[scene1] instruction:', game.scene1.bubbleSort.instruction);
 				// console.log('[scene1] cur_ins:', game.scene1.bubbleSort.cur_ins);
 
+				// 冒泡排序动画逻辑
 				if (game.scene1.bubbleSort.state == 'busy') {
 					if (game.scene1.bubbleSort.instruction == 'next') {
 						// do next
@@ -627,6 +749,159 @@ class Game {
 						console.log('shuffle is done');
 						game.scene1.bubbleSort.cur_ins = 0;
 						game.scene1.bubbleSort.state = 'free';
+					}
+				}
+
+				// 选择排序动画逻辑
+				if (game.scene1.selectSort.state == 'busy') {
+					if (game.scene1.selectSort.instruction == 'next') {
+						// do next
+						if (game.scene1.selectSort.cur_ins < game.scene1.selectSort.record.length) {
+							console.log('doing next...');
+
+							// ap在bp的右侧。左侧是x轴负方向，上侧是y轴正方向。
+							let action = game.scene1.selectSort.record[game.scene1.selectSort.cur_ins];
+							
+							let swap_pair;
+							let ap, bp;
+							let a, b;
+							let av, bv;
+
+							if (action["swap"] != undefined) {
+								swap_pair = action["swap"];
+								if (swap_pair[0] > swap_pair[1]) {
+									ap = game.scene1.selectSort.boxList[swap_pair[0]].position;
+									bp = game.scene1.selectSort.boxList[swap_pair[1]].position;
+									a = game.scene1.selectSort.boxList[swap_pair[0]];
+									b = game.scene1.selectSort.boxList[swap_pair[1]];
+									av = swap_pair[2];
+									bv = swap_pair[3];
+								} else {
+									bp = game.scene1.selectSort.boxList[swap_pair[0]].position;
+									ap = game.scene1.selectSort.boxList[swap_pair[1]].position;
+									b = game.scene1.selectSort.boxList[swap_pair[0]];
+									a = game.scene1.selectSort.boxList[swap_pair[1]];
+									bv = swap_pair[2];
+									av = swap_pair[3];
+								}
+							}
+
+							// stage的定义与切换
+							if (game.scene1.selectSort.swap_state === undefined) {
+								game.scene1.selectSort.swap_state = 'stage0';
+								// 高亮当前轮取值最小的方块，红色
+								game.scene1.selectSort.boxList[action["light_min"][0]].material.map = new THREE.CanvasTexture(game.scene1.utils.getNumCanvas(action["light_min"][1], '#FF4B4B', '#4B76FF'));
+								game.scene1.selectSort.stage0counter = 0;
+								game.scene1.selectSort.stage0counterObj = 50;
+							} else if (game.scene1.selectSort.swap_state == 'stage0') {
+								if (game.scene1.selectSort.stage0counter == game.scene1.selectSort.stage0counterObj) {
+									delete game.scene1.selectSort.stage0counter;
+									delete game.scene1.selectSort.stage0counterObj;
+									if (action["swap"] === undefined) {
+										game.scene1.selectSort.swap_state = 'finish';
+										// 高亮被交换至正确位置的红色方块，绿色
+										game.scene1.selectSort.boxList[action["light_min"][0]].material.map = new THREE.CanvasTexture(game.scene1.utils.getNumCanvas(action["light_min"][1], '#8FFF4B', '#FFD94B'));
+									} else {
+										game.scene1.selectSort.swap_state = 'stage1';
+										// stage1 目标
+
+										game.scene1.selectSort.swap_ap = ap.y - 300;
+										game.scene1.selectSort.swap_bp = bp.y + 300;
+									}
+								}
+							} else if (game.scene1.selectSort.swap_state == 'stage1') {
+								if (ap.y <= game.scene1.selectSort.swap_ap && bp.y >= game.scene1.selectSort.swap_bp) {
+									game.scene1.selectSort.swap_state = 'stage2';
+									// stage2 目标
+									game.scene1.selectSort.swap_ap = bp.x;
+									game.scene1.selectSort.swap_bp = ap.x;
+								}
+							} else if (game.scene1.selectSort.swap_state == 'stage2') {
+								if (ap.x <= game.scene1.selectSort.swap_ap && bp.x >= game.scene1.selectSort.swap_bp) {
+									game.scene1.selectSort.swap_state = 'stage3';
+									// stage3 目标
+									game.scene1.selectSort.swap_ap = ap.y + 300;
+									game.scene1.selectSort.swap_bp = bp.y - 300;
+								}
+							} else if (game.scene1.selectSort.swap_state == 'stage3') {
+								if (ap.y >= game.scene1.selectSort.swap_ap && bp.y <= game.scene1.selectSort.swap_bp) {
+									game.scene1.selectSort.swap_state = 'finish';
+									// 高亮被交换至正确位置的红色方块，绿色
+									game.scene1.selectSort.boxList[action["light_min"][0]].material.map = new THREE.CanvasTexture(game.scene1.utils.getNumCanvas(action["light_min"][1], '#8FFF4B', '#FFD94B'));
+								}
+							}
+
+							// 根据stage进行动画
+							if (game.scene1.selectSort.swap_state == 'stage0') {
+								game.scene1.selectSort.stage0counter++;
+							} else if (game.scene1.selectSort.swap_state == 'stage1') {
+								// ap.y = ap.y - 300/30;
+								// bp.y = bp.y + 300/30;
+								ap.y = ap.y - 10;
+								bp.y = bp.y + 10;
+							} else if (game.scene1.selectSort.swap_state == 'stage2') {
+								let ap_obj = game.scene1.selectSort.swap_ap;
+								let bp_obj = game.scene1.selectSort.swap_bp;
+								// ap.x = ap.x - (bp_obj - ap_obj)/30;
+								// bp.x = bp.x + (bp_obj - ap_obj)/30;
+								ap.x = ap.x - 10;
+								bp.x = bp.x + 10;
+							} else if (game.scene1.selectSort.swap_state == 'stage3') {
+								// ap.y = ap.y + 300/30;
+								// bp.y = bp.y - 300/30;
+								ap.y = ap.y + 10;
+								bp.y = bp.y - 10;
+							} else if (game.scene1.selectSort.swap_state == 'finish') {
+								// 交换完成，无需取消高亮
+								if (action["swap"] != undefined) {
+									let temp_box = game.scene1.selectSort.boxList[swap_pair[0]];
+									game.scene1.selectSort.boxList[swap_pair[0]] = game.scene1.selectSort.boxList[swap_pair[1]];
+									game.scene1.selectSort.boxList[swap_pair[1]] = temp_box;
+								}
+							}
+						} else {
+							game.scene1.selectSort.swap_state = 'finish';
+						}
+
+						// once done, become free
+						if (game.scene1.selectSort.swap_state == 'finish') {
+							console.log('next is done');
+							game.scene1.selectSort.cur_ins += 1;
+							game.scene1.selectSort.state = 'free'
+							delete game.scene1.selectSort.swap_state;
+						}
+
+					} else if (game.scene1.selectSort.instruction == 'restart') {
+						// do restart
+						console.log('doing restart...');
+
+						let list = game.scene1.selectSort.valList;
+						for (let i = 0; i < list.length; i++) {
+							game.scene1.selectSort.boxList[i].material.map = new THREE.CanvasTexture(game.scene1.utils.getNumCanvas(list[i], '#700BE1', '#FFD795'));
+						}
+
+						// once done, become free
+						console.log('restart is done');
+						game.scene1.selectSort.cur_ins = 0;
+						game.scene1.selectSort.state = 'free'
+					} else if (game.scene1.selectSort.instruction == 'shuffle') {
+						// do shuffle
+						console.log('doing shuffle...');
+
+						let valList = [1, 2, 3, 4, 5, 6, 7, 8];
+						valList.sort(function () { return Math.random() > 0.5 ? -1 : 1; });
+						game.scene1.selectSort.valList = valList.concat();
+						game.scene1.selectSort.record = game.scene1.utils.getSelectSortRecord();
+
+						let list = game.scene1.selectSort.valList;
+						for (let i = 0; i < list.length; i++) {
+							game.scene1.selectSort.boxList[i].material.map = new THREE.CanvasTexture(game.scene1.utils.getNumCanvas(list[i], '#700BE1', '#FFD795'));
+						}
+
+						// once done, become free
+						console.log('shuffle is done');
+						game.scene1.selectSort.cur_ins = 0;
+						game.scene1.selectSort.state = 'free';
 					}
 				}
 
@@ -1462,7 +1737,7 @@ class Game {
 				console.log('begin loadMyAnim');
 				game.loadMyAnim(loader);
 			}
-		});	
+		});
 	}
 
 	loadMyAnim(loader) {
@@ -1471,7 +1746,7 @@ class Game {
 		let character = dict["character"];
 		let anim = dict["anim"];
 		// console.log(`loadMyAnim [${character}][${anim}]`);
-		loader.load(`${game.assetsPath}fbx/character/${character}/${anim}.fbx`, function( object ){
+		loader.load(`${game.assetsPath}fbx/character/${character}/${anim}.fbx`, function (object) {
 			if (game.animations2 === undefined) {
 				game.animations2 = {};
 			}
@@ -1481,15 +1756,15 @@ class Game {
 			if (character != game.player.selected_character || anim != "Idle") {
 				game.animations2[character][anim] = object.animations[0];
 			}
-			if (game.anims2_dict.length>0){
+			if (game.anims2_dict.length > 0) {
 				game.loadMyAnim(loader);
-			}else{
+			} else {
 				delete game.anims2_dict;
 
 				console.log('end loadMyAnim');
 
 				console.log('game.animations2', game.animations2);
-				
+
 				game.action = "Idle";
 				game.mode = game.modes.ACTIVE;
 
@@ -1881,7 +2156,56 @@ class Game {
 		this.renderer.render(this.scene, this.camera);
 	}
 }
+// 创建文字精灵的函数
+function createTextSprite(text, backgroundColor, textColor) {
+	const canvas = document.createElement('canvas');
+	const context = canvas.getContext('2d');
+	
+	// 测量文字的宽度
+	context.font = 'Bold 20px Arial';
+	const textWidth = context.measureText(text).width;
+	
+	// 设置矩形的宽度为文字宽度加上一定的边距
+	const padding = 10;
+	const rectWidth = textWidth + padding * 2;
+	const rectHeight = 50;
+	const borderRadius = 10;
+	const shadowBlur = 5;
+	const shadowColor = 'rgba(0, 0, 0, 0.5)';
+	
+	// 绘制背景矩形
+	context.fillStyle = backgroundColor;
+	context.shadowBlur = shadowBlur;
+	context.shadowColor = shadowColor;
+	context.beginPath();
+	context.moveTo(borderRadius, 0);
+	context.lineTo(rectWidth - borderRadius, 0);
+	context.quadraticCurveTo(rectWidth, 0, rectWidth, borderRadius);
+	context.lineTo(rectWidth, rectHeight - borderRadius);
+	context.quadraticCurveTo(rectWidth, rectHeight, rectWidth - borderRadius, rectHeight);
+	context.lineTo(borderRadius, rectHeight);
+	context.quadraticCurveTo(0, rectHeight, 0, rectHeight - borderRadius);
+	context.lineTo(0, borderRadius);
+	context.quadraticCurveTo(0, 0, borderRadius, 0);
+	context.closePath();
+	context.fill();
+  
+	// 绘制文字
+	context.font = 'Bold 20px Arial';
+	context.fillStyle = textColor;
+	context.textAlign = 'center';
+	context.textBaseline = 'middle';
+	context.fillText(text, rectWidth / 2, rectHeight / 2);
+  
+	const texture = new THREE.CanvasTexture(canvas);
+	const spriteMaterial = new THREE.SpriteMaterial({ map: texture });
+	const sprite = new THREE.Sprite(spriteMaterial);
 
+  
+	return sprite;
+  }
+
+  
 class Player {
 	constructor(game, options) {
 		this.local = true;
@@ -1920,12 +2244,12 @@ class Player {
 
 		player.selected_skin = "黑旋风";
 		player.selected_character = "rabbit";
-		
+
 		// loader.load( `${game.assetsPath}fbx/people/${model}.fbx`, function ( object ) {
-		loader.load( `${game.assetsPath}fbx/character/${player.selected_character}/Idle.fbx`, function ( object ) {
-			
+		loader.load(`${game.assetsPath}fbx/character/${player.selected_character}/Idle.fbx`, function (object) {
+
 			object.scale.set(16, 16, 16);
-			object.mixer = new THREE.AnimationMixer( object );
+			object.mixer = new THREE.AnimationMixer(object);
 			player.root = object;
 			player.mixer = object.mixer;
 
@@ -1943,14 +2267,22 @@ class Player {
 				object.scale.x = scale;
 				object.scale.y = scale;
 				object.scale.z = scale;
-				object.position.y = config.transformMap.get(player.selected_character)['y'];	
+				object.position.y = config.transformMap.get(player.selected_character)['y'];
 			})
-			
+
 			player.object = new THREE.Object3D();
 			player.object.position.set(3122, 0, -173);
 			player.object.rotation.set(0, 2.6, 0);
 
 			player.object.add(object);
+			
+			player.name = createTextSprite('Hello World', 'rgba(0, 255, 0, 0.5)', 'white');
+		
+			player.name.position.y = 300
+			player.name.rotation.y = -Math.PI/2
+			player.name.scale.set(150,150,150)
+			player.object.add(player.name)
+			
 			if (player.deleted === undefined) game.scene.add(player.object);
 
 			if (player.local) {
@@ -1969,10 +2301,10 @@ class Player {
 				console.log('game.animations', game.animations);
 				console.log('player.animations', player.animations);
 
-				if (player.initSocket!==undefined) player.initSocket();
-			}else{
-				const geometry = new THREE.BoxGeometry(100,300,100);
-				const material = new THREE.MeshBasicMaterial({visible:false});
+				if (player.initSocket !== undefined) player.initSocket();
+			} else {
+				const geometry = new THREE.BoxGeometry(100, 300, 100);
+				const material = new THREE.MeshBasicMaterial({ visible: false });
 				const box = new THREE.Mesh(geometry, material);
 				box.name = "Collider";
 				box.position.set(0, 150, 0);
@@ -1983,11 +2315,11 @@ class Player {
 				const players = game.initialisingPlayers.splice(game.initialisingPlayers.indexOf(this), 1);
 				game.remotePlayers.push(players[0]);
 			}
-			
-			if (game.animations.Idle!==undefined) {
+
+			if (game.animations.Idle !== undefined) {
 				player.action = "Idle";
 			}
-		} );
+		});
 	}
 
 	set action(name) {
@@ -1995,10 +2327,10 @@ class Player {
 		const player = this;
 		const game = player.game;
 		if (this.actionName == name) return;
-		const clip = (this.local) ? game.animations2[player.selected_character][name] : THREE.AnimationClip.parse(THREE.AnimationClip.toJSON(game.animations2[player.selected_character][name])); 
+		const clip = (this.local) ? game.animations2[player.selected_character][name] : THREE.AnimationClip.parse(THREE.AnimationClip.toJSON(game.animations2[player.selected_character][name]));
 
-		const action = this.mixer.clipAction( clip );
-        action.time = 0;
+		const action = this.mixer.clipAction(clip);
+		action.time = 0;
 		this.mixer.stopAllAction();
 		this.actionName = name;
 		this.actionTime = Date.now();
@@ -2013,7 +2345,7 @@ class Player {
 
 	update(dt) {
 		this.mixer.update(dt);
-
+		
 		if (this.game.remoteData.length > 0) {
 			let found = false;
 			for (let data of this.game.remoteData) {
@@ -2027,6 +2359,7 @@ class Player {
 			}
 			if (!found) this.game.removePlayer(this);
 		}
+		
 	}
 }
 
@@ -2035,7 +2368,7 @@ class PlayerLocal extends Player {
 		super(game, model);
 
 		const player = this;
-		const socket = io.connect();
+		const socket = io.connect("http://localhost:2002/");
 		this.velocityY = 0;
 
 		socket.on('setId', function (data) {

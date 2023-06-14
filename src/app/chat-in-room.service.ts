@@ -1,11 +1,12 @@
 import { Injectable } from '@angular/core';
 import { io, Socket } from "socket.io-client";
 import { Observable } from 'rxjs';
+import { ChatMessage } from './chat/chat.component';
 @Injectable({
   providedIn: 'root'
 })
-class ChatInRoomService {
-  private url = 'ws://localhost:3000';  // 后台服务端口
+export class ChatInRoomService {
+  private url = 'http://localhost:3000';  // 后台服务端口
   private socket: Socket;
   constructor() {
     this.socket = io(this.url, {
@@ -23,29 +24,33 @@ class ChatInRoomService {
   join_room(roomName: string) {
     this.socket.connect();
     this.socket.emit("join room", roomName);
-    
+
   }
-  create_room(newRoom: string) {
-    this.socket.connect();
-    console.log("emit new room");
+  create_room(newRoom: string):boolean {
     this.socket.emit('new room', newRoom);
+    return true;
   }
-  getRooms(): Observable<Map<string,Set<string>>> {
+  getRooms(): Observable<string[]> {
     return new Observable(observer => {
-      if (!this.socket.connected) {
-        this.socket.connect();
-        console.log("try connect");
-      }
-      this.socket.on('rooms', (data: Map<string,Set<string>>) => {
+
+      this.socket.on('rooms', (data: string[]) => {
         console.log(data);
         observer.next(data);
-        
+
       });
-      return () => {
-        this.socket.disconnect();
-      }
     })
   }
+  getMessage(): Observable<any> {
+    return new Observable(observer => {
+      this.socket.on('chat message', (data) =>{
+        observer.next(data);
+      },)
+    })
+  }
+  send_message(data:any){
+    this.socket.emit('chat message',data);
+  }
+
   setId(): Observable<any> {
     return new Observable(observer => {
       if (!this.socket.connected) {

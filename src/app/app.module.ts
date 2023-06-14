@@ -34,6 +34,8 @@ import { ChangePasswordComponent } from './change-password/change-password.compo
 import { PersonalFigureHistoryComponent } from './personal-figure-history/personal-figure-history.component';
 import { PersonalAlgorithmHistoryComponent } from './personal-algorithm-history/personal-algorithm-history.component';
 import { CubeComponent } from './cube/cube.component';
+import * as echarts from 'echarts';
+import { ChatInRoomService } from './chat-in-room.service';
 
 @NgModule({
   declarations: [
@@ -82,6 +84,7 @@ import { CubeComponent } from './cube/cube.component';
         MatTabsModule
     ],
   providers: [
+    ChatInRoomService
   ],
   bootstrap: [AppComponent]
 })
