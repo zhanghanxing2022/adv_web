@@ -1995,10 +1995,10 @@ class Game {
 					// 	break;
 					case 'KeyQ':
 						let info = "请输入场景编号(1-4):\n"
-							+ "1: 排序算法演示\n"
+							+ "1: 冒泡排序算法演示\n"
 							+ "2: 二叉树遍历演示\n"
-							+ "3: 未知方块世界1\n"
-							+ "4: 未知方块世界2\n";
+							+ "3: 选择排序算法演示\n"
+							+ "4: 未知方块世界\n";
 						let sceneId = prompt(info);
 						game.goToScene(sceneId);
 						break;
