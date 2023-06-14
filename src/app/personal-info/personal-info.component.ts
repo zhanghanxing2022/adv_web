@@ -32,4 +32,13 @@ export class PersonalInfoComponent implements OnInit {
         private location: Location,
         private router: Router
     ) { }
+
+    home() {
+        this.router.navigateByUrl("user/personalCenter");
+    }
+
+    logout() {
+        sessionStorage.clear();
+        this.router.navigateByUrl("user/login");
+    }
 }

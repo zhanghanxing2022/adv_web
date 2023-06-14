@@ -42,4 +42,16 @@ export class RegisterComponent{
       }
     )
   }
+
+  home() {
+    this.router.navigateByUrl("user/personalCenter");
+  }
+
+  info() {
+    this.router.navigateByUrl("user/personalInfo");
+  }
+
+  login() {
+    this.router.navigateByUrl("user/login");
+  }
 }
