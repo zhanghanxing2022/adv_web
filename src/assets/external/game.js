@@ -1856,7 +1856,7 @@ class Game {
 		this.updateRemotePlayers(dt);
 
 		// 本地玩家动作的变化
-		if (this.player.mixer != undefined && this.mode == this.modes.ACTIVE) this.player.mixer.update(dt);
+		if (this.player.mixer != undefined && this.mode == this.modes.ACTIVE) this.player.mixer.update(1);
 		if (this.player.action == 'Walking') {
 			const elapsedTime = Date.now() - this.player.actionTime;
 			if (elapsedTime > 1000 && this.player.motion.forward > 0) {
