@@ -3,7 +3,7 @@
     bottom: 0;
     left: 0;
     width: 100%;
-    height: auto;
+    min-height:50px ;
     background-color: rgba(32, 23, 113, 0.5);
     box-sizing: border-box;
     display: none;

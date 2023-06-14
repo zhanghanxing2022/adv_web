@@ -1,4 +1,5 @@
 import { Component, OnInit, ViewChild, ViewRef } from '@angular/core';
+import { Router } from '@angular/router';
 import { io, Socket } from 'socket.io-client';
 import { ChatInRoomService } from '../chat-in-room.service';
 export interface ChatMessage {
@@ -15,9 +16,8 @@ export class ChatComponent implements OnInit {
   @ViewChild("bubble") bubble: any;
   @ViewChild("drawer") drawer: any;
   @ViewChild("game") game: any;
-  @ViewChild("room") room: any;
   roomList: string[] = ["123", "1233"];
-  player_id = 0;
+  player_name = "";
   newRoom: string = "";
   new_mess_author = "";
   new_mess_text = "";
@@ -28,7 +28,7 @@ export class ChatComponent implements OnInit {
   timeout!: NodeJS.Timeout;
   bubbleOpen = true;
   private url = 'http://localhost:3000';  // 后台服务端口
-  constructor(private socket: ChatInRoomService) {
+  constructor(private socket: ChatInRoomService,public router: Router) {
 
     console.log(this.socket);
 
@@ -54,9 +54,23 @@ export class ChatComponent implements OnInit {
         this.showBubble();
       }
     )
-
-
+    if(sessionStorage.getItem("username")==null)
+    {
+      window.alert("请登录")
+      this.router.navigateByUrl("user/login")
+      this.player_name =this.generateRandomString()
+    }else
+    {
+      this.player_name = String(sessionStorage.getItem("username"))
+    }
+      
   }
+  generateRandomString(): string {
+    const currentTime = new Date().getTime(); // 获取当前时间的时间戳
+    const randomString = currentTime.toString(36).substring(2, 8); // 将时间戳转换为36进制并截取长度为6的字符串
+    return randomString;
+  }
+  
   ngAfterViewInit(): void {
     // let box1=document.getElementById('box1');
     // console.log(box1?.innerHTML);
@@ -67,6 +81,8 @@ export class ChatComponent implements OnInit {
     // 在Angular组件中的ngOnInit或其他适当的生命周期钩子中添加以下代码
     window.addEventListener('message', this.handleMessage.bind(this));
     this.closeBubble();
+    this.newRoom = "12";
+    this.join_room("12");
   }
 
   handleMessage(event: MessageEvent) {
@@ -88,7 +104,6 @@ export class ChatComponent implements OnInit {
   }
   begin_game() {
     sessionStorage.setItem("roomId", this.my_room);
-    this.room.nativeElement.style.display = "none";
     this.game.nativeElement.style.display = "";
     this.game.nativeElement.src = this.gameSrc;
   }
@@ -98,13 +113,12 @@ export class ChatComponent implements OnInit {
       this.socket.create_room(this.newRoom);
     }
 
-
   }
   send_message() {
     if (this.mess) {
       this.socket.send_message(
         {
-          id: "zhx",
+          id: this.player_name,
           message: this.mess,
           type: "text"
         });

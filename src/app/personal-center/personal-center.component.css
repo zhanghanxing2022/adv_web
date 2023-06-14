@@ -184,7 +184,7 @@ mat-sidenav {
     margin-left: 70px; /* 可根据需要调整元素之间的间距 */
     width: 80px;
     height: 45px;
-    background-color: rgba(0, 255, 255, 0.647);
+    background-color: rgba(16, 246, 246, 0.485);
     bottom: 12px;
   }
   
