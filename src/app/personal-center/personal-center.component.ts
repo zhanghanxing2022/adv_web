@@ -2,7 +2,7 @@ import { Component, ElementRef, ViewChild, OnChanges, SimpleChanges, Input } fro
 import * as THREE from 'three'
 import { OrbitControls } from 'three-orbitcontrols-ts';
 import { FBXLoader } from 'three/examples/jsm/loaders/FBXLoader';
-import { characters, introductionMap, optionsMap, skinMap, transformMap } from './model-config';
+import { characters, CN_EN_MPA, introductionMap, optionsMap, skinMap, transformMap } from './model-config';
 import { FormControl, Validators } from '@angular/forms';
 import { Router } from '@angular/router';
 import { UserService } from '../user.service';
@@ -261,7 +261,7 @@ export class PersonalCenterComponent implements OnChanges{
     {
       return
     }
-    this.userService.addFigure(this.selected_character, this.selected_skin).subscribe(
+    this.userService.addFigure(this.selected_character, CN_EN_MPA.get(this.selected_skin)!).subscribe(
       (response) => {
         sessionStorage.setItem('roomId', this.worldFormControl.value!);
         sessionStorage.setItem('model', this.selected_character);
@@ -270,8 +270,17 @@ export class PersonalCenterComponent implements OnChanges{
       }
       ,
       (response) => {
-        window.alert("请登录！");
-        this.router.navigateByUrl("user/login");
+        if (response.status === 0) {
+          window.alert("请登录！");
+          this.router.navigateByUrl("user/login");
+      } else {
+          if (response.error != undefined && response.status === 400) {
+            window.alert(response.error);
+          } else {
+            window.alert("服务器错误！");
+          }
+          
+      }
     });
   }
 

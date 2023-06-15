@@ -38,3 +38,13 @@ export let introductionMap = new Map([
     ["mouse", "Yes Sir♂"],
     ["强健体魄", "其实它只有一个皮肤，只是强行多加了一个皮肤"]
 ])
+
+export let CN_EN_MPA = new Map([
+    ["rabbit", "rabbit"],
+    ["粉色妖精小兔♪", "pink"],
+    ["黑旋风", "black"],
+    ["jimmy", "jimmy"],
+    ["amy", "amy"],
+    ["mouse", "mouse"],
+    ["强健体魄", "strong"]
+])

@@ -168,6 +168,11 @@ export class ChatComponent implements OnInit {
   onFileSelected(event: any) {
     const file: File = event.target.files[0];
 
+    if(file.size/1024 >500)
+    {
+      window.alert("上传文件大与500KB！！")
+      return
+    }
     if (file && file.type.startsWith('image/')) {
       const reader = new FileReader();
 
