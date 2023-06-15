@@ -2736,7 +2736,7 @@ class PlayerLocal extends Player {
 		super(game, model);
 
 		const player = this;
-		const socket = io.connect("http://localhost:2002/");
+		const socket = io.connect("http://34.201.157.50:2002/");
 		this.velocityY = 0;
 
 		socket.on('setId', function (data) {

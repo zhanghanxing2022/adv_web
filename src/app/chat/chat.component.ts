@@ -176,7 +176,7 @@ export class ChatComponent implements OnInit {
         // 在这里处理提取到的 base64 编码
         this.socket.send_message(
           {
-            id: "zhx",
+            id: this.player_name,
             message: base64data,
             type: "img"
           });

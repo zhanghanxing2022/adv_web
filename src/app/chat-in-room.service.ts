@@ -6,7 +6,7 @@ import { ChatMessage } from './chat/chat.component';
   providedIn: 'root'
 })
 export class ChatInRoomService {
-  private url = 'http://localhost:3000';  // 后台服务端口
+  private url = 'http://34.201.157.50:3000';  // 后台服务端口
   private socket: Socket;
   constructor() {
     this.socket = io(this.url, {
