@@ -407,7 +407,7 @@ class Game {
 			game.colliders.push(game.scene1.boardMesh);
 
 			const EVENT_MOUSEDOWN_onBoard1 = (ev) => {
-				if (game.scene1.info === true)	
+				if (game.scene1.info === true)
 					return;
 				const mouse = new THREE.Vector2();
 				mouse.x = (ev.clientX / window.innerWidth) * 2 - 1;
@@ -416,7 +416,7 @@ class Game {
 				raycaster.setFromCamera(mouse, game.camera);
 				const intersects = raycaster.intersectObjects(game.colliders);
 				console.log(intersects[0]);
-				if (intersects.length === 0 )
+				if (intersects.length === 0)
 					return;
 				if (intersects[0].object.isBoard1) {
 					let info = document.getElementById("info");
@@ -440,7 +440,7 @@ class Game {
 			}
 
 			document.addEventListener('mousedown', EVENT_MOUSEDOWN_onBoard1, false);
-			
+
 
 			// [冒泡排序]
 			// 8个立方体，对应待排序的8个数字
@@ -509,7 +509,7 @@ class Game {
 				// 计算物体和射线的焦点
 				let bubbleSortButtonList = game.scene1.bubbleSort.boxButtonList;
 				const intersects = raycaster.intersectObjects(bubbleSortButtonList);
-			
+
 
 				if (intersects.length > 0) {
 					for (let i = 0; i < 3; i++) {
@@ -525,7 +525,7 @@ class Game {
 										// game.scene1.bubbleSort.state = 'busy';
 										const socket = game.player.socket;
 										let roomId = sessionStorage.getItem("roomId");
-										socket.emit('scene1 request', {instruction: "next", roomId: roomId});
+										socket.emit('scene1 request', { instruction: "next", roomId: roomId });
 									}
 								}
 							} else if (i == 1) {
@@ -535,7 +535,7 @@ class Game {
 										// game.scene1.bubbleSort.state = 'busy';
 										const socket = game.player.socket;
 										let roomId = sessionStorage.getItem("roomId");
-										socket.emit('scene1 request', {instruction: "restart", roomId: roomId});
+										socket.emit('scene1 request', { instruction: "restart", roomId: roomId });
 									}
 								}
 							} else if (i == 2) {
@@ -545,7 +545,7 @@ class Game {
 										// game.scene1.bubbleSort.state = 'busy';
 										const socket = game.player.socket;
 										let roomId = sessionStorage.getItem("roomId");
-										socket.emit('scene1 request', {instruction: "shuffle", roomId: roomId});
+										socket.emit('scene1 request', { instruction: "shuffle", roomId: roomId });
 									}
 								}
 							}
@@ -578,13 +578,13 @@ class Game {
 
 			document.addEventListener("mousedown", mouseDownBoxButton, false);
 			document.addEventListener("mouseup", mouseUpBoxButton, false);
-		
+
 			game.scene1.bubbleSort.state = "free";	// free表示可以执行指令，busy表示正在执行指令
-			
+
 			const socket = game.player.socket;
 			// 获取服务器当前的实际数据
 			socket.on('scene1 sendCurrent', function (data) {
-						console.log('data', data);
+				console.log('data', data);
 				game.scene1.bubbleSort.cur_ins = data.cur_ins;
 				game.scene1.bubbleSort.valList = data.valList;
 				game.scene1.bubbleSort.record = game.scene1.utils.getBubbleSortRecord();
@@ -592,10 +592,10 @@ class Game {
 				for (let i = 0; i < 8; i++) {
 					game.scene1.bubbleSort.boxList[i].material.map = new THREE.CanvasTexture(game.scene1.utils.getNumCanvas(valList[i], '#700BE1', '#FFD795'));
 				}
-				
+
 				game.scene1.bubbleSort.state = data.state;
 				game.scene1.bubbleSort.instruction = data.instruction;
-			});	
+			});
 
 			// 排序动画演示
 			game.scene1.animate = function (dt) {
@@ -699,7 +699,7 @@ class Game {
 							// game.scene1.bubbleSort.state = 'free'
 							const socket = game.player.socket;
 							let roomId = sessionStorage.getItem("roomId");
-							socket.emit('scene1 i finish', {"roomId": roomId, "record_length": game.scene1.bubbleSort.record.length});
+							socket.emit('scene1 i finish', { "roomId": roomId, "record_length": game.scene1.bubbleSort.record.length });
 							game.scene1.bubbleSort.instruction = undefined;
 							console.log('next is done');
 							delete game.scene1.bubbleSort.swap_state;
@@ -717,7 +717,7 @@ class Game {
 						// once done, become free
 						const socket = game.player.socket;
 						let roomId = sessionStorage.getItem("roomId");
-						socket.emit('scene1 i finish', {"roomId": roomId});
+						socket.emit('scene1 i finish', { "roomId": roomId });
 						game.scene1.bubbleSort.instruction = undefined;
 						console.log('restart is done');
 
@@ -734,7 +734,7 @@ class Game {
 						const socket = game.player.socket;
 						let roomId = sessionStorage.getItem("roomId");
 						game.scene1.bubbleSort.instruction = undefined;
-						socket.emit('scene1 i finish', {"roomId": roomId});
+						socket.emit('scene1 i finish', { "roomId": roomId });
 						console.log('shuffle is done');
 					} else {
 						// do nothing
@@ -753,23 +753,29 @@ class Game {
 	}
 
 	goToScene1() {
+		const theData = {
+			"algorithm": "BubbleSort",
+			"type": "LEARN"
+		}
+		const jsonData = JSON.stringify(theData);
+
 		$.ajax({
 			type: "POST",
 			url: "http://3.208.228.114:8080/user/addAlgorithm",
-			data: {
-				"algorithm": "冒泡排序",
-				"type": "LEARN"
+			data: jsonData,
+			headers: {
+				"token": sessionStorage.getItem("token"),
+				"Content-Type": "Application/json"
 			},
-			beforeSend: function (XMLHttpRequest) {
-				let token = sessionStorage.getItem("token");
-				if (token !== undefined && token !== null) {
-					XMLHttpRequest.setRequestHeader("token", token);
-				}
+			success: function (data) {
+
+				console.log("ajax sucess", data)
 			},
-			dataType: "json",
-			ContentType: "application/json",
-			success: function () {}
-		});	
+			error: function (xhr, status, error) {
+				// 请求失败的处理
+				console.log(error)
+			}
+		});
 
 		const game = this;
 		const socket = game.player.socket;
@@ -779,7 +785,7 @@ class Game {
 			return;
 		}
 
-		socket.emit('scene1 getCurrent', {"roomId": roomId});
+		socket.emit('scene1 getCurrent', { "roomId": roomId });
 
 		game.player.object.position.y = 10000 + 500;
 		game.player.object.position.x = -900 - 1210;
@@ -796,22 +802,28 @@ class Game {
 	}
 
 	goToScene2() {
+		const theData = {
+			"algorithm": "BST",
+			"type": "LEARN"
+		}
+		const jsonData = JSON.stringify(theData);
+
 		$.ajax({
 			type: "POST",
 			url: "http://3.208.228.114:8080/user/addAlgorithm",
-			data: {
-				"algorithm": "二叉树遍历",
-				"type": "LEARN"
+			data: jsonData,
+			headers: {
+				"token": sessionStorage.getItem("token"),
+				"Content-Type": "Application/json"
 			},
-			beforeSend: function (XMLHttpRequest) {
-				let token = sessionStorage.getItem("token");
-				if (token !== undefined && token !== null) {
-					XMLHttpRequest.setRequestHeader("token", token);
-				}
+			success: function (data) {
+
+				console.log("ajax sucess", data)
 			},
-			dataType: "json",
-			ContentType: "application/json",
-			success: function () {}
+			error: function (xhr, status, error) {
+				// 请求失败的处理
+				console.log(error)
+			}
 		});
 
 		const game = this;
@@ -1377,7 +1389,7 @@ class Game {
 			game.colliders.push(game.scene2.boardMesh);
 
 			const EVENT_MOUSEDOWN_onBoard2 = (ev) => {
-				if (game.scene2.info === true)	
+				if (game.scene2.info === true)
 					return;
 				const mouse = new THREE.Vector2();
 				mouse.x = (ev.clientX / window.innerWidth) * 2 - 1;
@@ -1386,7 +1398,7 @@ class Game {
 				raycaster.setFromCamera(mouse, game.camera);
 				const intersects = raycaster.intersectObjects(game.colliders);
 				console.log(intersects[0]);
-				if (intersects.length === 0 )
+				if (intersects.length === 0)
 					return;
 				if (intersects[0].object.isBoard2) {
 					let info = document.getElementById("info");
@@ -1412,7 +1424,7 @@ class Game {
 
 			document.addEventListener('mousedown', EVENT_MOUSEDOWN_onBoard2, false);
 
-			
+
 
 
 
@@ -1550,22 +1562,28 @@ class Game {
 
 
 	goToScene3() {
+		const theData = {
+			"algorithm": "SelectSort",
+			"type": "LEARN"
+		}
+		const jsonData = JSON.stringify(theData);
+
 		$.ajax({
 			type: "POST",
 			url: "http://3.208.228.114:8080/user/addAlgorithm",
-			data: {
-				"algorithm": "选择排序",
-				"type": "LEARN"
+			data: jsonData,
+			headers: {
+				"token": sessionStorage.getItem("token"),
+				"Content-Type": "Application/json"
 			},
-			beforeSend: function (XMLHttpRequest) {
-				let token = sessionStorage.getItem("token");
-				if (token !== undefined && token !== null) {
-					XMLHttpRequest.setRequestHeader("token", token);
-				}
+			success: function (data) {
+
+				console.log("ajax sucess", data)
 			},
-			// dataType: "json",
-			ContentType: "application/json",
-			success: function () {}
+			error: function (xhr, status, error) {
+				// 请求失败的处理
+				console.log(error)
+			}
 		});
 
 		const game = this;
@@ -1630,7 +1648,7 @@ class Game {
 							}
 						}
 					}
-					let action = {"light_min": [min_i, list[min_i]]};
+					let action = { "light_min": [min_i, list[min_i]] };
 
 					if (min_i != i) {
 						action["swap"] = [i, min_i, list[i], list[min_i]];
@@ -1642,7 +1660,7 @@ class Game {
 					list[i] = list[min_i];
 					list[min_i] = temp;
 				}
-					console.log('selectSort record', record);
+				console.log('selectSort record', record);
 				return record;
 			}
 
@@ -1701,7 +1719,7 @@ class Game {
 			game.colliders.push(game.scene3.boardMesh);
 
 			const EVENT_MOUSEDOWN_onBoard3 = (ev) => {
-				if (game.scene3.info === true)	
+				if (game.scene3.info === true)
 					return;
 				const mouse = new THREE.Vector2();
 				mouse.x = (ev.clientX / window.innerWidth) * 2 - 1;
@@ -1710,7 +1728,7 @@ class Game {
 				raycaster.setFromCamera(mouse, game.camera);
 				const intersects = raycaster.intersectObjects(game.colliders);
 				console.log(intersects[0]);
-				if (intersects.length === 0 )
+				if (intersects.length === 0)
 					return;
 				if (intersects[0].object.isBoard3) {
 					let info = document.getElementById("info");
@@ -1871,7 +1889,7 @@ class Game {
 
 							// ap在bp的右侧。左侧是x轴负方向，上侧是y轴正方向。
 							let action = game.scene3.selectSort.record[game.scene3.selectSort.cur_ins];
-							
+
 							let swap_pair;
 							let ap, bp;
 							let a, b;
@@ -2069,7 +2087,7 @@ class Game {
 			game.colliders.push(floor);
 			game.scene4 = {};
 			game.scene4.floor = floor;
-			
+
 
 
 			let bbb = new THREE.BoxGeometry(200, 200, 200);
@@ -2512,11 +2530,11 @@ class Game {
 function createTextSprite(text, backgroundColor, textColor) {
 	const canvas = document.createElement('canvas');
 	const context = canvas.getContext('2d');
-	
+
 	// 测量文字的宽度
 	context.font = 'Bold 20px Arial';
 	const textWidth = context.measureText(text).width;
-	
+
 	// 设置矩形的宽度为文字宽度加上一定的边距
 	const padding = 10;
 	const rectWidth = textWidth + padding * 2;
@@ -2524,7 +2542,7 @@ function createTextSprite(text, backgroundColor, textColor) {
 	const borderRadius = 10;
 	const shadowBlur = 5;
 	const shadowColor = 'rgba(0, 0, 0, 0.5)';
-	
+
 	// 绘制背景矩形
 	context.fillStyle = backgroundColor;
 	context.shadowBlur = shadowBlur;
@@ -2541,23 +2559,23 @@ function createTextSprite(text, backgroundColor, textColor) {
 	context.quadraticCurveTo(0, 0, borderRadius, 0);
 	context.closePath();
 	context.fill();
-  
+
 	// 绘制文字
 	context.font = 'Bold 20px Arial';
 	context.fillStyle = textColor;
 	context.textAlign = 'center';
 	context.textBaseline = 'middle';
 	context.fillText(text, rectWidth / 2, rectHeight / 2);
-  
+
 	const texture = new THREE.CanvasTexture(canvas);
 	const spriteMaterial = new THREE.SpriteMaterial({ map: texture });
 	const sprite = new THREE.Sprite(spriteMaterial);
 
-  
-	return sprite;
-  }
 
-  
+	return sprite;
+}
+
+
 class Player {
 	constructor(game, options) {
 		this.local = true;
@@ -2576,13 +2594,13 @@ class Player {
 				player.selected_skin = "黑旋风";
 				player.selected_character = "rabbit";
 			}
-			player.name_text =sessionStorage.getItem("username")
+			player.name_text = sessionStorage.getItem("username")
 		} else if (typeof options == 'object') {
 			this.local = false;
 			this.options = options;
 			this.id = options.id;
 			player.selected_character = options.model;
-			player.selected_skin  = options.colour;
+			player.selected_skin = options.colour;
 			player.name_text = options.name
 		} else {
 			model = options;
@@ -2625,14 +2643,14 @@ class Player {
 			player.object.rotation.set(0, 2.6, 0);
 
 			player.object.add(object);
-			
+
 			player.name = createTextSprite(player.name_text, 'rgba(0, 255, 0, 0.5)', 'white');
-		
+
 			player.name.position.y = 300
-			player.name.rotation.y = -Math.PI/2
-			player.name.scale.set(150,150,150)
+			player.name.rotation.y = -Math.PI / 2
+			player.name.scale.set(150, 150, 150)
 			player.object.add(player.name)
-			
+
 			if (player.deleted === undefined) game.scene.add(player.object);
 
 			if (player.local) {
@@ -2695,7 +2713,7 @@ class Player {
 
 	update(dt) {
 		this.mixer.update(dt);
-		
+
 		if (this.game.remoteData.length > 0) {
 			let found = false;
 			for (let data of this.game.remoteData) {
@@ -2709,7 +2727,7 @@ class Player {
 			}
 			if (!found) this.game.removePlayer(this);
 		}
-		
+
 	}
 }
 
@@ -2772,16 +2790,16 @@ class PlayerLocal extends Player {
 
 		this.socket = socket;
 
-		socket.on('scene1 getCurrent', function(data) {
+		socket.on('scene1 getCurrent', function (data) {
 
 		});
-		socket.on('scene1 next', function(data) {
+		socket.on('scene1 next', function (data) {
 
 		});
-		socket.on('scene1 restart', function(data) {
+		socket.on('scene1 restart', function (data) {
 
 		});
-		socket.on('scene1 shuffle', function(data) {
+		socket.on('scene1 shuffle', function (data) {
 
 		});
 	}
@@ -2796,7 +2814,7 @@ class PlayerLocal extends Player {
 			z: this.object.position.z,
 			h: this.object.rotation.y,
 			pb: this.object.rotation.x,
-			name:this.name_text
+			name: this.name_text
 		});
 	}
 
