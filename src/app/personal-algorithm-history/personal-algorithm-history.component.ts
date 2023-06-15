@@ -17,20 +17,18 @@ export class PersonalAlgorithmHistoryComponent {
       private userService : UserService,
       private router : Router
   ) {
-    this.algorithm2index.set("冒泡排序", 1);
-    this.algorithm2index.set("选择排序", 2);
-    this.algorithm2index.set("二叉树遍历", 3);
-    this.algorithm2index.set("BST", 4);
-    this.algorithm2index.set("HeapSort", 5);
-    this.algorithm2index.set("MergeSort", 6);
-    this.algorithm2index.set("QuickSort", 7);
-    this.index2algorithm.set(1, "冒泡排序");
-    this.index2algorithm.set(2, "选择排序");
-    this.index2algorithm.set(3, "二叉树遍历");
-    this.index2algorithm.set(4, "BST");
-    this.index2algorithm.set(5, "HeapSort");
-    this.index2algorithm.set(6, "MergeSort");
-    this.index2algorithm.set(7, "QuickSort");
+    this.algorithm2index.set("BubbleSort", 1);
+    this.algorithm2index.set("SelectSort", 2);
+    this.algorithm2index.set("BST", 3);
+    this.algorithm2index.set("HeapSort", 4);
+    this.algorithm2index.set("MergeSort", 5);
+    this.algorithm2index.set("QuickSort", 6);
+    this.index2algorithm.set(1, "BubbleSort");
+    this.index2algorithm.set(2, "SelectSort");
+    this.index2algorithm.set(3, "BST");
+    this.index2algorithm.set(4, "HeapSort");
+    this.index2algorithm.set(5, "MergeSort");
+    this.index2algorithm.set(6, "QuickSort");
   }
 
   ngAfterViewInit() {
