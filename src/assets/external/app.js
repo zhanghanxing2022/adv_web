@@ -15,8 +15,6 @@ const rooms = {};
 app.use(express.static('./'));
 app.use(express.static('libs/'));
 
-<<<<<<< Updated upstream
-=======
 function loadScene1() {
 	let valList = [1, 2, 3, 4, 5, 6, 7, 8];
 	valList.sort(function () { return Math.random() > 0.5 ? -1 : 1; });
@@ -28,7 +26,6 @@ function loadScene1() {
 	state.finish_num = 0;
 	return state;
 }
->>>>>>> Stashed changes
 
 io.sockets.on('connection', function (socket) {
 	socket.userData = { x: 0, y: 0, z: 0, heading: 0 };//Default values;

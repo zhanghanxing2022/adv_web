@@ -2384,10 +2384,7 @@ class Game {
 		});
 
 		this.remotePlayers = remotePlayers;
-<<<<<<< Updated upstream
-=======
 		// console.log(this.remotePlayers)
->>>>>>> Stashed changes
 		this.remoteColliders = remoteColliders;
 		this.remotePlayers.forEach(function (player) { player.update(dt); });
 	}
@@ -2732,10 +2729,7 @@ class PlayerLocal extends Player {
 		});
 		socket.on('remoteData', function (data) {
 			game.remoteData = data;
-<<<<<<< Updated upstream
-=======
 			// console.log(data)
->>>>>>> Stashed changes
 		});
 		socket.on('deletePlayer', function (data) {
 			const players = game.remotePlayers.filter(function (player) {
