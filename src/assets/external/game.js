@@ -1267,15 +1267,18 @@ class Game {
 				}
 			}
 			F.midOrder = function () {
+				// 当前高亮结点 取消高亮
+				let cur_ins = game.scene2.BSTtraverse.cur_ins;
+				let orderList = game.scene2.BSTtraverse.orderList;
+				if (orderList !== undefined && cur_ins !== undefined) {
+					orderList[cur_ins].box.material.map = new THREE.CanvasTexture(game.scene2.utils.getNumCanvas(orderList[cur_ins].val, '#700BE1', '#FFD795'));
+				}
 				game.scene2.BSTtraverse.type = 'midOrder';
-				let orderList = [];
+				orderList = [];
 				let root = game.scene2.BSTtraverse.BST;
 				F.getMidOrderList(root, orderList);
 				console.log(orderList);
 				game.scene2.BSTtraverse.orderList = orderList;
-				// 当前高亮结点 取消高亮
-				let cur_ins = game.scene2.BSTtraverse.cur_ins;
-				orderList[cur_ins].box.material.map = new THREE.CanvasTexture(game.scene2.utils.getNumCanvas(orderList[cur_ins].val, '#700BE1', '#FFD795'));
 				// 首个结点高亮
 				game.scene2.BSTtraverse.cur_ins = 0;
 				orderList[0].box.material.map = new THREE.CanvasTexture(game.scene2.utils.getNumCanvas(orderList[0].val, '#21FFB2', '#FF21E7'));
