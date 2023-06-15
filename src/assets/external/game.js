@@ -2491,7 +2491,7 @@ class Game {
 		this.updateRemotePlayers(dt);
 
 		// 本地玩家动作的变化
-		if (this.player.mixer != undefined && this.mode == this.modes.ACTIVE) this.player.mixer.update(1);
+		if (this.player.mixer != undefined && this.mode == this.modes.ACTIVE) this.player.mixer.update(0.02);
 		if (this.player.action == 'Walking') {
 			const elapsedTime = Date.now() - this.player.actionTime;
 			if (elapsedTime > 1000 && this.player.motion.forward > 0) {
@@ -2901,10 +2901,10 @@ class PlayerLocal extends Player {
 
 		if (!blocked) {
 			if (this.motion.forward > 0) {
-				const speed = (this.action == 'Running') ? 500 * 6 : 150 * 6;
+				const speed = (this.action == 'Running') ? 500 * 3 : 150 * 3;
 				this.object.translateZ(dt * speed);
 			} else if (this.action != "Idle") {
-				this.object.translateZ(-dt * 30);
+				this.object.translateZ(-dt * 120 * 3);
 			}
 		}
 
