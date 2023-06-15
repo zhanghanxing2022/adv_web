@@ -240,6 +240,10 @@ class Game {
 
 			game.scene.background = textureCube;
 
+			game.loadScene1();
+			game.loadScene2();
+			game.loadScene3();
+
 			game.loadNextAnim(loader);
 		})
 	}
@@ -273,33 +277,11 @@ class Game {
 
 	}
 
-	goToScene1() {
-		// $.ajax({
-		// 	type: "POST",
-		// 	url: "",
-		// 	data: {
-		// 		"algorithm": "冒泡排序",
-		// 		"type": "LEARN"
-		// 	},
-		// 	beforeSend: function (XMLHttpRequest) {
-		// 		let token = sessionStorage.getItem("token");
-		// 		if (token !== undefined && token !== null) {
-		// 			XMLHttpRequest.setRequestHeader("token", token);
-		// 		}
-		// 	},
-		// 	dataType: "json",
-		// 	ContentType: "application/json",
-		// 	success: function () {}
-		// });
-
-		const game = this;
-
+	loadScene1() {
 		if (game.scene1 === undefined) {
 			console.log('loading scene1');
-
 			// 存储到game.scene1之中
 			game.scene1 = {};
-
 			// 一些工具函数
 			game.scene1.utils = {};
 			game.scene1.utils.getNumCanvas = function (i, bgc, fc) {
@@ -351,6 +333,32 @@ class Game {
 					}
 				}
 				return record;
+			}
+			game.scene1.utils.getCurrentState = function () {
+				let list = game.scene1.bubbleSort.valList.concat();
+				let k = 0;
+				let num;
+				if (game.scene1.bubbleSort.cur_ins < game.scene1.bubbleSort.record.length) {
+					num = game.scene1.bubbleSort.cur_ins;
+				} else {
+					num = game.scene1.bubbleSort.record.length
+				}
+				if (k == num) {
+					return list;
+				}
+				for (let i = 0; i <= list.length - 2; i++) {
+					for (let j = list.length - 1; j >= i + 1; j--) {
+						if (list[j] < list[j - 1]) {
+							let temp = list[j];
+							list[j] = list[j - 1];
+							list[j - 1] = temp;
+							k++;
+							if (k == num) {
+								return list;
+							}
+						}
+					}
+				}
 			}
 
 			// 彩色花纹地板
@@ -513,22 +521,31 @@ class Game {
 							if (i == 0) {
 								if (game.scene1 !== undefined) {
 									if (game.scene1.bubbleSort.state != undefined && game.scene1.bubbleSort.state == 'free') {
-										game.scene1.bubbleSort.instruction = 'next';
-										game.scene1.bubbleSort.state = 'busy';
+										// game.scene1.bubbleSort.instruction = 'next';
+										// game.scene1.bubbleSort.state = 'busy';
+										const socket = game.player.socket;
+										let roomId = sessionStorage.getItem("roomId");
+										socket.emit('scene1 request', {instruction: "next", roomId: roomId});
 									}
 								}
 							} else if (i == 1) {
 								if (game.scene1 !== undefined) {
 									if (game.scene1.bubbleSort.state != undefined && game.scene1.bubbleSort.state == 'free') {
-										game.scene1.bubbleSort.instruction = 'restart';
-										game.scene1.bubbleSort.state = 'busy';
+										// game.scene1.bubbleSort.instruction = 'restart';
+										// game.scene1.bubbleSort.state = 'busy';
+										const socket = game.player.socket;
+										let roomId = sessionStorage.getItem("roomId");
+										socket.emit('scene1 request', {instruction: "restart", roomId: roomId});
 									}
 								}
 							} else if (i == 2) {
 								if (game.scene1 !== undefined) {
 									if (game.scene1.bubbleSort.state != undefined && game.scene1.bubbleSort.state == 'free') {
-										game.scene1.bubbleSort.instruction = 'shuffle';
-										game.scene1.bubbleSort.state = 'busy';
+										// game.scene1.bubbleSort.instruction = 'shuffle';
+										// game.scene1.bubbleSort.state = 'busy';
+										const socket = game.player.socket;
+										let roomId = sessionStorage.getItem("roomId");
+										socket.emit('scene1 request', {instruction: "shuffle", roomId: roomId});
 									}
 								}
 							}
@@ -546,9 +563,7 @@ class Game {
 				raycaster.setFromCamera(mouse, game.camera);
 				// 计算物体和射线的焦点
 				let bubbleSortButtonList = game.scene1.bubbleSort.boxButtonList;
-				let selectSortButtonList = game.scene1.selectSort.boxButtonList
-				let clickedButtonList = bubbleSortButtonList.concat(selectSortButtonList);
-				const intersects = raycaster.intersectObjects(clickedButtonList);
+				const intersects = raycaster.intersectObjects(bubbleSortButtonList);
 
 				if (intersects.length > 0) {
 					for (let i = 0; i < 3; i++) {
@@ -563,8 +578,24 @@ class Game {
 
 			document.addEventListener("mousedown", mouseDownBoxButton, false);
 			document.addEventListener("mouseup", mouseUpBoxButton, false);
-
+		
 			game.scene1.bubbleSort.state = "free";	// free表示可以执行指令，busy表示正在执行指令
+			
+			const socket = game.player.socket;
+			// 获取服务器当前的实际数据
+			socket.on('scene1 sendCurrent', function (data) {
+						console.log('data', data);
+				game.scene1.bubbleSort.cur_ins = data.cur_ins;
+				game.scene1.bubbleSort.valList = data.valList;
+				game.scene1.bubbleSort.record = game.scene1.utils.getBubbleSortRecord();
+				let valList = game.scene1.utils.getCurrentState();
+				for (let i = 0; i < 8; i++) {
+					game.scene1.bubbleSort.boxList[i].material.map = new THREE.CanvasTexture(game.scene1.utils.getNumCanvas(valList[i], '#700BE1', '#FFD795'));
+				}
+				
+				game.scene1.bubbleSort.state = data.state;
+				game.scene1.bubbleSort.instruction = data.instruction;
+			});	
 
 			// 排序动画演示
 			game.scene1.animate = function (dt) {
@@ -664,9 +695,13 @@ class Game {
 
 						// once done, become free
 						if (game.scene1.bubbleSort.swap_state == 'finish') {
+							// game.scene1.bubbleSort.cur_ins += 1;
+							// game.scene1.bubbleSort.state = 'free'
+							const socket = game.player.socket;
+							let roomId = sessionStorage.getItem("roomId");
+							socket.emit('scene1 i finish', {"roomId": roomId, "record_length": game.scene1.bubbleSort.record.length});
+							game.scene1.bubbleSort.instruction = undefined;
 							console.log('next is done');
-							game.scene1.bubbleSort.cur_ins += 1;
-							game.scene1.bubbleSort.state = 'free'
 							delete game.scene1.bubbleSort.swap_state;
 						}
 
@@ -680,31 +715,71 @@ class Game {
 						}
 
 						// once done, become free
+						const socket = game.player.socket;
+						let roomId = sessionStorage.getItem("roomId");
+						socket.emit('scene1 i finish', {"roomId": roomId});
+						game.scene1.bubbleSort.instruction = undefined;
 						console.log('restart is done');
-						game.scene1.bubbleSort.cur_ins = 0;
-						game.scene1.bubbleSort.state = 'free'
+
+						// game.scene1.bubbleSort.cur_ins = 0;
+						// game.scene1.bubbleSort.state = 'free'
 					} else if (game.scene1.bubbleSort.instruction == 'shuffle') {
 						// do shuffle
 						console.log('doing shuffle...');
 
-						let valList = [1, 2, 3, 4, 5, 6, 7, 8];
-						valList.sort(function () { return Math.random() > 0.5 ? -1 : 1; });
-						game.scene1.bubbleSort.valList = valList.concat();
-						game.scene1.bubbleSort.record = game.scene1.utils.getBubbleSortRecord();
-
-						let list = game.scene1.bubbleSort.valList;
-						for (let i = 0; i < list.length; i++) {
-							game.scene1.bubbleSort.boxList[i].material.map = new THREE.CanvasTexture(game.scene1.utils.getNumCanvas(list[i], '#700BE1', '#FFD795'));
-						}
-
 						// once done, become free
+						// game.scene1.bubbleSort.cur_ins = 0;
+						// game.scene1.bubbleSort.state = 'free';
+
+						const socket = game.player.socket;
+						let roomId = sessionStorage.getItem("roomId");
+						game.scene1.bubbleSort.instruction = undefined;
+						socket.emit('scene1 i finish', {"roomId": roomId});
 						console.log('shuffle is done');
-						game.scene1.bubbleSort.cur_ins = 0;
-						game.scene1.bubbleSort.state = 'free';
+					} else {
+						// do nothing
 					}
 				}
 			}
 		}
+	}
+
+	loadScene2() {
+
+	}
+
+	loadScene3() {
+
+	}
+
+	goToScene1() {
+		$.ajax({
+			type: "POST",
+			url: "http://3.208.228.114:8080/user/addAlgorithm",
+			data: {
+				"algorithm": "冒泡排序",
+				"type": "LEARN"
+			},
+			beforeSend: function (XMLHttpRequest) {
+				let token = sessionStorage.getItem("token");
+				if (token !== undefined && token !== null) {
+					XMLHttpRequest.setRequestHeader("token", token);
+				}
+			},
+			dataType: "json",
+			ContentType: "application/json",
+			success: function () {}
+		});	
+
+		const game = this;
+		const socket = game.player.socket;
+		let roomId = sessionStorage.getItem("roomId");
+		if (roomId == null) {
+			alert("roomId is null!");
+			return;
+		}
+
+		socket.emit('scene1 getCurrent', {"roomId": roomId});
 
 		game.player.object.position.y = 10000 + 500;
 		game.player.object.position.x = -900 - 1210;
@@ -721,23 +796,23 @@ class Game {
 	}
 
 	goToScene2() {
-		// $.ajax({
-		// 	type: "POST",
-		// 	url: "",
-		// 	data: {
-		// 		"algorithm": "二叉树遍历",
-		// 		"type": "LEARN"
-		// 	},
-		// 	beforeSend: function (XMLHttpRequest) {
-		// 		let token = sessionStorage.getItem("token");
-		// 		if (token !== undefined && token !== null) {
-		// 			XMLHttpRequest.setRequestHeader("token", token);
-		// 		}
-		// 	},
-		// 	dataType: "json",
-		// 	ContentType: "application/json",
-		// 	success: function () {}
-		// });
+		$.ajax({
+			type: "POST",
+			url: "http://3.208.228.114:8080/user/addAlgorithm",
+			data: {
+				"algorithm": "二叉树遍历",
+				"type": "LEARN"
+			},
+			beforeSend: function (XMLHttpRequest) {
+				let token = sessionStorage.getItem("token");
+				if (token !== undefined && token !== null) {
+					XMLHttpRequest.setRequestHeader("token", token);
+				}
+			},
+			dataType: "json",
+			ContentType: "application/json",
+			success: function () {}
+		});
 
 		const game = this;
 
@@ -1475,23 +1550,23 @@ class Game {
 
 
 	goToScene3() {
-		// $.ajax({
-		// 	type: "POST",
-		// 	url: "",
-		// 	data: {
-		// 		"algorithm": "选择排序",
-		// 		"type": "LEARN"
-		// 	},
-		// 	beforeSend: function (XMLHttpRequest) {
-		// 		let token = sessionStorage.getItem("token");
-		// 		if (token !== undefined && token !== null) {
-		// 			XMLHttpRequest.setRequestHeader("token", token);
-		// 		}
-		// 	},
-		// 	dataType: "json",
-		// 	ContentType: "application/json",
-		// 	success: function () {}
-		// });
+		$.ajax({
+			type: "POST",
+			url: "http://3.208.228.114:8080/user/addAlgorithm",
+			data: {
+				"algorithm": "选择排序",
+				"type": "LEARN"
+			},
+			beforeSend: function (XMLHttpRequest) {
+				let token = sessionStorage.getItem("token");
+				if (token !== undefined && token !== null) {
+					XMLHttpRequest.setRequestHeader("token", token);
+				}
+			},
+			// dataType: "json",
+			ContentType: "application/json",
+			success: function () {}
+		});
 
 		const game = this;
 
@@ -2178,32 +2253,6 @@ class Game {
 						let sceneId = prompt(info);
 						game.goToScene(sceneId);
 						break;
-
-					// 测试阶段暂时使用H来触发
-					case 'KeyH':
-						if (game.scene1 !== undefined) {
-							if (game.scene1.bubbleSort.state != undefined && game.scene1.bubbleSort.state == 'free') {
-								game.scene1.bubbleSort.instruction = 'next';
-								game.scene1.bubbleSort.state = 'busy';
-							}
-						}
-						break;
-					case 'KeyG':
-						if (game.scene1 !== undefined) {
-							if (game.scene1.bubbleSort.state != undefined && game.scene1.bubbleSort.state == 'free') {
-								game.scene1.bubbleSort.instruction = 'restart';
-								game.scene1.bubbleSort.state = 'busy';
-							}
-						}
-						break;
-					case 'KeyF':
-						if (game.scene1 !== undefined) {
-							if (game.scene1.bubbleSort.state != undefined && game.scene1.bubbleSort.state == 'free') {
-								game.scene1.bubbleSort.instruction = 'shuffle';
-								game.scene1.bubbleSort.state = 'busy';
-							}
-						}
-						break;
 				}
 			}
 		};
@@ -2335,6 +2384,10 @@ class Game {
 		});
 
 		this.remotePlayers = remotePlayers;
+<<<<<<< Updated upstream
+=======
+		// console.log(this.remotePlayers)
+>>>>>>> Stashed changes
 		this.remoteColliders = remoteColliders;
 		this.remotePlayers.forEach(function (player) { player.update(dt); });
 	}
@@ -2679,6 +2732,10 @@ class PlayerLocal extends Player {
 		});
 		socket.on('remoteData', function (data) {
 			game.remoteData = data;
+<<<<<<< Updated upstream
+=======
+			// console.log(data)
+>>>>>>> Stashed changes
 		});
 		socket.on('deletePlayer', function (data) {
 			const players = game.remotePlayers.filter(function (player) {
@@ -2720,6 +2777,19 @@ class PlayerLocal extends Player {
 		});
 
 		this.socket = socket;
+
+		socket.on('scene1 getCurrent', function(data) {
+
+		});
+		socket.on('scene1 next', function(data) {
+
+		});
+		socket.on('scene1 restart', function(data) {
+
+		});
+		socket.on('scene1 shuffle', function(data) {
+
+		});
 	}
 
 	initSocket() {

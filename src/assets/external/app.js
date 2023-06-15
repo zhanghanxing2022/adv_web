@@ -15,6 +15,20 @@ const rooms = {};
 app.use(express.static('./'));
 app.use(express.static('libs/'));
 
+<<<<<<< Updated upstream
+=======
+function loadScene1() {
+	let valList = [1, 2, 3, 4, 5, 6, 7, 8];
+	valList.sort(function () { return Math.random() > 0.5 ? -1 : 1; });
+	let state = {};
+	state.valList = valList.concat();
+	state.cur_ins = 0;
+	state.state = "free";
+	state.instruction = undefined;
+	state.finish_num = 0;
+	return state;
+}
+>>>>>>> Stashed changes
 
 io.sockets.on('connection', function (socket) {
 	socket.userData = { x: 0, y: 0, z: 0, heading: 0 };//Default values;
@@ -28,10 +42,16 @@ io.sockets.on('connection', function (socket) {
 		// 检查房间是否存在，如果不存在则创建
 		if (!rooms[data.roomId]) {
 			rooms[data.roomId] = {
-				// 初始化房间数据
-				players: [],
-				// 其他房间相关数据...
+				// 初始化第一个玩家
+				players: [socket.id],
+				// 初始化场景状态
+				scene1: {}
+
 			};
+
+			rooms[data.roomId]["scene1"] = loadScene1();
+		} else {
+			rooms[data.roomId].players.push(socket.id);
 		}
 		socket.join(data.roomId);
 	});
@@ -41,22 +61,19 @@ io.sockets.on('connection', function (socket) {
 	})
 	socket.on('disconnect', function () {
 		socket.broadcast.emit('deletePlayer', { id: socket.id });
-		const currentRoom = Object.keys(rooms).find((roomId) => {
-			return rooms[roomId].players.includes(socket);
+		
+			console.log(`${socket.id} disconnected`);
+		
+		// 将玩家从房间中移除
+		rooms[socket.userData.roomId].players = rooms[socket.userData.roomId].players.filter((player) => {
+			return player !== socket.id;
 		});
 
-		// 如果找到了房间
-		if (currentRoom) {
-			// 将玩家从房间中移除
-			rooms[currentRoom].players = rooms[currentRoom].players.filter((player) => {
-				return player !== socket;
-			});
-
-			// 如果房间中没有其他玩家，则清除该房间
-			if (rooms[currentRoom].players.length === 0) {
-				delete rooms[currentRoom];
-			}
+		// 如果房间中没有其他玩家，则清除该房间
+		if (rooms[socket.userData.roomId].players.length === 0) {
+			delete rooms[socket.userData.roomId];
 		}
+		
 	});
 
 	// 同步公共物体状态
@@ -90,12 +107,47 @@ io.sockets.on('connection', function (socket) {
 		socket.userData.z = data.z;
 		socket.userData.heading = data.h;
 		socket.userData.pb = data.pb,
-			socket.userData.action = data.action;
+		socket.userData.action = data.action;
 	});
 
 	socket.on('chat message', function (data) {
 		console.log(`chat message:${data.id} ${data.message}`);
 		io.to(data.id).emit('chat message', { id: socket.id, message: data.message });
+	})
+
+	socket.on('scene1 getCurrent', function (data) {
+		console.log(`${socket.id} scene1 getCurrent`);
+		io.to(socket.id).emit('scene1 sendCurrent', rooms[data.roomId]["scene1"]);
+	})
+
+	socket.on('scene1 request', function (data) {
+		rooms[data.roomId]["scene1"]["finish_num"] = 0;
+		rooms[data.roomId]["scene1"]["state"] = "busy";
+		rooms[data.roomId]["scene1"]["instruction"] = data.instruction;
+
+		if (data.instruction == "shuffle") {
+			rooms[data.roomId]["scene1"] = loadScene1();
+		}
+
+		io.in(data.roomId).emit('scene1 sendCurrent', rooms[data.roomId]["scene1"]);
+	});
+
+	socket.on('scene1 i finish', function(data) {
+			console.log(`scene i finish ${socket.id}`);
+		rooms[data.roomId]["scene1"]["finish_num"]++;
+		if (rooms[data.roomId]["scene1"]["finish_num"] == rooms[data.roomId]["players"].length) {
+
+				console.log(`scene all finish`);
+			rooms[data.roomId]["scene1"]["finish_num"] = 0;
+			rooms[data.roomId]["scene1"]["state"] = "free";
+			if (rooms[data.roomId]["scene1"]["instruction"] == "next") {
+				rooms[data.roomId]["scene1"]["cur_ins"]++;
+			} else {
+				rooms[data.roomId]["scene1"]["cur_ins"] = 0;
+			}
+			rooms[data.roomId]["scene1"]["instruction"] = undefined;
+			io.in(data.roomId).emit('scene1 sendCurrent', rooms[data.roomId]["scene1"]);
+		}
 	})
 });
 
